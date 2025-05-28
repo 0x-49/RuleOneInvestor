@@ -3,7 +3,7 @@ import { StockWithMetrics } from "@shared/schema";
 
 export function useFinancialData(symbol: string) {
   return useQuery<StockWithMetrics>({
-    queryKey: ["/api/stocks", symbol],
+    queryKey: [`/api/stocks/${symbol}`],
     enabled: !!symbol && symbol.length > 0,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchInterval: 1000 * 60 * 15, // 15 minutes

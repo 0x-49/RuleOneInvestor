@@ -307,6 +307,33 @@ export class DatabaseStorage implements IStorage {
     return rate;
   }
 
+  // Fixed calculation method that caps unrealistic growth rates
+  private calculateBigFourGrowthFixed(metrics: any[]) {
+    if (metrics.length < 2) return undefined;
+
+    const sortedMetrics = metrics.sort((a: any, b: any) => parseInt(a.year) - parseInt(b.year));
+    
+    if (metrics.length < 10) {
+      console.warn(`Data Quality Warning: Only ${metrics.length} years of data available. Rule One methodology requires 10 years.`);
+    }
+    
+    const calculateCAGR = (endValue: number, startValue: number, years: number) => {
+      if (startValue <= 0) return 0;
+      return (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
+    };
+
+    const years = sortedMetrics.length - 1;
+    const first = sortedMetrics[0];
+    const last = sortedMetrics[sortedMetrics.length - 1];
+
+    return {
+      salesGrowth: this.capGrowthRate(calculateCAGR(last.revenue || 0, first.revenue || 1, years)),
+      epsGrowth: this.capGrowthRate(calculateCAGR(last.eps || 0, first.eps || 1, years)),
+      equityGrowth: this.capGrowthRate(calculateCAGR(last.bookValue || 0, first.bookValue || 1, years)),
+      fcfGrowth: this.capGrowthRate(calculateCAGR(last.freeCashFlow || 0, first.freeCashFlow || 1, years)),
+    };
+  }
+
   async getStock(symbol: string): Promise<Stock | undefined> {
     const [stock] = await db.select().from(stocks).where(eq(stocks.symbol, symbol.toUpperCase()));
     return stock || undefined;

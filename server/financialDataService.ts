@@ -228,7 +228,7 @@ interface FMPBalanceSheetData {
 }
 
 export class FinancialDataService {
-  private readonly FMP_API_KEY = "LKODerELb8EZDzg1tl275H8MQoupFnY1";
+  private readonly FMP_API_KEY = process.env.FMP_API_KEY || "LKODerELb8EZDzg1tl275H8MQoupFnY1";
   private readonly FMP_BASE_URL = "https://financialmodelingprep.com/api/v3";
 
   async fetchStockData(symbol: string): Promise<InsertStock | null> {
@@ -248,13 +248,23 @@ export class FinancialDataService {
 
   async fetchFinancialMetrics(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {
     try {
-      // Try Yahoo Finance first
-      const yahooMetrics = await this.fetchYahooFinancialMetrics(symbol, stockId);
-      if (yahooMetrics && yahooMetrics.length > 0) return yahooMetrics;
-
-      // Fallback to Financial Modeling Prep
+      // Try Financial Modeling Prep first for better 10-year data
       const fmpMetrics = await this.fetchFMPFinancialMetrics(symbol, stockId);
-      return fmpMetrics;
+      if (fmpMetrics && fmpMetrics.length >= 5) {
+        console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`);
+        return fmpMetrics;
+      }
+
+      // Fallback to Yahoo Finance
+      console.log(`⚠️ FMP returned insufficient data for ${symbol}, trying Yahoo Finance...`);
+      const yahooMetrics = await this.fetchYahooFinancialMetrics(symbol, stockId);
+      if (yahooMetrics && yahooMetrics.length > 0) {
+        console.log(`✅ Got ${yahooMetrics.length} years of data from Yahoo for ${symbol}`);
+        return yahooMetrics;
+      }
+
+      console.warn(`❌ No reliable financial data found for ${symbol}`);
+      return [];
     } catch (error) {
       console.error(`Error fetching financial metrics for ${symbol}:`, error);
       return [];

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -154,7 +155,9 @@ export default function Screening() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="container mx-auto p-6 space-y-6">
+        <Navigation />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -515,6 +518,7 @@ export default function Screening() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

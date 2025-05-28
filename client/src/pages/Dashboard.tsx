@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navigation from "@/components/Navigation";
 import StockSearch from "@/components/StockSearch";
 import StockSelector from "@/components/StockSelector";
 import BigFourMetrics from "@/components/BigFourMetrics";

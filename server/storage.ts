@@ -46,7 +46,9 @@ export interface IStorage {
   
   // User operations (required for authentication)
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  createUser(user: UpsertUser): Promise<User>;
 }
 
 export class MemStorage implements IStorage {
@@ -279,12 +281,18 @@ export class MemStorage implements IStorage {
 
   // User operations (required for authentication)
   async getUser(id: string): Promise<User | undefined> {
-    // Not implemented for in-memory storage
+    return undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
     return undefined;
   }
 
   async upsertUser(user: UpsertUser): Promise<User> {
-    // Not implemented for in-memory storage
+    throw new Error("User operations not supported in memory storage");
+  }
+
+  async createUser(user: UpsertUser): Promise<User> {
     throw new Error("User operations not supported in memory storage");
   }
 }
@@ -498,6 +506,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -509,6 +522,14 @@ export class DatabaseStorage implements IStorage {
           updatedAt: new Date(),
         },
       })
+      .returning();
+    return user;
+  }
+
+  async createUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
       .returning();
     return user;
   }

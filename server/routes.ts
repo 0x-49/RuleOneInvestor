@@ -18,8 +18,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      // For Google OAuth, user is directly available from req.user
+      const user = req.user;
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);

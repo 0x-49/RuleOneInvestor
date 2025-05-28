@@ -6,6 +6,12 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Add explicit API route handling middleware
+  app.use('/api', (req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    next();
+  });
+  
   // Stock search endpoint
   app.get("/api/stocks/search", async (req, res) => {
     try {

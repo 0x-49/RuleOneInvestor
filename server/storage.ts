@@ -573,6 +573,44 @@ async function initializeSampleData() {
 
       await db.insert(financialMetrics).values(aaplMetrics);
     }
+
+    // Sample financial metrics for AMZN
+    const amznStock = insertedStocks.find(s => s.symbol === "AMZN");
+    if (amznStock) {
+      const amznMetrics = [
+        { stockId: amznStock.id, year: "2014", revenue: 89.0, earnings: -0.2, freeCashFlow: 1.9, bookValue: 19.3, eps: -0.52, roic: -0.8, debt: 8.2 },
+        { stockId: amznStock.id, year: "2015", revenue: 111.0, earnings: 0.6, freeCashFlow: 7.3, bookValue: 25.3, eps: 1.25, roic: 1.4, debt: 8.2 },
+        { stockId: amznStock.id, year: "2016", revenue: 136.0, earnings: 2.4, freeCashFlow: 9.7, bookValue: 32.2, eps: 4.90, roic: 4.2, debt: 7.7 },
+        { stockId: amznStock.id, year: "2017", revenue: 178.0, earnings: 3.0, freeCashFlow: 18.4, bookValue: 43.5, eps: 6.15, roic: 5.1, debt: 24.7 },
+        { stockId: amznStock.id, year: "2018", revenue: 233.0, earnings: 10.1, freeCashFlow: 19.4, bookValue: 62.1, eps: 20.14, roic: 12.8, debt: 23.5 },
+        { stockId: amznStock.id, year: "2019", revenue: 281.0, earnings: 11.6, freeCashFlow: 25.8, bookValue: 78.4, eps: 23.01, roic: 13.2, debt: 32.7 },
+        { stockId: amznStock.id, year: "2020", revenue: 386.0, earnings: 21.3, freeCashFlow: 31.0, bookValue: 93.4, eps: 41.83, roic: 18.1, debt: 67.1 },
+        { stockId: amznStock.id, year: "2021", revenue: 470.0, earnings: 33.4, freeCashFlow: 46.3, bookValue: 138.2, eps: 64.81, roic: 16.2, debt: 48.4 },
+        { stockId: amznStock.id, year: "2022", revenue: 514.0, earnings: -2.7, freeCashFlow: -16.9, bookValue: 146.0, eps: -5.12, roic: -1.2, debt: 67.2 },
+        { stockId: amznStock.id, year: "2023", revenue: 575.0, earnings: 15.3, freeCashFlow: 35.5, bookValue: 201.9, eps: 14.87, roic: 6.1, debt: 58.3 }
+      ];
+
+      await db.insert(financialMetrics).values(amznMetrics);
+    }
+
+    // Sample financial metrics for MSFT
+    const msftStock = insertedStocks.find(s => s.symbol === "MSFT");
+    if (msftStock) {
+      const msftMetrics = [
+        { stockId: msftStock.id, year: "2014", revenue: 86.8, earnings: 22.1, freeCashFlow: 28.3, bookValue: 89.8, eps: 2.63, roic: 16.4, debt: 20.6 },
+        { stockId: msftStock.id, year: "2015", revenue: 93.6, earnings: 12.2, freeCashFlow: 24.1, bookValue: 96.5, eps: 1.48, roic: 8.7, debt: 27.8 },
+        { stockId: msftStock.id, year: "2016", revenue: 85.3, earnings: 16.8, freeCashFlow: 20.9, bookValue: 71.9, eps: 2.10, roic: 12.3, debt: 36.9 },
+        { stockId: msftStock.id, year: "2017", revenue: 90.0, earnings: 21.2, freeCashFlow: 24.3, bookValue: 87.7, eps: 2.73, roic: 13.7, debt: 76.0 },
+        { stockId: msftStock.id, year: "2018", revenue: 110.4, earnings: 16.6, freeCashFlow: 43.9, bookValue: 82.7, eps: 2.13, roic: 11.1, debt: 72.2 },
+        { stockId: msftStock.id, year: "2019", revenue: 125.8, earnings: 39.2, freeCashFlow: 38.3, bookValue: 102.3, eps: 5.06, roic: 17.2, debt: 66.7 },
+        { stockId: msftStock.id, year: "2020", revenue: 143.0, earnings: 44.3, freeCashFlow: 45.2, bookValue: 118.3, eps: 5.76, roic: 15.9, debt: 63.3 },
+        { stockId: msftStock.id, year: "2021", revenue: 168.1, earnings: 61.3, freeCashFlow: 56.1, bookValue: 141.9, eps: 8.05, roic: 18.1, debt: 67.8 },
+        { stockId: msftStock.id, year: "2022", revenue: 198.3, earnings: 72.7, freeCashFlow: 65.1, bookValue: 166.5, eps: 9.65, roic: 18.4, debt: 61.0 },
+        { stockId: msftStock.id, year: "2023", revenue: 211.9, earnings: 72.4, freeCashFlow: 28.1, bookValue: 206.2, eps: 9.65, roic: 16.2, debt: 58.5 }
+      ];
+
+      await db.insert(financialMetrics).values(msftMetrics);
+    }
   } catch (error) {
     console.error("Error initializing sample data:", error);
   }

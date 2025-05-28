@@ -230,6 +230,8 @@ interface FMPBalanceSheetData {
 export class FinancialDataService {
   private readonly FMP_API_KEY = process.env.FMP_API_KEY || "LKODerELb8EZDzg1tl275H8MQoupFnY1";
   private readonly FMP_BASE_URL = "https://financialmodelingprep.com/api/v3";
+  private readonly ALPHA_VANTAGE_API_KEY = "WXNYFQPLJCO2ECMN";
+  private readonly ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/query";
 
   async fetchStockData(symbol: string): Promise<InsertStock | null> {
     try {
@@ -255,8 +257,16 @@ export class FinancialDataService {
         return fmpMetrics;
       }
 
+      // Try Alpha Vantage for international stocks
+      console.log(`⚠️ FMP returned insufficient data for ${symbol}, trying Alpha Vantage...`);
+      const alphaMetrics = await this.fetchAlphaVantageFinancialMetrics(symbol, stockId);
+      if (alphaMetrics && alphaMetrics.length > 0) {
+        console.log(`✅ Got ${alphaMetrics.length} years of data from Alpha Vantage for ${symbol}`);
+        return alphaMetrics;
+      }
+
       // Fallback to Yahoo Finance
-      console.log(`⚠️ FMP returned insufficient data for ${symbol}, trying Yahoo Finance...`);
+      console.log(`⚠️ Alpha Vantage returned insufficient data for ${symbol}, trying Yahoo Finance...`);
       const yahooMetrics = await this.fetchYahooFinancialMetrics(symbol, stockId);
       if (yahooMetrics && yahooMetrics.length > 0) {
         console.log(`✅ Got ${yahooMetrics.length} years of data from Yahoo for ${symbol}`);
@@ -537,6 +547,90 @@ export class FinancialDataService {
       return results;
     } catch (error) {
       console.error(`FMP search error for ${query}:`, error);
+      return [];
+    }
+  }
+
+  private async fetchAlphaVantageFinancialMetrics(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {
+    try {
+      const metrics: InsertFinancialMetrics[] = [];
+      
+      // Fetch fundamental data from Alpha Vantage
+      const [incomeResponse, balanceResponse, cashflowResponse] = await Promise.all([
+        fetch(`${this.ALPHA_VANTAGE_BASE_URL}?function=INCOME_STATEMENT&symbol=${symbol}&apikey=${this.ALPHA_VANTAGE_API_KEY}`),
+        fetch(`${this.ALPHA_VANTAGE_BASE_URL}?function=BALANCE_SHEET&symbol=${symbol}&apikey=${this.ALPHA_VANTAGE_API_KEY}`),
+        fetch(`${this.ALPHA_VANTAGE_BASE_URL}?function=CASH_FLOW&symbol=${symbol}&apikey=${this.ALPHA_VANTAGE_API_KEY}`)
+      ]);
+
+      if (!incomeResponse.ok) {
+        console.warn(`Alpha Vantage API error for ${symbol}`);
+        return [];
+      }
+
+      const [incomeData, balanceData, cashflowData] = await Promise.all([
+        incomeResponse.json(),
+        balanceResponse.json(),
+        cashflowResponse.json()
+      ]);
+
+      // Check for API limits or errors
+      if (incomeData.Note || incomeData['Error Message']) {
+        console.warn(`Alpha Vantage limit/error for ${symbol}:`, incomeData.Note || incomeData['Error Message']);
+        return [];
+      }
+
+      const annualReports = incomeData.annualReports || [];
+      const balanceReports = balanceData.annualReports || [];
+      const cashflowReports = cashflowData.annualReports || [];
+
+      // Process up to 10 years of data
+      for (let i = 0; i < Math.min(10, annualReports.length); i++) {
+        const income = annualReports[i];
+        const balance = balanceReports[i];
+        const cashflow = cashflowReports[i];
+
+        if (income && income.fiscalDateEnding) {
+          const year = income.fiscalDateEnding.substring(0, 4);
+          
+          // Calculate key metrics
+          const revenue = income.totalRevenue !== 'None' ? parseFloat(income.totalRevenue) || null : null;
+          const earnings = income.netIncome !== 'None' ? parseFloat(income.netIncome) || null : null;
+          
+          let freeCashFlow = null;
+          if (cashflow && cashflow.operatingCashflow !== 'None' && cashflow.capitalExpenditures !== 'None') {
+            freeCashFlow = parseFloat(cashflow.operatingCashflow) - Math.abs(parseFloat(cashflow.capitalExpenditures) || 0);
+          }
+          
+          const bookValue = balance && balance.totalShareholderEquity !== 'None' ? parseFloat(balance.totalShareholderEquity) || null : null;
+          const debt = balance && balance.totalDebt !== 'None' ? parseFloat(balance.totalDebt) || null : null;
+          
+          // Calculate EPS if shares outstanding is available
+          const sharesOutstanding = income.weightedAverageShsOut !== 'None' ? parseFloat(income.weightedAverageShsOut) || null : null;
+          const eps = earnings && sharesOutstanding ? earnings / sharesOutstanding : null;
+          
+          // Calculate ROIC
+          const equity = bookValue || 0;
+          const totalDebt = debt || 0;
+          const investedCapital = equity + totalDebt;
+          const roic = earnings && investedCapital > 0 ? (earnings / investedCapital) * 100 : null;
+
+          metrics.push({
+            stockId,
+            year,
+            revenue,
+            earnings,
+            freeCashFlow,
+            bookValue,
+            eps,
+            roic,
+            debt
+          });
+        }
+      }
+
+      return metrics.reverse(); // Return in chronological order
+    } catch (error) {
+      console.error(`Alpha Vantage error for ${symbol}:`, error);
       return [];
     }
   }

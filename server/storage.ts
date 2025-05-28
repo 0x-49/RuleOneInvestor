@@ -298,6 +298,15 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Cap extreme growth rates to prevent display of obviously wrong data
+  private capGrowthRate(rate: number): number {
+    if (Math.abs(rate) > 200) {
+      console.warn(`Data Quality Warning: Growth rate of ${rate.toFixed(1)}% detected. Capping at 200% due to likely data quality issues.`);
+      return rate > 0 ? 200 : -200;
+    }
+    return rate;
+  }
+
   async getStock(symbol: string): Promise<Stock | undefined> {
     const [stock] = await db.select().from(stocks).where(eq(stocks.symbol, symbol.toUpperCase()));
     return stock || undefined;

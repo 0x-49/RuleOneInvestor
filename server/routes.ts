@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { financialDataService } from "./financialDataService";
 import { insertStockSchema, insertWatchlistItemSchema, insertValuationInputsSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -35,9 +36,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Query parameter 'q' is required" });
       }
       
-      const stocks = await storage.searchStocks(q);
+      // Search using live financial data APIs
+      const stocks = await financialDataService.searchStocks(q);
       res.json(stocks);
     } catch (error) {
+      console.error("Error searching stocks:", error);
       res.status(500).json({ error: "Failed to search stocks" });
     }
   });
@@ -46,14 +49,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stocks/:symbol", async (req, res) => {
     try {
       const { symbol } = req.params;
-      const stock = await storage.getStockWithMetrics(symbol);
+      const upperSymbol = symbol.toUpperCase();
+      
+      // Try to get from database first
+      let stock = await storage.getStock(upperSymbol);
+      
+      if (!stock) {
+        // Fetch from live APIs if not in database
+        const stockData = await financialDataService.fetchStockData(upperSymbol);
+        if (stockData) {
+          stock = await storage.createStock(stockData);
+        }
+      }
       
       if (!stock) {
         return res.status(404).json({ error: "Stock not found" });
       }
       
-      res.json(stock);
+      // Get financial metrics
+      let metrics = await storage.getFinancialMetrics(stock.id);
+      
+      if (!metrics || metrics.length === 0) {
+        // Fetch from live APIs if not in database
+        const liveMetrics = await financialDataService.fetchFinancialMetrics(upperSymbol, stock.id);
+        if (liveMetrics.length > 0) {
+          // Store metrics in database
+          for (const metric of liveMetrics) {
+            await storage.createFinancialMetrics(metric);
+          }
+          metrics = await storage.getFinancialMetrics(stock.id);
+        }
+      }
+      
+      // Return stock with metrics and calculated data
+      const stockWithMetrics = await storage.getStockWithMetrics(upperSymbol);
+      res.json(stockWithMetrics);
     } catch (error) {
+      console.error("Error fetching stock:", error);
       res.status(500).json({ error: "Failed to fetch stock data" });
     }
   });

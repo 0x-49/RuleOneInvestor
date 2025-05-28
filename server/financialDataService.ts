@@ -354,6 +354,8 @@ export class FinancialDataService {
       const balanceSheets = result.balanceSheetHistory?.balanceSheetStatements || [];
 
       // Get last 10 years of data
+      console.log(`Fetching financial data for ${symbol}: Found ${incomeStatements.length} income statements`);
+      
       for (let i = 0; i < Math.min(10, incomeStatements.length); i++) {
         const income = incomeStatements[i];
         const cashflow = cashflowStatements[i];

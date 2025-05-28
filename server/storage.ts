@@ -3,6 +3,7 @@ import {
   financialMetrics, 
   watchlistItems, 
   valuationInputs,
+  users,
   type Stock, 
   type InsertStock,
   type FinancialMetrics,
@@ -12,7 +13,9 @@ import {
   type ValuationInputs,
   type InsertValuationInputs,
   type StockWithMetrics,
-  type NewsItem
+  type NewsItem,
+  type User,
+  type UpsertUser
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, ilike, or } from "drizzle-orm";
@@ -273,6 +276,17 @@ export class MemStorage implements IStorage {
       }
     ];
   }
+
+  // User operations (required for authentication)
+  async getUser(id: string): Promise<User | undefined> {
+    // Not implemented for in-memory storage
+    return undefined;
+  }
+
+  async upsertUser(user: UpsertUser): Promise<User> {
+    // Not implemented for in-memory storage
+    throw new Error("User operations not supported in memory storage");
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -476,6 +490,27 @@ export class DatabaseStorage implements IStorage {
         symbol: "MSFT"
       }
     ];
+  }
+
+  // User operations (required for authentication)
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 }
 

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, real, jsonb, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, real, jsonb, timestamp, boolean, varchar, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -40,6 +40,28 @@ export const valuationInputs = pgTable("valuation_inputs", {
   minimumReturn: real("minimum_return").notNull(),
 });
 
+// Session storage table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for authentication
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertStockSchema = createInsertSchema(stocks).omit({
   id: true,
   lastUpdated: true,
@@ -60,6 +82,11 @@ export const insertValuationInputsSchema = createInsertSchema(valuationInputs).o
   id: true,
 });
 
+export const insertUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type Stock = typeof stocks.$inferSelect;
 export type InsertStock = z.infer<typeof insertStockSchema>;
 export type FinancialMetrics = typeof financialMetrics.$inferSelect;
@@ -68,6 +95,8 @@ export type WatchlistItem = typeof watchlistItems.$inferSelect;
 export type InsertWatchlistItem = z.infer<typeof insertWatchlistItemSchema>;
 export type ValuationInputs = typeof valuationInputs.$inferSelect;
 export type InsertValuationInputs = z.infer<typeof insertValuationInputsSchema>;
+export type User = typeof users.$inferSelect;
+export type UpsertUser = typeof users.$inferInsert;
 
 // Additional types for frontend
 export interface StockWithMetrics extends Stock {

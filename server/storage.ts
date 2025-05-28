@@ -40,6 +40,10 @@ export interface IStorage {
   // Enhanced operations
   getStockWithMetrics(symbol: string): Promise<StockWithMetrics | undefined>;
   getNews(): Promise<NewsItem[]>;
+  
+  // User operations (required for authentication)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
 }
 
 export class MemStorage implements IStorage {

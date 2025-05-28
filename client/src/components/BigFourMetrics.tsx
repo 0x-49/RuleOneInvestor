@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp, DollarSign, BarChart3, PiggyBank, Info } from "lucide-react";
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -11,6 +13,7 @@ interface BigFourMetricsProps {
 }
 
 export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsProps) {
+  const [selectedPeriod, setSelectedPeriod] = useState<'10year' | '5year' | '1year'>('10year');
   if (isLoading) {
     return (
       <Card>
@@ -23,7 +26,7 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
         <CardContent>
           <div className="grid grid-cols-2 gap-4 mb-6">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-24" />
+              <Skeleton key={i} className="h-32" />
             ))}
           </div>
           <Skeleton className="h-64 w-full" />
@@ -47,42 +50,116 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
     );
   }
 
-  const { bigFourGrowth } = stockData;
+  // Calculate different time period averages
+  const calculatePeriodAverages = (metrics: any[], field: string, years: number) => {
+    const recentMetrics = metrics.slice(-years);
+    const growthRates = recentMetrics.map((metric, index) => {
+      if (index === 0) return null;
+      const currentValue = metric[field];
+      const previousValue = recentMetrics[index - 1][field];
+      if (!currentValue || !previousValue || previousValue <= 0) return null;
+      return ((currentValue - previousValue) / previousValue) * 100;
+    }).filter(rate => rate !== null);
+    
+    return growthRates.length > 0 
+      ? growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length 
+      : 0;
+  };
 
-  // Prepare chart data
-  const chartData = stockData.metrics.map((metric) => ({
-    year: metric.year,
-    salesGrowth: calculateYearOverYearGrowth(stockData.metrics!, metric.year, 'revenue'),
-    epsGrowth: calculateYearOverYearGrowth(stockData.metrics!, metric.year, 'eps'),
-    equityGrowth: calculateYearOverYearGrowth(stockData.metrics!, metric.year, 'bookValue'),
-    fcfGrowth: calculateYearOverYearGrowth(stockData.metrics!, metric.year, 'freeCashFlow'),
-  })).filter(item => item.salesGrowth !== null);
+  const tenYearAverages = {
+    salesGrowth: calculatePeriodAverages(stockData.metrics, 'revenue', 10),
+    epsGrowth: calculatePeriodAverages(stockData.metrics, 'eps', 10),
+    equityGrowth: calculatePeriodAverages(stockData.metrics, 'bookValue', 10),
+    fcfGrowth: calculatePeriodAverages(stockData.metrics, 'freeCashFlow', 10),
+  };
+
+  const fiveYearAverages = {
+    salesGrowth: calculatePeriodAverages(stockData.metrics, 'revenue', 5),
+    epsGrowth: calculatePeriodAverages(stockData.metrics, 'eps', 5),
+    equityGrowth: calculatePeriodAverages(stockData.metrics, 'bookValue', 5),
+    fcfGrowth: calculatePeriodAverages(stockData.metrics, 'freeCashFlow', 5),
+  };
+
+  const oneYearAverages = {
+    salesGrowth: calculatePeriodAverages(stockData.metrics, 'revenue', 2),
+    epsGrowth: calculatePeriodAverages(stockData.metrics, 'eps', 2),
+    equityGrowth: calculatePeriodAverages(stockData.metrics, 'bookValue', 2),
+    fcfGrowth: calculatePeriodAverages(stockData.metrics, 'freeCashFlow', 2),
+  };
+
+  // Prepare chart data for ALL years (not filtered)
+  const chartData = stockData.metrics?.map((metric, index) => {
+    if (index === 0) return null;
+    
+    const previousMetric = stockData.metrics![index - 1];
+    
+    const salesGrowth = metric.revenue && previousMetric.revenue && previousMetric.revenue > 0
+      ? ((metric.revenue - previousMetric.revenue) / previousMetric.revenue) * 100
+      : 0;
+      
+    const epsGrowth = metric.eps && previousMetric.eps && previousMetric.eps > 0
+      ? ((metric.eps - previousMetric.eps) / previousMetric.eps) * 100
+      : 0;
+      
+    const equityGrowth = metric.bookValue && previousMetric.bookValue && previousMetric.bookValue > 0
+      ? ((metric.bookValue - previousMetric.bookValue) / previousMetric.bookValue) * 100
+      : 0;
+      
+    const fcfGrowth = metric.freeCashFlow && previousMetric.freeCashFlow && previousMetric.freeCashFlow > 0
+      ? ((metric.freeCashFlow - previousMetric.freeCashFlow) / previousMetric.freeCashFlow) * 100
+      : 0;
+
+    return {
+      year: metric.year,
+      salesGrowth,
+      epsGrowth,
+      equityGrowth,
+      fcfGrowth,
+    };
+  }).filter(item => item !== null) || [];
+
+  // Select which averages to display based on selected period
+  const currentAverages = selectedPeriod === '10year' ? tenYearAverages :
+                         selectedPeriod === '5year' ? fiveYearAverages : 
+                         oneYearAverages;
 
   const metrics = [
     {
       title: "Sales Growth",
-      value: bigFourGrowth?.salesGrowth || 0,
+      value: currentAverages.salesGrowth,
+      tenYear: tenYearAverages.salesGrowth,
+      fiveYear: fiveYearAverages.salesGrowth,
+      oneYear: oneYearAverages.salesGrowth,
       icon: TrendingUp,
       color: "text-green-600",
       bgColor: "from-green-500/10 to-green-500/5 border-green-500/20",
     },
     {
       title: "EPS Growth",
-      value: bigFourGrowth?.epsGrowth || 0,
+      value: currentAverages.epsGrowth,
+      tenYear: tenYearAverages.epsGrowth,
+      fiveYear: fiveYearAverages.epsGrowth,
+      oneYear: oneYearAverages.epsGrowth,
       icon: DollarSign,
       color: "text-green-600",
       bgColor: "from-green-500/10 to-green-500/5 border-green-500/20",
     },
     {
       title: "Equity Growth",
-      value: bigFourGrowth?.equityGrowth || 0,
+      value: currentAverages.equityGrowth,
+      tenYear: tenYearAverages.equityGrowth,
+      fiveYear: fiveYearAverages.equityGrowth,
+      oneYear: oneYearAverages.equityGrowth,
       icon: BarChart3,
       color: "text-green-600",
       bgColor: "from-green-500/10 to-green-500/5 border-green-500/20",
     },
     {
       title: "FCF Growth",
-      value: bigFourGrowth?.fcfGrowth || 0,
+      value: currentAverages.fcfGrowth,
+      tenYear: tenYearAverages.fcfGrowth,
+      fiveYear: fiveYearAverages.fcfGrowth,
+      oneYear: oneYearAverages.fcfGrowth,
       icon: PiggyBank,
       color: "text-green-600",
       bgColor: "from-green-500/10 to-green-500/5 border-green-500/20",
@@ -95,7 +172,16 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
         <CardTitle className="flex items-center justify-between">
           <span>The Big Four Growth Rates</span>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-slate-600 dark:text-slate-400">10-Year Average</span>
+            <Select value={selectedPeriod} onValueChange={(value: '10year' | '5year' | '1year') => setSelectedPeriod(value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10year">10-Year Avg</SelectItem>
+                <SelectItem value="5year">5-Year Avg</SelectItem>
+                <SelectItem value="1year">1-Year Avg</SelectItem>
+              </SelectContent>
+            </Select>
             <UITooltip>
               <TooltipTrigger>
                 <Info className="h-4 w-4 text-slate-400" />
@@ -125,8 +211,22 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
                 <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                   {metric.value.toFixed(1)}%
                 </div>
-                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                  Target: &gt;10%
+                <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                  <div className="flex justify-between">
+                    <span>10Y:</span>
+                    <span className="font-medium">{metric.tenYear.toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>5Y:</span>
+                    <span className="font-medium">{metric.fiveYear.toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>1Y:</span>
+                    <span className="font-medium">{metric.oneYear.toFixed(1)}%</span>
+                  </div>
+                  <div className="text-green-600 dark:text-green-400 font-medium pt-1">
+                    Target: &gt;10%
+                  </div>
                 </div>
               </div>
             );

@@ -230,7 +230,7 @@ interface FMPBalanceSheetData {
 export class FinancialDataService {
   private readonly FMP_API_KEY = process.env.FMP_API_KEY || "LKODerELb8EZDzg1tl275H8MQoupFnY1";
   private readonly FMP_BASE_URL = "https://financialmodelingprep.com/api/v3";
-  private readonly ALPHA_VANTAGE_API_KEY = "WXNYFQPLJCO2ECMN";
+  private readonly ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "WXNYFQPLJCO2ECMN";
   private readonly ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/query";
 
   async fetchStockData(symbol: string): Promise<InsertStock | null> {

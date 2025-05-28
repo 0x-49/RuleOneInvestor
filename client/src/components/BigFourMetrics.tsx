@@ -42,8 +42,24 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
           <CardTitle>The Big Four Growth Rates</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-slate-600 dark:text-slate-400 py-8">
-            No financial data available for this stock
+          <div className="text-center py-8">
+            <div className="mb-4">
+              <Info className="h-12 w-12 text-slate-400 mx-auto mb-2" />
+              <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                No Financial Data Available
+              </h3>
+            </div>
+            <div className="text-slate-600 dark:text-slate-400 space-y-2 max-w-md mx-auto">
+              <p>This stock isn't covered by our financial data providers.</p>
+              <p className="text-sm">
+                This commonly happens with smaller international stocks, recent IPOs, or companies from emerging markets.
+              </p>
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-4">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  💡 <strong>Tip:</strong> Try searching for larger companies from the same exchange, or consider looking up the company's investor relations page for annual reports.
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

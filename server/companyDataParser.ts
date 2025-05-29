@@ -12,9 +12,13 @@ export class CompanyDataParser {
    * Parse the 400+ company list from the provided data
    */
   static parseCompanyList(): CompanyData[] {
+    // Test with smaller batch of US companies first to verify data retrieval
     return [
-      { symbol: "NVDA", name: "NVIDIA Corporation", exchange: "NASDAQ", marketCap: "130.5 B", logo: "https://s3-symbol-logo.tradingview.com/nvidia.svg" },
-      { symbol: "2330", name: "TAIWAN SEMICONDUCTOR MANUFACTURING", exchange: "TWSE", marketCap: "94.4 B", logo: "https://s3-symbol-logo.tradingview.com/taiwan-semiconductor.svg" },
+      { symbol: "AAPL", name: "Apple Inc.", exchange: "NASDAQ", marketCap: "3500 B" },
+      { symbol: "MSFT", name: "Microsoft Corporation", exchange: "NASDAQ", marketCap: "3000 B" },
+      { symbol: "NVDA", name: "NVIDIA Corporation", exchange: "NASDAQ", marketCap: "130.5 B" },
+      { symbol: "GOOGL", name: "Alphabet Inc.", exchange: "NASDAQ", marketCap: "2000 B" },
+      { symbol: "AMZN", name: "Amazon.com Inc.", exchange: "NASDAQ", marketCap: "1800 B" },
       { symbol: "NOVO_B", name: "NOVO NORDISK B A/S", exchange: "OMXCOP", marketCap: "43.92 B", logo: "https://s3-symbol-logo.tradingview.com/novo-nordisk.svg" },
       { symbol: "ASML", name: "ASML HOLDING", exchange: "EURONEXT", marketCap: "33.23 B", logo: "https://s3-symbol-logo.tradingview.com/asml.svg" },
       { symbol: "UBER", name: "Uber Technologies, Inc.", exchange: "NYSE", marketCap: "45.38 B", logo: "https://s3-symbol-logo.tradingview.com/uber.svg" },

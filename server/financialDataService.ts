@@ -254,7 +254,7 @@ export class FinancialDataService {
       // Try Financial Modeling Prep first for better 10-year data
       const fmpMetrics = await this.fetchFMPFinancialMetrics(symbol, stockId);
       if (fmpMetrics && fmpMetrics.length >= 7) {
-        console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`);
+        console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`, fmpMetrics.map(m => `${m.year}: $${(m.revenue || 0) / 1e9}B revenue`));
         return fmpMetrics;
       }
 

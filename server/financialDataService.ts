@@ -468,17 +468,23 @@ export class FinancialDataService {
           const investedCapital = equity + debt;
           const roic = investedCapital > 0 ? (income.netIncome / investedCapital) * 100 : null;
 
-          metrics.push({
-            stockId,
-            year: income.calendarYear,
-            revenue: income.revenue ?? null,
-            earnings: income.netIncome ?? null,
-            freeCashFlow: cashflowYear?.freeCashFlow ?? null,
-            bookValue: equity > 0 ? equity : null,
-            eps: income.eps ?? income.epsdiluted ?? null,
-            roic: roic,
-            debt: debt > 0 ? debt : null
-          });
+          // Ensure we have valid data before adding to metrics
+          const revenue = income.revenue || 0;
+          const netIncome = income.netIncome || 0;
+          
+          if (revenue > 0 || netIncome !== 0) {
+            metrics.push({
+              stockId,
+              year: income.calendarYear,
+              revenue: revenue > 0 ? revenue : null,
+              earnings: netIncome,
+              freeCashFlow: cashflowYear?.freeCashFlow ?? null,
+              bookValue: equity > 0 ? equity : null,
+              eps: income.eps ?? income.epsdiluted ?? null,
+              roic: roic,
+              debt: debt > 0 ? debt : null
+            });
+          }
         }
       }
 

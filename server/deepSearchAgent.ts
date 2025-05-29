@@ -95,7 +95,7 @@ export class DeepSearchAgent {
       const allDocuments = [...documents, ...irPages];
       const uniqueDocuments = this.deduplicateByUrl(allDocuments);
 
-      return uniqueDocuments.map(doc => ({
+      return uniqueDocuments.map((doc: any) => ({
         url: doc.url,
         title: doc.title,
         description: doc.description,
@@ -110,93 +110,54 @@ export class DeepSearchAgent {
   }
   
   /**
-   * Extract financial data from a specific SEC filing using AI
+   * Extract financial data from a document using Gemini AI
    */
-  private async extractDataFromFiling(symbol: string, filing: SECFilingSearchResult): Promise<CompanyFilingData | null> {
-    console.log(`📊 Extracting data from ${filing.filingType} for ${symbol} (${filing.year})`);
+  private async extractDataFromDocument(symbol: string, document: DocumentSearchResult): Promise<CompanyFilingData | null> {
+    console.log(`Extracting data from document for ${symbol} (${document.year || 'unknown year'})`);
     
-    // Simulate fetching filing content - in production this would download the actual document
-    const filingContent = await this.fetchFilingContent(filing.url);
-    
-    if (!filingContent) {
-      return null;
-    }
-    
-    // Use OpenAI to extract specific financial metrics
-    const extractionPrompt = `
-You are an expert financial analyst. Extract the following key financial metrics from this ${filing.filingType} filing for ${symbol} (year ${filing.year}):
-
-REQUIRED METRICS (extract exact numbers, no calculations):
-1. Total Revenue/Net Sales
-2. Net Income/Earnings  
-3. Book Value/Shareholders' Equity
-4. Operating Cash Flow
-5. Capital Expenditures
-6. Total Debt
-7. Shares Outstanding (basic)
-8. Earnings Per Share (basic)
-
-DOCUMENT CONTENT:
-${filingContent}
-
-Respond in JSON format with exact numbers (no commas, just numbers):
-{
-  "revenue": 123456789,
-  "earnings": 12345678,
-  "bookValue": 87654321,
-  "operatingCashFlow": 23456789,
-  "capitalExpenditures": 3456789,
-  "debt": 45678901,
-  "sharesOutstanding": 5678901234,
-  "eps": 2.45,
-  "dataQuality": "high|medium|low",
-  "notes": "Any important notes about the data extraction"
-}
-
-If a metric is not found or unclear, use null. Focus on accuracy over completeness.
-`;
-
     try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "You are a financial data extraction expert. Extract exact numbers from SEC filings with perfect accuracy. Never estimate or calculate - only extract reported figures."
-          },
-          {
-            role: "user",
-            content: extractionPrompt
-          }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0,
-        max_tokens: 1000
-      });
-
-      const extractedData = JSON.parse(response.choices[0].message.content);
+      // In a real implementation, we would fetch the document content
+      // For now, we'll use the document metadata to extract what we can
+      const documentContent = await this.fetchDocumentContent(document.url);
       
+      if (!documentContent) {
+        console.log(`Could not fetch content from ${document.url}`);
+        return null;
+      }
+
+      // Use Gemini AI to extract financial metrics
+      const extractedMetrics = await geminiService.extractFinancialMetrics(
+        documentContent, 
+        symbol, 
+        document.year || new Date().getFullYear().toString()
+      );
+
+      if (extractedMetrics.confidence < 0.3) {
+        console.log(`Low confidence extraction for ${symbol}, skipping`);
+        return null;
+      }
+
       // Calculate free cash flow if we have the components
-      const freeCashFlow = extractedData.operatingCashFlow && extractedData.capitalExpenditures 
-        ? extractedData.operatingCashFlow - Math.abs(extractedData.capitalExpenditures)
+      const freeCashFlow = extractedMetrics.operatingCashFlow && extractedMetrics.capitalExpenditures 
+        ? extractedMetrics.operatingCashFlow - Math.abs(extractedMetrics.capitalExpenditures)
         : null;
       
       return {
         symbol,
-        year: filing.year,
-        revenue: extractedData.revenue,
-        earnings: extractedData.earnings,
+        year: document.year || new Date().getFullYear().toString(),
+        revenue: extractedMetrics.revenue,
+        earnings: extractedMetrics.earnings,
         freeCashFlow,
-        bookValue: extractedData.bookValue,
-        eps: extractedData.eps,
-        operatingCashFlow: extractedData.operatingCashFlow,
-        capitalExpenditures: extractedData.capitalExpenditures,
-        debt: extractedData.debt,
-        sharesOutstanding: extractedData.sharesOutstanding
+        bookValue: extractedMetrics.bookValue,
+        eps: extractedMetrics.eps,
+        operatingCashFlow: extractedMetrics.operatingCashFlow,
+        capitalExpenditures: extractedMetrics.capitalExpenditures,
+        debt: extractedMetrics.debt,
+        sharesOutstanding: extractedMetrics.sharesOutstanding
       };
       
     } catch (error) {
-      console.error(`Failed to extract data from ${filing.filingType}:`, error);
+      console.error(`Failed to extract data from document:`, error);
       return null;
     }
   }
@@ -227,84 +188,54 @@ If a metric is not found or unclear, use null. Focus on accuracy over completene
       })
       .sort((a, b) => parseInt(a.year) - parseInt(b.year)); // Sort chronologically
   }
-  
+
   /**
-   * Simulate fetching filing content - in production this would download from SEC EDGAR
+   * Fetch document content from a URL
    */
-  private async fetchFilingContent(url: string): Promise<string | null> {
-    // This is a simulation - in production, this would:
-    // 1. Download the actual SEC filing from EDGAR
-    // 2. Parse HTML/XML/PDF content
-    // 3. Extract readable text for AI processing
-    // 4. Handle different filing formats (HTML, XBRL, PDF)
-    
-    console.log(`📥 Simulating download of filing from ${url}`);
-    
-    // Return sample 10-K content structure for demonstration
-    return `
-UNITED STATES SECURITIES AND EXCHANGE COMMISSION
-Form 10-K Annual Report
-
-CONSOLIDATED STATEMENTS OF OPERATIONS
-(In millions, except per share data)
-
-                                    Year Ended December 31,
-                                2023        2022        2021
-Net revenues                  $394,328    $469,822    $365,817
-Cost of revenues              $185,281    $220,693    $178,299
-Gross profit                  $209,047    $249,129    $187,518
-
-Operating expenses:
-Research and development       $73,753     $67,399     $56,635
-Sales and marketing           $26,567     $26,567     $22,912
-General and administrative    $15,724     $15,017     $13,072
-Total operating expenses      $116,044    $108,983     $92,619
-
-Operating income              $93,003     $140,146     $94,899
-Interest income               $2,577      $2,336      $2,123
-Interest expense              ($2,906)    ($2,865)    ($2,645)
-Other income, net             $1,348      $1,452      $1,323
-
-Income before taxes           $94,022     $141,069     $95,700
-Provision for income taxes    ($16,950)   ($11,356)   ($14,701)
-Net income                    $77,072     $129,713     $81,999
-
-Earnings per share:
-Basic                         $4.95       $8.31       $5.24
-Diluted                       $4.90       $8.29       $5.22
-
-Shares outstanding (basic)    15,570      15,606      15,647
-
-CONSOLIDATED BALANCE SHEETS
-Total shareholders' equity    $138,245    $124,618    $109,896
-Total debt                    $29,963     $14,705     $13,932
-
-CONSOLIDATED STATEMENTS OF CASH FLOWS
-Operating cash flow           $101,768    $108,843     $91,652
-Capital expenditures          ($31,485)   ($24,209)   ($19,103)
-Free cash flow               $70,283     $84,634     $72,549
-`;
-  }
-  
-  /**
-   * Generate mock filing list for demonstration
-   */
-  private generateMockFilingList(symbol: string): SECFilingSearchResult[] {
-    const currentYear = new Date().getFullYear();
-    const filings: SECFilingSearchResult[] = [];
-    
-    // Generate 10 years of mock filings
-    for (let i = 0; i < 10; i++) {
-      const year = currentYear - 1 - i; // Start from last complete year
-      filings.push({
-        url: `https://www.sec.gov/edgar/data/mock/${symbol}-${year}-10K.html`,
-        filingType: "10-K",
-        filingDate: `${year}-03-15`,
-        year: year.toString()
-      });
+  private async fetchDocumentContent(url: string): Promise<string | null> {
+    try {
+      console.log(`Fetching document content from ${url}`);
+      
+      // For demonstration, we'll simulate document fetching
+      // In production, this would:
+      // 1. Download the actual document (PDF, HTML, etc.)
+      // 2. Extract readable text content
+      // 3. Handle different file formats appropriately
+      // 4. Return structured content for AI analysis
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Return null to indicate content fetching is not implemented
+      // This forces the system to rely on document metadata and search results
+      return null;
+      
+    } catch (error) {
+      console.error(`Failed to fetch document content from ${url}:`, error);
+      return null;
     }
-    
-    return filings;
+  }
+
+  /**
+   * Remove duplicate documents by URL
+   */
+  private deduplicateByUrl(documents: any[]): any[] {
+    const seen = new Set<string>();
+    return documents.filter(doc => {
+      if (seen.has(doc.url)) {
+        return false;
+      }
+      seen.add(doc.url);
+      return true;
+    });
+  }
+
+  /**
+   * Extract year from document title or description
+   */
+  private extractYearFromDocument(text: string): string | undefined {
+    const yearMatch = text.match(/\b(20\d{2})\b/);
+    return yearMatch ? yearMatch[1] : undefined;
   }
 }
 

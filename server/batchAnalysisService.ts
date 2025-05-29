@@ -152,7 +152,6 @@ export class BatchAnalysisService {
           stock = await storage.createStock({
             symbol: company.symbol,
             name: company.name,
-            currency: 'USD',
             price: 0,
             change: 0,
             changePercent: 0
@@ -223,29 +222,29 @@ export class BatchAnalysisService {
     
     // Calculate compound annual growth rates (CAGR)
     const salesGrowth = this.calculateCAGR(
-      sortedMetrics.map(m => m.revenue).filter(Boolean),
+      sortedMetrics.map(m => m.revenue).filter(v => v !== null && v !== undefined) as number[],
       sortedMetrics.length
     );
 
     const epsGrowth = this.calculateCAGR(
-      sortedMetrics.map(m => m.eps).filter(Boolean),
+      sortedMetrics.map(m => m.eps).filter(v => v !== null && v !== undefined) as number[],
       sortedMetrics.length
     );
 
     const equityGrowth = this.calculateCAGR(
-      sortedMetrics.map(m => m.bookValue).filter(Boolean),
+      sortedMetrics.map(m => m.bookValue).filter(v => v !== null && v !== undefined) as number[],
       sortedMetrics.length
     );
 
     const fcfGrowth = this.calculateCAGR(
-      sortedMetrics.map(m => m.freeCashFlow).filter(Boolean),
+      sortedMetrics.map(m => m.freeCashFlow).filter(v => v !== null && v !== undefined) as number[],
       sortedMetrics.length
     );
 
     // Calculate average ROIC
     const roicValues = sortedMetrics.map(m => m.roic).filter(Boolean);
     const roic = roicValues.length > 0 
-      ? roicValues.reduce((sum, val) => sum + val!, 0) / roicValues.length 
+      ? roicValues.reduce((sum, val) => (sum || 0) + (val || 0), 0) / roicValues.length 
       : null;
 
     // Calculate debt payoff years (most recent data)

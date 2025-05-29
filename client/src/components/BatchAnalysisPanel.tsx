@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,13 +76,15 @@ export function BatchAnalysisPanel() {
   });
 
   // Stop monitoring when batch is complete
-  if (progress && progress.processed >= progress.total && isRunning) {
-    setIsRunning(false);
-    toast({
-      title: "Batch Analysis Complete",
-      description: `Successfully analyzed ${progress.successful}/${progress.total} companies`,
-    });
-  }
+  useEffect(() => {
+    if (progress && progress.processed >= progress.total && isRunning) {
+      setIsRunning(false);
+      toast({
+        title: "Batch Analysis Complete",
+        description: `Successfully analyzed ${progress.successful}/${progress.total} companies`,
+      });
+    }
+  }, [progress, isRunning, toast]);
 
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString();

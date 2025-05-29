@@ -152,10 +152,10 @@ export class BatchAnalysisService {
           stock = await storage.createStock({
             symbol: company.symbol,
             name: company.name,
-            exchange: company.exchange,
             currency: 'USD',
             price: 0,
-            marketCap: this.parseMarketCap(company.marketCap)
+            change: 0,
+            changePercent: 0
           });
         }
       }

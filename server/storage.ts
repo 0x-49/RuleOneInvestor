@@ -344,6 +344,10 @@ export class DatabaseStorage implements IStorage {
     return stock || undefined;
   }
 
+  async getStockBySymbol(symbol: string): Promise<Stock | undefined> {
+    return this.getStock(symbol);
+  }
+
   async createStock(stock: InsertStock): Promise<Stock> {
     const [newStock] = await db
       .insert(stocks)

@@ -15,7 +15,7 @@ export const stocks = pgTable("stocks", {
 
 export const financialMetrics = pgTable("financial_metrics", {
   id: serial("id").primaryKey(),
-  stockId: serial("stock_id").references(() => stocks.id).notNull(),
+  stockId: integer("stock_id").references(() => stocks.id).notNull(),
   year: text("year").notNull(),
   revenue: real("revenue"),
   earnings: real("earnings"),

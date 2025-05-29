@@ -457,23 +457,27 @@ export class FinancialDataService {
         const cashflow = cashflowData[i];
         const balance = balanceData[i];
 
-        if (income && cashflow && balance && income.calendarYear === cashflow.calendarYear && income.calendarYear === balance.calendarYear) {
-          // Calculate ROIC
-          const equity = balance.totalStockholdersEquity || 0;
-          const debt = balance.totalDebt || 0;
+        if (income && income.calendarYear) {
+          // Use available data even if cashflow/balance is missing
+          const cashflowYear = cashflow && cashflow.calendarYear === income.calendarYear ? cashflow : null;
+          const balanceYear = balance && balance.calendarYear === income.calendarYear ? balance : null;
+          
+          // Calculate ROIC if balance sheet data is available
+          const equity = balanceYear?.totalStockholdersEquity || balanceYear?.totalEquity || 0;
+          const debt = balanceYear?.totalDebt || 0;
           const investedCapital = equity + debt;
-          const roic = investedCapital > 0 ? (income.netIncome / investedCapital) * 100 : 0;
+          const roic = investedCapital > 0 ? (income.netIncome / investedCapital) * 100 : null;
 
           metrics.push({
             stockId,
             year: income.calendarYear,
-            revenue: income.revenue || null,
-            earnings: income.netIncome || null,
-            freeCashFlow: cashflow.freeCashFlow || null,
-            bookValue: balance.totalStockholdersEquity || null,
-            eps: income.eps || null,
-            roic: roic || null,
-            debt: balance.totalDebt || null
+            revenue: income.revenue ?? null,
+            earnings: income.netIncome ?? null,
+            freeCashFlow: cashflowYear?.freeCashFlow ?? null,
+            bookValue: equity > 0 ? equity : null,
+            eps: income.eps ?? income.epsdiluted ?? null,
+            roic: roic,
+            debt: debt > 0 ? debt : null
           });
         }
       }

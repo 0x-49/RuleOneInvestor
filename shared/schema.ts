@@ -1,4 +1,4 @@
-import { pgTable, text, serial, real, jsonb, timestamp, boolean, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, real, jsonb, timestamp, boolean, varchar, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -15,7 +15,7 @@ export const stocks = pgTable("stocks", {
 
 export const financialMetrics = pgTable("financial_metrics", {
   id: serial("id").primaryKey(),
-  stockId: integer("stock_id").references(() => stocks.id).notNull(),
+  stockId: serial("stock_id").references(() => stocks.id).notNull(),
   year: text("year").notNull(),
   revenue: real("revenue"),
   earnings: real("earnings"),

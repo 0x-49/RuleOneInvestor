@@ -147,9 +147,16 @@ export class MemStorage implements IStorage {
 
   async createFinancialMetrics(metrics: InsertFinancialMetrics): Promise<FinancialMetrics> {
     const newMetrics: FinancialMetrics = {
-      ...metrics,
       id: this.currentMetricsId++,
-      stockId: metrics.stockId!,
+      stockId: metrics.stockId,
+      year: metrics.year,
+      revenue: metrics.revenue ?? null,
+      earnings: metrics.earnings ?? null,
+      freeCashFlow: metrics.freeCashFlow ?? null,
+      bookValue: metrics.bookValue ?? null,
+      eps: metrics.eps ?? null,
+      roic: metrics.roic ?? null,
+      debt: metrics.debt ?? null,
     };
 
     const existing = this.metrics.get(metrics.stockId!) || [];

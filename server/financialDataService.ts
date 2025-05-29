@@ -429,12 +429,17 @@ export class FinancialDataService {
 
   private async fetchFMPFinancialMetrics(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {
     try {
-      // Fetch income statements, cash flow, and balance sheet data
-      const [incomeResponse, cashflowResponse, balanceResponse] = await Promise.all([
-        fetch(`${this.FMP_BASE_URL}/income-statement/${symbol}?limit=10&apikey=${this.FMP_API_KEY}`),
-        fetch(`${this.FMP_BASE_URL}/cash-flow-statement/${symbol}?limit=10&apikey=${this.FMP_API_KEY}`),
-        fetch(`${this.FMP_BASE_URL}/balance-sheet-statement/${symbol}?limit=10&apikey=${this.FMP_API_KEY}`)
-      ]);
+      // Add delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Fetch income statements, cash flow, and balance sheet data sequentially to avoid rate limits
+      const incomeResponse = await fetch(`${this.FMP_BASE_URL}/income-statement/${symbol}?limit=10&apikey=${this.FMP_API_KEY}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const cashflowResponse = await fetch(`${this.FMP_BASE_URL}/cash-flow-statement/${symbol}?limit=10&apikey=${this.FMP_API_KEY}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const balanceResponse = await fetch(`${this.FMP_BASE_URL}/balance-sheet-statement/${symbol}?limit=10&apikey=${this.FMP_API_KEY}`);
 
       if (!incomeResponse.ok || !cashflowResponse.ok || !balanceResponse.ok) return [];
 

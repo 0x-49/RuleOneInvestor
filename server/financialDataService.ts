@@ -1,4 +1,5 @@
 import { Stock, FinancialMetrics, InsertStock, InsertFinancialMetrics } from "@shared/schema";
+import { deepSearchAgent } from "./deepSearchAgent";
 
 interface YahooFinanceResponse {
   chart: {
@@ -248,11 +249,11 @@ export class FinancialDataService {
     }
   }
 
-  async fetchFinancialMetrics(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {
+  async fetchFinancialMetrics(symbol: string, stockId: number, useDeepSearch: boolean = false): Promise<InsertFinancialMetrics[]> {
     try {
       // Try Financial Modeling Prep first for better 10-year data
       const fmpMetrics = await this.fetchFMPFinancialMetrics(symbol, stockId);
-      if (fmpMetrics && fmpMetrics.length >= 5) {
+      if (fmpMetrics && fmpMetrics.length >= 7) {
         console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`);
         return fmpMetrics;
       }
@@ -260,7 +261,7 @@ export class FinancialDataService {
       // Try Alpha Vantage for international stocks
       console.log(`⚠️ FMP returned insufficient data for ${symbol}, trying Alpha Vantage...`);
       const alphaMetrics = await this.fetchAlphaVantageFinancialMetrics(symbol, stockId);
-      if (alphaMetrics && alphaMetrics.length > 0) {
+      if (alphaMetrics && alphaMetrics.length >= 7) {
         console.log(`✅ Got ${alphaMetrics.length} years of data from Alpha Vantage for ${symbol}`);
         return alphaMetrics;
       }
@@ -268,9 +269,23 @@ export class FinancialDataService {
       // Fallback to Yahoo Finance
       console.log(`⚠️ Alpha Vantage returned insufficient data for ${symbol}, trying Yahoo Finance...`);
       const yahooMetrics = await this.fetchYahooFinancialMetrics(symbol, stockId);
-      if (yahooMetrics && yahooMetrics.length > 0) {
+      if (yahooMetrics && yahooMetrics.length >= 7) {
         console.log(`✅ Got ${yahooMetrics.length} years of data from Yahoo for ${symbol}`);
         return yahooMetrics;
+      }
+
+      // If deep search is requested and API data is insufficient, try AI extraction from SEC filings
+      if (useDeepSearch) {
+        console.log(`🔍 API data insufficient for ${symbol}. Attempting deep search from SEC filings...`);
+        try {
+          const deepSearchMetrics = await deepSearchAgent.extractFinancialDataForStock(symbol, stockId);
+          if (deepSearchMetrics.length > 0) {
+            console.log(`✅ Deep search found ${deepSearchMetrics.length} years of authentic data from SEC filings for ${symbol}`);
+            return deepSearchMetrics;
+          }
+        } catch (error) {
+          console.warn(`Deep search failed for ${symbol}:`, error instanceof Error ? error.message : error);
+        }
       }
 
       console.warn(`❌ No reliable financial data found for ${symbol}`);

@@ -8,6 +8,7 @@ import { Info, Clock, Eye, ShoppingCart } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { apiRequest } from "@/lib/queryClient";
 import { StockWithMetrics } from "@shared/schema";
+import { motion } from "framer-motion";
 
 interface ValuationToolsProps {
   stockData?: StockWithMetrics;

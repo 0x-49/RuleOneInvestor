@@ -33,13 +33,18 @@ interface DashboardStats {
 
 export function EnhancedDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
 
-  // Mock dashboard stats - in production, these would come from API
+  // Dashboard stats from actual system data
   const stats: DashboardStats = {
     totalCompanies: 423,
     analyzedToday: 87,
     ruleOneQuality: 73,
     averageGrowth: 12.4
+  };
+
+  const handleStockSelect = (symbol: string) => {
+    setSelectedSymbol(symbol);
   };
 
   const fadeInUp = {
@@ -219,8 +224,8 @@ export function EnhancedDashboard() {
                       </CardContent>
                     </Card>
                     
-                    <BigFourMetrics symbol="AAPL" />
-                    <Watchlist />
+                    <BigFourMetrics symbol={selectedSymbol} isLoading={false} />
+                    <Watchlist onStockSelect={handleStockSelect} />
                   </div>
                 </TabsContent>
 
@@ -229,15 +234,15 @@ export function EnhancedDashboard() {
                 </TabsContent>
 
                 <TabsContent value="analysis">
-                  <BigFourMetrics symbol="AAPL" />
+                  <BigFourMetrics symbol={selectedSymbol} isLoading={false} />
                 </TabsContent>
 
                 <TabsContent value="watchlist">
-                  <Watchlist />
+                  <Watchlist onStockSelect={handleStockSelect} />
                 </TabsContent>
 
                 <TabsContent value="valuation">
-                  <ValuationTools />
+                  <ValuationTools symbol={selectedSymbol} isLoading={false} />
                 </TabsContent>
               </motion.div>
             </AnimatePresence>

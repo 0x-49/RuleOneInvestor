@@ -433,6 +433,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Batch analysis routes for processing 400+ companies
+  app.post('/api/batch/start', isAuthenticated, async (req, res) => {
+    try {
+      const companies = companyDataParser.parseCompanyList();
+      const result = await batchAnalysisService.processBatchAnalysis(companies);
+      res.json(result);
+    } catch (error) {
+      console.error('Error starting batch analysis:', error);
+      res.status(500).json({ error: 'Failed to start batch analysis' });
+    }
+  });
+
+  app.get('/api/batch/progress', isAuthenticated, async (req, res) => {
+    try {
+      const progress = batchAnalysisService.getBatchProgress();
+      res.json(progress);
+    } catch (error) {
+      console.error('Error fetching batch progress:', error);
+      res.status(500).json({ error: 'Failed to fetch batch progress' });
+    }
+  });
+
+  app.get('/api/batch/results', isAuthenticated, async (req, res) => {
+    try {
+      const results = batchAnalysisService.getBatchResults();
+      res.json(results);
+    } catch (error) {
+      console.error('Error fetching batch results:', error);
+      res.status(500).json({ error: 'Failed to fetch batch results' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

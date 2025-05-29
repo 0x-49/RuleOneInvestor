@@ -159,24 +159,24 @@ export class BatchAnalysisService {
         }
       }
 
-      // Step 2: Get financial metrics - first check existing, then fetch from API if needed
-      let metrics = await storage.getFinancialMetrics(stock.id);
+      // Step 2: Get financial metrics - always try to fetch fresh data from API first
+      console.log(`Fetching financial metrics for ${company.symbol} from API...`);
+      const apiMetrics = await financialDataService.fetchFinancialMetrics(company.symbol, stock.id);
+      let metrics: any[] = [];
       let dataSource: 'api' | 'deep_search' = 'api';
-
-      // If no stored metrics, fetch from API first
-      if (metrics.length === 0) {
-        console.log(`No stored metrics for ${company.symbol}, fetching from API...`);
-        const apiMetrics = await financialDataService.fetchFinancialMetrics(company.symbol, stock.id);
-        
-        if (apiMetrics.length > 0) {
-          // Store API results
-          for (const metric of apiMetrics) {
-            await storage.createFinancialMetrics(metric);
-          }
-          // Get the stored metrics with IDs
-          metrics = await storage.getFinancialMetrics(stock.id);
-          console.log(`Stored ${apiMetrics.length} years of API data for ${company.symbol}`);
+      
+      if (apiMetrics.length > 0) {
+        // Store API results
+        for (const metric of apiMetrics) {
+          await storage.createFinancialMetrics(metric);
         }
+        // Get the stored metrics with IDs
+        metrics = await storage.getFinancialMetrics(stock.id);
+        console.log(`Successfully stored ${apiMetrics.length} years of API data for ${company.symbol}`);
+      } else {
+        // Check if we have any existing stored data
+        metrics = await storage.getFinancialMetrics(stock.id);
+        console.log(`No API data available for ${company.symbol}, found ${metrics.length} stored metrics`);
       }
 
       // If we still don't have sufficient data (less than 7 years), try deep search

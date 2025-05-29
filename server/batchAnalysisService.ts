@@ -87,8 +87,8 @@ export class BatchAnalysisService {
    * Process companies asynchronously with rate limiting
    */
   private async processCompaniesAsync(companies: CompanyData[], batchId: string) {
-    const BATCH_SIZE = 2; // Process 2 companies at a time to avoid rate limits
-    const DELAY_BETWEEN_BATCHES = 5000; // 5 second delay between batches
+    const BATCH_SIZE = 1; // Process 1 company at a time to ensure data quality
+    const DELAY_BETWEEN_BATCHES = 8000; // 8 second delay between companies
 
     for (let i = 0; i < companies.length; i += BATCH_SIZE) {
       const batch = companies.slice(i, i + BATCH_SIZE);

@@ -159,11 +159,27 @@ export class BatchAnalysisService {
         }
       }
 
-      // Step 2: Get financial metrics
+      // Step 2: Get financial metrics - first check existing, then fetch from API if needed
       let metrics = await storage.getFinancialMetrics(stock.id);
       let dataSource: 'api' | 'deep_search' = 'api';
 
-      // If we don't have sufficient data (less than 7 years), try deep search
+      // If no stored metrics, fetch from API first
+      if (metrics.length === 0) {
+        console.log(`No stored metrics for ${company.symbol}, fetching from API...`);
+        const apiMetrics = await financialDataService.fetchFinancialMetrics(company.symbol, stock.id);
+        
+        if (apiMetrics.length > 0) {
+          // Store API results
+          for (const metric of apiMetrics) {
+            await storage.createFinancialMetrics(metric);
+          }
+          // Get the stored metrics with IDs
+          metrics = await storage.getFinancialMetrics(stock.id);
+          console.log(`Stored ${apiMetrics.length} years of API data for ${company.symbol}`);
+        }
+      }
+
+      // If we still don't have sufficient data (less than 7 years), try deep search
       if (metrics.length < 7) {
         console.log(`Insufficient API data for ${company.symbol}, attempting deep search...`);
         
@@ -174,7 +190,8 @@ export class BatchAnalysisService {
           for (const metric of deepSearchMetrics) {
             await storage.createFinancialMetrics(metric);
           }
-          metrics = [...metrics, ...deepSearchMetrics];
+          // Get updated metrics with IDs
+          metrics = await storage.getFinancialMetrics(stock.id);
           dataSource = 'deep_search';
         }
       }
@@ -244,12 +261,12 @@ export class BatchAnalysisService {
     // Calculate average ROIC
     const roicValues = sortedMetrics.map(m => m.roic).filter(Boolean);
     const roic = roicValues.length > 0 
-      ? roicValues.reduce((sum, val) => (sum || 0) + (val || 0), 0) / roicValues.length 
+      ? roicValues.reduce((sum, val) => (sum || 0) + (val || 0), 0)! / roicValues.length 
       : null;
 
     // Calculate debt payoff years (most recent data)
     const latestMetrics = sortedMetrics[sortedMetrics.length - 1];
-    const debtPayoffYears = latestMetrics.debt && latestMetrics.freeCashFlow && latestMetrics.freeCashFlow > 0
+    const debtPayoffYears = latestMetrics?.debt && latestMetrics?.freeCashFlow && latestMetrics.freeCashFlow > 0
       ? latestMetrics.debt / latestMetrics.freeCashFlow
       : null;
 

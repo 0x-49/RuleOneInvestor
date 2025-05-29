@@ -159,7 +159,7 @@ export class MemStorage implements IStorage {
       debt: metrics.debt ?? null,
     };
 
-    const existing = this.metrics.get(metrics.stockId!) || [];
+    const existing = this.metrics.get(metrics.stockId) || [];
     existing.push(newMetrics);
     this.metrics.set(metrics.stockId!, existing);
     

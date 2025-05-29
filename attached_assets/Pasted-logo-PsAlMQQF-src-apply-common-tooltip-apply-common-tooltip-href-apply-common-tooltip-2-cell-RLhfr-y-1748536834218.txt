@@ -1,0 +1,481 @@
+logo-PsAlMQQF src	apply-common-tooltip	apply-common-tooltip href	apply-common-tooltip 2	cell-RLhfr_y4	positive-p_QIAEOQ	cell-RLhfr_y4 2	cell-RLhfr_y4 3	cell-RLhfr_y4 4	cell-RLhfr_y4 5	currency-WyLKdeog 5	cell-RLhfr_y4 6	currency-WyLKdeog 6	positive-p_QIAEOQ 2	dataMode-FRcSVmGO
+https://s3-symbol-logo.tradingview.com/nvidia.svg	NVDA	https://www.tradingview.com/symbols/NASDAQ-NVDA/	NVIDIA Corporation	130.5 B	1.142	97.86 B	81.45 B	72.88 B	83.32 B	USD	2.94	USD	1.4627	
+https://s3-symbol-logo.tradingview.com/taiwan-semiconductor.svg	2330	https://www.tradingview.com/symbols/TWSE-2330/	TAIWAN SEMICONDUCTOR MANUFACTURING	94.4 B	0.3986	52.89 B	44.55 B	39.35 B	64.96 B	USD	1.52	USD	0.5279	D
+https://s3-symbol-logo.tradingview.com/novo-nordisk.svg	NOVO_B	https://www.tradingview.com/symbols/OMXCOP-NOVO_B/	NOVO NORDISK B A/S	43.92 B	0.2411	37.04 B	19.82 B	15.16 B	22.72 B	USD	3.4	USD	0.1773	D
+https://s3-symbol-logo.tradingview.com/asml.svg	ASML	https://www.tradingview.com/symbols/EURONEXT-ASML/	ASML HOLDING	33.23 B	0.1767	17.28 B	11.22 B	9.42 B	12.24 B	USD	23.94	USD	0.2262	D
+https://s3-symbol-logo.tradingview.com/uber.svg	UBER	https://www.tradingview.com/symbols/NYSE-UBER/	Uber Technologies, Inc.	45.38 B	0.176	14.55 B	4.52 B	12.29 B	5.24 B	USD	5.73	USD	7.951	
+https://s3-symbol-logo.tradingview.com/blackstone.svg	BX	https://www.tradingview.com/symbols/NYSE-BX/	Blackstone Inc.	12.63 B	0.2206	12.57 B	6.51 B	2.54 B	6.55 B	USD	3.31	USD	0.1657	
+https://s3-symbol-logo.tradingview.com/cosco-shipping.svg	601919	https://www.tradingview.com/symbols/SSE-601919/	COSCO SHIPPING HOLDINGS	33.35 B	0.3812	12.11 B	8.72 B	7.44 B	—	USD	0.47		1.3397	D
+https://s3-symbol-logo.tradingview.com/jbs-s-a.svg	JBSS3	https://www.tradingview.com/symbols/BMFBOVESPA-JBSS3/	JBS ON ED NM	77.34 B	0.2065	11.37 B	4.55 B	1.91 B	6.69 B	USD	0.86	USD	4.3464	D
+https://s3-symbol-logo.tradingview.com/mercadolibre.svg	MELI	https://www.tradingview.com/symbols/NASDAQ-MELI/	MercadoLibre, Inc.	22.38 B	0.4192	10.32 B	2.87 B	2.06 B	3.5 B	USD	40.65	USD	0.822	
+https://s3-symbol-logo.tradingview.com/grupo-mexico-sab-de-cv.svg	GMEXICO/B	https://www.tradingview.com/symbols/BMV-GMEXICO%2FB/	GRUPO MEXICO SAB DE CV	15.47 B	0.2779	7.17 B	6.85 B	3.46 B	8.07 B	USD	0.46	USD	0.2687	D
+https://s3-symbol-logo.tradingview.com/kla-tencor.svg	KLAC	https://www.tradingview.com/symbols/NASDAQ-KLAC/	KLA Corporation	11.54 B	0.2044	7.05 B	4.85 B	3.7 B	5.25 B	USD	27.52	USD	0.4418	
+https://s3-symbol-logo.tradingview.com/southern-copper.svg	SCCO	https://www.tradingview.com/symbols/NYSE-SCCO/	Southern Copper Corporation	11.96 B	0.2323	6.03 B	5.9 B	3.59 B	6.76 B	USD	4.48	USD	0.5335	
+https://s3-symbol-logo.tradingview.com/emaar-properties.svg	EMAAR	https://www.tradingview.com/symbols/DFM-EMAAR/	EMAAR PROPERTIES	10.98 B	0.4075	5.99 B	5.07 B	3.89 B	5.49 B	USD	0.44	USD	0.2608	D
+https://s3-symbol-logo.tradingview.com/intuitive-surgical.svg	ISRG	https://www.tradingview.com/symbols/NASDAQ-ISRG/	Intuitive Surgical, Inc.	8.71 B	0.1908	5.85 B	2.46 B	2.48 B	2.95 B	USD	6.82	USD	0.2301	
+https://s3-symbol-logo.tradingview.com/fox-corporation.svg	FOX	https://www.tradingview.com/symbols/NASDAQ-FOX/	Fox Corporation	16.11 B	0.157	5.18 B	3.06 B	1.86 B	3.44 B	USD	4.02	USD	0.2595	
+https://s3-symbol-logo.tradingview.com/moodys.svg	MCO	https://www.tradingview.com/symbols/NYSE-MCO/	Moody's Corporation	7.23 B	0.1595	4.81 B	3.05 B	2.11 B	3.5 B	USD	11.58	USD	0.2637	
+https://s3-symbol-logo.tradingview.com/arista-networks.svg	ANET	https://www.tradingview.com/symbols/NYSE-ANET/	Arista Networks, Inc.	7.44 B	0.2231	4.77 B	3.14 B	3.03 B	3.2 B	USD	2.36	USD	0.3152	
+https://s3-symbol-logo.tradingview.com/polyus.svg	PLZL	https://www.tradingview.com/symbols/RUS-PLZL/	Polus	6.3 B	0.4795	4.75 B	4.42 B	2.66 B	4.96 B	USD	27.98	USD	1.3805	
+https://s3-symbol-logo.tradingview.com/applovin.svg	APP	https://www.tradingview.com/symbols/NASDAQ-APP/	Applovin Corporation	5.14 B	0.4163	3.92 B	2.42 B	1.92 B	2.84 B	USD	5.54	USD	2.281	
+https://s3-symbol-logo.tradingview.com/sabesp.svg	SBSP3	https://www.tradingview.com/symbols/BMFBOVESPA-SBSP3/	SABESP ON NM	6.65 B	0.438	3.55 B	2.96 B	1.79 B	3.4 B	USD	2.62	USD	1.8443	D
+https://s3-symbol-logo.tradingview.com/sungrow-power-supp.svg	300274	https://www.tradingview.com/symbols/SZSE-300274/	SUNGROW POWER SUPP	11.55 B	0.1658	3.49 B	2.03 B	1.76 B	—	USD	0.85		0.2786	D
+https://s3-symbol-logo.tradingview.com/emaar-development.svg	EMAARDEV	https://www.tradingview.com/symbols/DFM-EMAARDEV/	EMAAR DEVELOPMENT	5.62 B	0.5831	3.14 B	2.68 B	2.24 B	2.68 B	USD	0.56	USD	0.2031	D
+https://s3-symbol-logo.tradingview.com/genmab-a-s.svg	GMAB	https://www.tradingview.com/symbols/OMXCOP-GMAB/	GENMAB A/S	3.25 B	0.2639	3.09 B	1.08 B	1.14 B	—	USD	17.79		0.483	D
+https://s3-symbol-logo.tradingview.com/evercore-inc.svg	EVR	https://www.tradingview.com/symbols/NYSE-EVR/	Evercore Inc.	3.11 B	0.2688	3.07 B	578.06 M	438.77 M	602.21 M	USD	10.44	USD	0.639	
+https://s3-symbol-logo.tradingview.com/sprouts-farmers-markets.svg	SFM	https://www.tradingview.com/symbols/NASDAQ-SFM/	Sprouts Farmers Market, Inc.	8.07 B	0.1551	2.97 B	595.12 M	446.53 M	873.89 M	USD	4.44	USD	0.5346	
+https://s3-symbol-logo.tradingview.com/advantest.svg	6857	https://www.tradingview.com/symbols/TSE-6857/	ADVANTEST CORP	5.2 B	0.6027	2.97 B	1.66 B	1.07 B	1.84 B	USD	1.45	USD	1.5902	D
+https://s3-symbol-logo.tradingview.com/vertiv-holdings.svg	VRT	https://www.tradingview.com/symbols/NYSE-VRT/	Vertiv Holdings, LLC	8.41 B	0.2045	2.87 B	1.46 B	666.2 M	1.74 B	USD	1.72	USD	0.6583	
+https://s3-symbol-logo.tradingview.com/sharkninja.svg	SN	https://www.tradingview.com/symbols/NYSE-SN/	SharkNinja, Inc.	5.69 B	0.2733	2.71 B	657.32 M	446.93 M	784.55 M	USD	3.16	USD	1.3376	
+https://s3-symbol-logo.tradingview.com/phosagro.svg	PHOR	https://www.tradingview.com/symbols/RUS-PHOR/	PhosAgro	6.58 B	0.2355	2.7 B	2.07 B	1.36 B	2.52 B	USD	10.51	USD	0.4756	
+https://s3-symbol-logo.tradingview.com/united-therapeutics.svg	UTHR	https://www.tradingview.com/symbols/NASDAQ-UTHR/	United Therapeutics Corporation	2.99 B	0.1985	2.66 B	1.4 B	1.21 B	1.48 B	USD	25.06	USD	0.1848	
+https://s3-symbol-logo.tradingview.com/rheinmetall-ag.svg	RHM	https://www.tradingview.com/symbols/XETR-RHM/	RHEINMETALL AG	11.33 B	0.4165	2.61 B	1.57 B	814.63 M	2.03 B	USD	18.03	USD	0.406	D
+https://s3-symbol-logo.tradingview.com/constellation-software.svg	CSU	https://www.tradingview.com/symbols/TSX-CSU/	CONSTELLATION SOFTWARE INC	10.03 B	0.2099	2.41 B	1.47 B	715.32 M	2.69 B	USD	33.8	USD	0.3305	D
+https://s3-symbol-logo.tradingview.com/exelixis.svg	EXEL	https://www.tradingview.com/symbols/NASDAQ-EXEL/	Exelixis, Inc.	2.3 B	0.2449	2.22 B	814.51 M	643.57 M	844.28 M	USD	2.2	USD	2.4089	
+https://s3-symbol-logo.tradingview.com/fuyao-glass-industry-co-ltd.svg	600660	https://www.tradingview.com/symbols/SSE-600660/	FUYAO GLASS INDUSTRY GROUP CO. LTD.	5.51 B	0.1535	2.19 B	1.15 B	1.12 B	—	USD	0.43		0.3338	D
+https://s3-symbol-logo.tradingview.com/the-trade-desk.svg	TTD	https://www.tradingview.com/symbols/NASDAQ-TTD/	The Trade Desk, Inc.	2.57 B	0.2507	2.06 B	452.96 M	412.09 M	542.7 M	USD	0.82	USD	1.0305	
+https://s3-symbol-logo.tradingview.com/kinross-gold.svg	K	https://www.tradingview.com/symbols/TSX-K/	KINROSS GOLD CORP	5.39 B	0.3084	1.94 B	1.82 B	1.17 B	2.98 B	USD	0.95	USD	1.8999	D
+https://s3-symbol-logo.tradingview.com/adyen.svg	ADYEN	https://www.tradingview.com/symbols/EURONEXT-ADYEN/	ADYEN	2.26 B	0.1705	1.88 B	919.09 M	957.75 M	1.03 B	USD	30.68	USD	0.3216	D
+https://s3-symbol-logo.tradingview.com/realteks-gds.svg	2379	https://www.tradingview.com/symbols/TWSE-2379/	REALTEK SEMICONDUCTOR CORP	3.69 B	0.2136	1.81 B	470.74 M	508.65 M	574.01 M	USD	0.98	USD	0.6087	D
+https://s3-symbol-logo.tradingview.com/adnoc-drilling-company-pjsc.svg	ADNOCDRILL	https://www.tradingview.com/symbols/ADX-ADNOCDRILL/	ADNOC Drilling Company PJSC	4.31 B	0.3383	1.77 B	1.61 B	1.37 B	2.09 B	USD	0.09	USD	0.2585	
+https://s3-symbol-logo.tradingview.com/wise.svg	WISE	https://www.tradingview.com/symbols/LSE-WISE/	WISE PLC CLS A ORD GBP0.01	2.31 B	0.3439	1.65 B	737.2 M	576.73 M	774.51 M	USD	0.55	USD	0.9831	
+https://s3-symbol-logo.tradingview.com/anker-innovations.svg	300866	https://www.tradingview.com/symbols/SZSE-300866/	ANKER INNOVATIONS	3.62 B	0.4214	1.57 B	296.36 M	316.78 M	—	USD	0.57		0.3536	D
+https://s3-symbol-logo.tradingview.com/zhejiang-nhu-co.svg	2001	https://www.tradingview.com/symbols/SZSE-002001/	ZHEJIANG NHU CO	3.07 B	0.4087	1.55 B	1.07 B	947.63 M	—	USD	0.31		1.3471	D
+https://s3-symbol-logo.tradingview.com/cal-maine-foods.svg	CALM	https://www.tradingview.com/symbols/NASDAQ-CALM/	Cal-Maine Foods, Inc.	3.8 B	0.6	1.51 B	1.24 B	990.81 M	1.33 B	USD	20.24	USD	2.5886	
+https://s3-symbol-logo.tradingview.com/california-resources-corporation.svg	CRC	https://www.tradingview.com/symbols/NYSE-CRC/	California Resources Corporation	3.34 B	0.4168	1.35 B	750 M	501 M	1.32 B	USD	5.52	USD	0.5832	
+https://s3-symbol-logo.tradingview.com/man-group-plc-ord-usd0-0342857142.svg	EMG	https://www.tradingview.com/symbols/LSE-EMG/	MAN GROUP PLC (NEW) ORD USD0.0342857142	1.48 B	0.1885	1.3 B	412.7 M	292.1 M	486.19 M	USD	0.25	USD	0.2616	
+https://s3-symbol-logo.tradingview.com/krafton.svg	259960	https://www.tradingview.com/symbols/KRX-259960/	KRAFTON	1.97 B	0.432	1.23 B	897.25 M	896.5 M	971.79 M	USD	19.61	USD	0.9924	D
+https://s3-symbol-logo.tradingview.com/pop-mart-intl-grp-ltd.svg	9992	https://www.tradingview.com/symbols/HKEX-9992/	POP MART INTL GRP LTD	1.82 B	1.0344	1.22 B	573.23 M	436.16 M	693.61 M	USD	0.33	USD	1.8583	D
+https://s3-symbol-logo.tradingview.com/harmony-gold.svg	HAR	https://www.tradingview.com/symbols/JSE-HAR/	HARMONY GM CO LTD	3.65 B	0.1906	1.15 B	1.03 B	553.56 M	1.28 B	USD	0.88	USD	0.1632	
+https://s3-symbol-logo.tradingview.com/virtu-financial.svg	VIRT	https://www.tradingview.com/symbols/NASDAQ-VIRT/	Virtu Financial, Inc.	2.78 B	0.2602	1.14 B	848.04 M	300.96 M	961.28 M	USD	3.47	USD	1.418	
+https://s3-symbol-logo.tradingview.com/sitc-international-hldgs-co-ltd.svg	1308	https://www.tradingview.com/symbols/HKEX-1308/	SITC INTERNATIONAL HLDGS CO LTD	3.07 B	0.2544	1.14 B	1 B	1.03 B	1.17 B	USD	0.38	USD	0.9262	D
+https://s3-symbol-logo.tradingview.com/eastroc-beverage-coltd.svg	605499	https://www.tradingview.com/symbols/SSE-605499/	EASTROC BEVERAGE (GROUP) CO LTD	2.35 B	0.4054	1.08 B	577.15 M	501.84 M	—	USD	1.05		0.3816	D
+https://s3-symbol-logo.tradingview.com/orion.svg	ORNAV	https://www.tradingview.com/symbols/OMXHEX-ORNAV/	ORION CORPORATION A	1.72 B	0.3022	1.06 B	464.11 M	375.94 M	565.81 M	USD	2.68	USD	0.602	D
+https://s3-symbol-logo.tradingview.com/el-al-israel-airlines-ltd.svg	ELAL	https://www.tradingview.com/symbols/TASE-ELAL/	EL AL	3.43 B	0.2551	1.05 B	767.92 M	550.43 M	1.03 B	USD	1.12	USD	1.0118	D
+https://s3-symbol-logo.tradingview.com/national-marine-dredging-co.svg	NMDC	https://www.tradingview.com/symbols/ADX-NMDC/	NMDC Group PJSC	7.38 B	0.4406	1.02 B	934.55 M	829.96 M	1.14 B	USD	0.99	USD	0.2071	
+https://s3-symbol-logo.tradingview.com/celestica.svg	CLS	https://www.tradingview.com/symbols/TSX-CLS/	CELESTICA INC	9.76 B	0.2494	1.01 B	606.83 M	408.49 M	755.31 M	USD	3.46	USD	0.4168	D
+https://s3-symbol-logo.tradingview.com/ubiquiti-networks.svg	UI	https://www.tradingview.com/symbols/NYSE-UI/	Ubiquiti Inc.	2.32 B	0.2143	978.86 M	713.25 M	549.02 M	735.4 M	USD	9.07	USD	0.5678	
+https://s3-symbol-logo.tradingview.com/fpt-corporation.svg	FPT	https://www.tradingview.com/symbols/HOSE-FPT/	FPT CORPORATION	2.45 B	0.1944	928.19 M	409.9 M	306.06 M	508.62 M	USD	0.21	USD	0.2087	D
+https://s3-symbol-logo.tradingview.com/giga-byte-technology-co.svg	2376	https://www.tradingview.com/symbols/TWSE-2376/	GIGA-BYTE TECHNOLOGY CO	8.29 B	0.6822	911.88 M	418.94 M	327.04 M	443.27 M	USD	0.47	USD	0.7708	D
+https://s3-symbol-logo.tradingview.com/kongsberg-gruppen-asa.svg	KOG	https://www.tradingview.com/symbols/OSL-KOG/	KONGSBERG GRUPPEN ASA	4.84 B	0.1866	833.87 M	656.61 M	596.85 M	802.9 M	USD	3.39	USD	0.5381	D
+https://s3-symbol-logo.tradingview.com/halozyme-therapeutics.svg	HALO	https://www.tradingview.com/symbols/NASDAQ-HALO/	Halozyme Therapeutics, Inc.	1.08 B	0.2565	833.77 M	597.47 M	485.36 M	679.06 M	USD	3.77	USD	0.5589	
+https://s3-symbol-logo.tradingview.com/hd-hyundai-construction-equipment.svg	267260	https://www.tradingview.com/symbols/KRX-267260/	HD HYUNDAI ELECTRIC	2.39 B	0.2047	788.95 M	511.9 M	379.12 M	557.63 M	USD	10.53	USD	0.734	D
+https://s3-symbol-logo.tradingview.com/texas-roadhouse.svg	TXRH	https://www.tradingview.com/symbols/NASDAQ-TXRH/	Texas Roadhouse, Inc.	5.5 B	0.1509	772.87 M	545.98 M	434.05 M	731.45 M	USD	6.49	USD	0.3122	
+https://s3-symbol-logo.tradingview.com/evolution-mining.svg	EVN	https://www.tradingview.com/symbols/ASX-EVN/	EVOLUTION MINING LIMITED	2.42 B	0.6056	766.44 M	714.09 M	427.18 M	1.2 B	USD	0.21	USD	3.0267	D
+https://s3-symbol-logo.tradingview.com/lundin-gold.svg	LUG	https://www.tradingview.com/symbols/TSX-LUG/	LUNDIN GOLD INC	1.28 B	0.5662	755.59 M	720.29 M	520.56 M	848.87 M	USD	2.15	USD	2.2473	D
+https://s3-symbol-logo.tradingview.com/ies.svg	IESC	https://www.tradingview.com/symbols/NASDAQ-IESC/	IES Holdings, Inc.	3.13 B	0.2153	723.37 M	333.42 M	234.01 M	378.12 M	USD	11.53	USD	0.6649	
+https://s3-symbol-logo.tradingview.com/paykel.svg	FPH	https://www.tradingview.com/symbols/NZX-FPH/	FISHER & PAYKEL HEALTHCARE CORP NPV	1.15 B	0.151	723.04 M	290.77 M	214.17 M	370.21 M	USD	0.36	USD	1.8254	D
+https://s3-symbol-logo.tradingview.com/shenzhen-s-c-new-e.svg	300724	https://www.tradingview.com/symbols/SZSE-300724/	SHENZHEN S C NEW E	2.8 B	1.1905	722.64 M	435.47 M	398.58 M	—	USD	1.15		0.5445	D
+https://s3-symbol-logo.tradingview.com/leisure-and-resorts-world.svg	PLUS	https://www.tradingview.com/symbols/PSE-PLUS/	DIGIPLUS INTERACTIVE CORP	1.47 B	1.3062	719.74 M	261.72 M	257.54 M	284.64 M	USD	0.06	USD	1.4971	D
+https://s3-symbol-logo.tradingview.com/brinker-international.svg	EAT	https://www.tradingview.com/symbols/NYSE-EAT/	Brinker International, Inc.	5.13 B	0.198	711.3 M	496.1 M	333.4 M	689.8 M	USD	7.25	USD	1.1506	
+https://s3-symbol-logo.tradingview.com/green-brick-partners.svg	GRBK	https://www.tradingview.com/symbols/NYSE-GRBK/	Green Brick Partners, Inc.	2.15 B	0.2122	705.89 M	480.16 M	373.34 M	485.32 M	USD	8.29	USD	0.257	
+https://s3-symbol-logo.tradingview.com/inpost-s-a.svg	INPST	https://www.tradingview.com/symbols/EURONEXT-INPST/	INPOST S.A.	2.9 B	0.2835	690.49 M	527.64 M	297.08 M	939.3 M	USD	0.59	USD	0.5423	D
+https://s3-symbol-logo.tradingview.com/erie-indemnity.svg	ERIE	https://www.tradingview.com/symbols/NASDAQ-ERIE/	Erie Indemnity Company	3.9 B	0.1505	688.1 M	690.9 M	614.18 M	—	USD	11.66		0.2678	
+https://s3-symbol-logo.tradingview.com/swissquote-n.svg	SQN	https://www.tradingview.com/symbols/SIX-SQN/	SWISSQUOTE N	809.33 M	0.2478	685.18 M	384.28 M	323.91 M	434.31 M	USD	21.5	USD	0.3419	D
+https://s3-symbol-logo.tradingview.com/gqg-partners-inc.svg	GQG	https://www.tradingview.com/symbols/ASX-GQG/	GQG PARTNERS INC.	713.19 M	0.4763	684 M	546.72 M	404.72 M	547.12 M	USD	0.14	USD	0.5419	D
+https://s3-symbol-logo.tradingview.com/flow-traders-ltd.svg	FLOW	https://www.tradingview.com/symbols/EURONEXT-FLOW/	FLOW TRADERS	828.98 M	0.3876	676.75 M	417.23 M	165.16 M	435.13 M	USD	3.69	USD	3.3908	D
+https://s3-symbol-logo.tradingview.com/chifeng-jilong-gold-mining-coltd.svg	600988	https://www.tradingview.com/symbols/SSE-600988/	CHIFENG JILONG GOLD MINING CO LTD	1.25 B	0.2813	664.52 M	465.88 M	282.03 M	—	USD	0.17		1.2015	D
+https://s3-symbol-logo.tradingview.com/mitie-plc.svg	MTO	https://www.tradingview.com/symbols/LSE-MTO/	MITIE GROUP ORD GBP0.025	6.4 B	0.1525	664.05 M	222.11 M	161.27 M	346.74 M	USD	0.12	USD	0.2836	
+https://s3-symbol-logo.tradingview.com/ninebot-limited.svg	689009	https://www.tradingview.com/symbols/SSE-689009/	NINEBOT LIMITED	2.29 B	0.5067	656 M	210.62 M	193.5 M	—	USD	0.24		0.9229	D
+https://s3-symbol-logo.tradingview.com/ningbo-deye-technology.svg	605117	https://www.tradingview.com/symbols/SSE-605117/	NINGBO DEYE TECHNOLOGY CO LTD	1.62 B	0.6318	635.31 M	440.12 M	445.38 M	—	USD	0.69		0.8453	D
+https://s3-symbol-logo.tradingview.com/giant-biogene-hldg-co-ltd.svg	2367	https://www.tradingview.com/symbols/HKEX-2367/	GIANT BIOGENE HLDG CO. LTD	772.79 M	0.5444	634.4 M	318.32 M	287.74 M	325.23 M	USD	0.28	USD	0.352	D
+https://s3-symbol-logo.tradingview.com/transport-gas-sur.svg	TGSU2	https://www.tradingview.com/symbols/BCBA-TGSU2/	TRANSPORTADORA DE GAS DEL SUR S.A	1.16 B	1.9679	632.11 M	522.88 M	366.17 M	660.06 M	USD	0.49	USD	6.9444	D
+https://s3-symbol-logo.tradingview.com/yintai-gold-co-ltd.svg	975	https://www.tradingview.com/symbols/SZSE-000975/	SHANJIN INTERNATIO	2.04 B	0.7534	628.87 M	491.85 M	325.65 M	—	USD	0.12		0.4493	D
+https://s3-symbol-logo.tradingview.com/zhejiang-cfmoto-power.svg	603129	https://www.tradingview.com/symbols/SSE-603129/	ZHEJIANG CFMOTO POWER	2.19 B	0.3172	626.45 M	204.71 M	221.71 M	—	USD	1.45		0.4795	D
+https://s3-symbol-logo.tradingview.com/is-y-men-deg.svg	ISMEN	https://www.tradingview.com/symbols/BIST-ISMEN/	IS Y. MEN. DEG.	26.31 B	0.6773	625.14 M	483.82 M	160.18 M	490.17 M	USD	0.11	USD	0.4008	D
+https://s3-symbol-logo.tradingview.com/anima.svg	ANIM	https://www.tradingview.com/symbols/MIL-ANIM/	ANIMA HOLDING	1.48 B	0.2331	601.83 M	392.57 M	267.19 M	448.05 M	USD	0.82	USD	0.451	
+https://s3-symbol-logo.tradingview.com/antam.svg	ANTM	https://www.tradingview.com/symbols/IDX-ANTM/	ANEKA TAMBANG	5.2 B	1.2777	580.87 M	379.45 M	332.4 M	456.03 M	USD	0.01	USD	2.3517	D
+https://s3-symbol-logo.tradingview.com/masan-consumer.svg	MCH	https://www.tradingview.com/symbols/UPCOM-MCH/	MASAN CONSUMER CORPORATION	1.2 B	0.2697	561.78 M	293.47 M	304.33 M	319.97 M	USD	0.42	USD	0.638	D
+https://s3-symbol-logo.tradingview.com/samyang-food.svg	3230	https://www.tradingview.com/symbols/KRX-003230/	SAMYANG FOOD	1.26 B	0.4037	537 M	268.95 M	205.61 M	302.3 M	USD	27.57	USD	0.7871	D
+https://s3-symbol-logo.tradingview.com/alk-abello-b-a-s.svg	ALK_B	https://www.tradingview.com/symbols/OMXCOP-ALK_B/	ALK-ABELLO B A/S	827.07 M	0.1552	533.07 M	179.96 M	135.77 M	220.1 M	USD	0.61	USD	0.6864	D
+https://s3-symbol-logo.tradingview.com/rea-group.svg	REA	https://www.tradingview.com/symbols/ASX-REA/	REA GROUP LTD	1.12 B	0.2028	524.2 M	451.63 M	381.53 M	528.72 M	USD	2.89	USD	1.1889	D
+https://s3-symbol-logo.tradingview.com/hithink-royalflush.svg	300033	https://www.tradingview.com/symbols/SZSE-300033/	HITHINK ROYALFLUSH	582.92 M	0.2041	520.56 M	238.16 M	253.45 M	—	USD	0.47		0.3292	D
+https://s3-symbol-logo.tradingview.com/doximity.svg	DOCS	https://www.tradingview.com/symbols/NYSE-DOCS/	Doximity, Inc.	570.4 M	0.1998	514.52 M	230.78 M	223.19 M	241.44 M	USD	1.11	USD	0.5352	
+https://s3-symbol-logo.tradingview.com/shanghai-allist-pharmaceuticals-co-ltd.svg	688578	https://www.tradingview.com/symbols/SSE-688578/	SHANGHAI ALLIST PHARMACEUTICALS CO	531.73 M	0.575	512.17 M	225.09 M	211.36 M	—	USD	0.47		0.6762	D
+https://s3-symbol-logo.tradingview.com/appfolio.svg	APPF	https://www.tradingview.com/symbols/NASDAQ-APPF/	AppFolio, Inc.	824.47 M	0.2273	506.97 M	135.34 M	196.78 M	157.93 M	USD	5.35	USD	1.5811	
+https://s3-symbol-logo.tradingview.com/yealink-network-te.svg	300628	https://www.tradingview.com/symbols/SZSE-300628/	YEALINK NETWORK TE	770.11 M	0.2224	503.58 M	357.78 M	363.87 M	—	USD	0.29		0.2234	D
+https://s3-symbol-logo.tradingview.com/oceanagold-corporation.svg	OGC	https://www.tradingview.com/symbols/TSX-OGC/	OCEANAGOLD CORPORATION	1.34 B	0.3581	480.26 M	392.9 M	284.57 M	689.24 M	USD	0.39	USD	7.0455	D
+https://s3-symbol-logo.tradingview.com/clear-secure.svg	YOU	https://www.tradingview.com/symbols/NYSE-YOU/	Clear Secure, Inc.	802.81 M	0.2159	479.08 M	136.91 M	176.28 M	163.83 M	USD	1.86	USD	2.2884	
+https://s3-symbol-logo.tradingview.com/converge-information-and-communications-technology-solutions.svg	CNVRG	https://www.tradingview.com/symbols/PSE-CNVRG/	CONVERGE INFORMATION AND COMMUNICATIONS TECHNOLOGY SOLUTIONS, INC	729.32 M	0.1547	464.13 M	277.36 M	196.5 M	443.07 M	USD	0.03	USD	0.19	D
+	1318	https://www.tradingview.com/symbols/HKEX-1318/	MAO GEPING COSMETICS CO LTD	541.98 M	0.3209	447.97 M	154.73 M	122.85 M	165.67 M	USD	0.26	USD	0.3029	D
+https://s3-symbol-logo.tradingview.com/mavi-giyim.svg	MAVI	https://www.tradingview.com/symbols/BIST-MAVI/	MAVI GIYIM	1 B	0.385	444.64 M	123.37 M	69.12 M	185.69 M	USD	0.09	USD	0.407	D
+https://s3-symbol-logo.tradingview.com/gtt-gaztransport.svg	GTT	https://www.tradingview.com/symbols/EURONEXT-GTT/	GTT (GAZTRANSPORT ET TECHNIGAZ) EUR0.01	663.98 M	0.4996	431.04 M	382.67 M	360.07 M	401.86 M	USD	9.7	USD	0.7214	D
+https://s3-symbol-logo.tradingview.com/enaex-sa.svg	ENAEX	https://www.tradingview.com/symbols/BCS-ENAEX/	ENAEX SA	1.81 B	0.1654	430.42 M	253.94 M	151.83 M	322.94 M	USD	1.23	USD	0.1676	D
+https://s3-symbol-logo.tradingview.com/nova.svg	NVMI	https://www.tradingview.com/symbols/NASDAQ-NVMI/	Nova Ltd.	743.95 M	0.4103	426.13 M	213.55 M	211.73 M	231.46 M	USD	6.59	USD	0.5228	
+https://s3-symbol-logo.tradingview.com/catalyst-pharmaceuticals.svg	CPRX	https://www.tradingview.com/symbols/NASDAQ-CPRX/	Catalyst Pharmaceuticals, Inc.	534.65 M	0.2997	423.03 M	231.37 M	197.35 M	269.38 M	USD	1.57	USD	1.9105	
+https://s3-symbol-logo.tradingview.com/baycurrent-consulting.svg	6532	https://www.tradingview.com/symbols/TSE-6532/	BAYCURRENT INC	770.38 M	0.2358	414.58 M	282.85 M	204.18 M	299.37 M	USD	1.34	USD	0.2175	D
+https://s3-symbol-logo.tradingview.com/chroma-ate.svg	2360	https://www.tradingview.com/symbols/TWSE-2360/	CHROMA ATE INC	722.88 M	0.2858	414.52 M	202.75 M	193.31 M	226.54 M	USD	0.45	USD	0.6071	D
+https://s3-symbol-logo.tradingview.com/inner-mongolia-xin.svg	426	https://www.tradingview.com/symbols/SZSE-000426/	INNER MONGOLIA XIN	602.56 M	0.1582	413.56 M	288.65 M	230.73 M	—	USD	0.13		0.4283	D
+https://s3-symbol-logo.tradingview.com/tidewater.svg	TDW	https://www.tradingview.com/symbols/NYSE-TDW/	Tidewater Inc.	1.36 B	0.1934	411.82 M	297.24 M	176.28 M	549.17 M	USD	3.34	USD	0.3316	
+https://s3-symbol-logo.tradingview.com/apr.svg	278470	https://www.tradingview.com/symbols/KRX-278470/	APR	566.9 M	0.5255	410.23 M	100.91 M	90.07 M	117.86 M	USD	2.36	USD	0.5529	D
+https://s3-symbol-logo.tradingview.com/sumber-tani-agung-resources-tbk.svg	STAA	https://www.tradingview.com/symbols/IDX-STAA/	SUMBER TANIAGUNG RESOURCES TBK	674.94 M	1.0837	408.1 M	379.6 M	83.36 M	397.54 M	USD	0.01	USD	0.8879	D
+https://s3-symbol-logo.tradingview.com/xiamen-amoytop-biotech.svg	688278	https://www.tradingview.com/symbols/SSE-688278/	XIAMEN AMOYTOP BIOTECH CO LTD	403.75 M	0.3235	385.57 M	134.53 M	121.36 M	—	USD	0.3		0.468	D
+https://s3-symbol-logo.tradingview.com/flatexdegiro.svg	FTK	https://www.tradingview.com/symbols/XETR-FTK/	FLATEXDEGIRO AG	496.93 M	0.2285	383.56 M	177.69 M	115.46 M	219.32 M	USD	1.05	USD	0.556	D
+https://s3-symbol-logo.tradingview.com/athabasca.svg	ATH	https://www.tradingview.com/symbols/TSX-ATH/	ATHABASCA OIL CORP	978.23 M	0.1599	365.67 M	333.35 M	348.21 M	424.12 M	USD	0.64	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/multiplan-on-n2.svg	MULT3	https://www.tradingview.com/symbols/BMFBOVESPA-MULT3/	MULTIPLAN ON N2	445.7 M	0.2195	364.89 M	300.14 M	228.87 M	325.13 M	USD	0.42	USD	0.313	D
+https://s3-symbol-logo.tradingview.com/badger-meter.svg	BMI	https://www.tradingview.com/symbols/NYSE-BMI/	Badger Meter, Inc.	852.49 M	0.1508	347.44 M	170.78 M	134.21 M	203.24 M	USD	4.54	USD	0.3085	
+https://s3-symbol-logo.tradingview.com/china-overseas-ppty-hldgs-ltd.svg	2669	https://www.tradingview.com/symbols/HKEX-2669/	CHINA OVERSEAS PROPERTY HLDGS LTD	1.98 B	0.2026	346.11 M	284.14 M	210.8 M	—	USD	0.06		0.2876	D
+https://s3-symbol-logo.tradingview.com/hunan-gold-corpora.svg	2155	https://www.tradingview.com/symbols/SZSE-002155/	HUNAN GOLD CORPORA	4.55 B	0.3017	345.79 M	169.29 M	140.03 M	—	USD	0.12		0.8646	D
+https://s3-symbol-logo.tradingview.com/lig-nex1-co-ltd.svg	79550	https://www.tradingview.com/symbols/KRX-079550/	LIG NEX1 CO., LTD.	2.31 B	0.3545	344.25 M	170.39 M	165.62 M	227.31 M	USD	7.6	USD	0.3955	D
+https://s3-symbol-logo.tradingview.com/beijing-enlight-me.svg	300251	https://www.tradingview.com/symbols/SZSE-300251/	BEIJING ENLIGHT ME	480.09 M	0.5831	332.89 M	296.1 M	259.43 M	—	USD	0.09		1.606	D
+https://s3-symbol-logo.tradingview.com/topicus-com.svg	TOI	https://www.tradingview.com/symbols/TSXV-TOI/	TOPICUS COM INC	1.39 B	0.1762	326.92 M	220.83 M	102.45 M	403.63 M	USD	0.79	USD	0.1665	D
+https://s3-symbol-logo.tradingview.com/metrogas-sa.svg	METR	https://www.tradingview.com/symbols/BCBA-METR/	METROGAS SA	946.96 M	1.9494	326.25 M	166.91 M	135.67 M	208.19 M	USD	0.24	USD	0.44	D
+https://s3-symbol-logo.tradingview.com/alchip-technologies-limitd.svg	3661	https://www.tradingview.com/symbols/TWSE-3661/	ALCHIP TECHNOLOGIES LIMITD	1.56 B	0.4739	314.54 M	203.75 M	200.74 M	297.71 M	USD	2.45	USD	0.5882	D
+https://s3-symbol-logo.tradingview.com/santos-brp.svg	STBP3	https://www.tradingview.com/symbols/BMFBOVESPA-STBP3/	SANTOS BRP ON NM	549.76 M	0.335	307.44 M	238.52 M	138.71 M	285.44 M	USD	0.16	USD	0.3155	D
+https://s3-symbol-logo.tradingview.com/ramelius-resources.svg	RMS	https://www.tradingview.com/symbols/ASX-RMS/	RAMELIUS RESOURCES LIMITED	644.61 M	0.5437	283.73 M	275.67 M	213.88 M	386.82 M	USD	0.19	USD	3.1094	D
+https://s3-symbol-logo.tradingview.com/suzhou-tfc-optical.svg	300394	https://www.tradingview.com/symbols/SZSE-300394/	SUZHOU TFC OPTICAL	472.19 M	0.4512	275.02 M	205.48 M	193.18 M	—	USD	0.35		0.5247	D
+https://s3-symbol-logo.tradingview.com/polar-capital-technology-trust-plc-ord-25p.svg	PCT	https://www.tradingview.com/symbols/LSE-PCT/	POLAR CAPITAL TECHNOLOGY TRUST PLC ORD GBP0.025	311.84 M	#ERROR!	274.56 M	1.59 B	1.57 B	1.59 B	USD	1.29	USD	1.4667	
+https://s3-symbol-logo.tradingview.com/guangxi-huaxi-nonferrous-metal-coltd.svg	600301	https://www.tradingview.com/symbols/SSE-600301/	GUANGXI HUAXI NONFERROUS METAL CO L	653.49 M	0.4931	271.27 M	181.91 M	82.26 M	—	USD	0.13		0.3206	D
+	2520	https://www.tradingview.com/symbols/TWSE-2520/	KINDOM DEVELOPMENT CO LTD	859.35 M	0.4468	267.13 M	215.27 M	157.4 M	229.22 M	USD	0.29	USD	0.9634	D
+https://s3-symbol-logo.tradingview.com/domdev.svg	DOM	https://www.tradingview.com/symbols/GPW-DOM/	DOMDEV	826.92 M	0.3163	266.5 M	190.75 M	149.74 M	197.29 M	USD	5.8	USD	0.3214	D
+https://s3-symbol-logo.tradingview.com/jf-smartinvest-ltd.svg	9636	https://www.tradingview.com/symbols/HKEX-9636/	JF SMARTINVEST HOLDINGS LTD	321.76 M	0.154	264.3 M	42.3 M	38.05 M	54.98 M	USD	0.08	USD	0.5095	D
+	2059	https://www.tradingview.com/symbols/TWSE-2059/	KING SLIDE WORKS CO	365.05 M	0.8573	262.97 M	234.82 M	218.81 M	244.9 M	USD	2.28	USD	1.0003	D
+https://s3-symbol-logo.tradingview.com/wilson-sons-on-eb-nm.svg	PORT3	https://www.tradingview.com/symbols/BMFBOVESPA-PORT3/	WILSON SONS ON ED NM	534.15 M	0.222	255.49 M	156.02 M	100.05 M	227.64 M	USD	0.23	USD	0.3567	D
+https://s3-symbol-logo.tradingview.com/lafarge-cement-wapco-plc.svg	WAPCO	https://www.tradingview.com/symbols/NSENG-WAPCO/	LAFARGE CEMENT WAPCO PLC	494.09 M	0.7883	245.81 M	138.62 M	87.88 M	157.36 M	USD	0.01	USD	2.4725	
+https://s3-symbol-logo.tradingview.com/triputra-agro-persada-tbk.svg	TAPG	https://www.tradingview.com/symbols/IDX-TAPG/	TRIPUTRA AGRO PERSADA TBK	622.77 M	0.2487	245.05 M	193.91 M	213.28 M	234.97 M	USD	0.01	USD	1.1105	D
+https://s3-symbol-logo.tradingview.com/kayne-anderson.svg	KYN	https://www.tradingview.com/symbols/NYSE-KYN/	Kayne Anderson Energy Infrastructure Fund, Inc.	279.32 M	0.3673	241.28 M	1.21 B	929.67 M	1.21 B	USD	5.5	USD	5.7257	
+https://s3-symbol-logo.tradingview.com/posiflex-technologies.svg	8114	https://www.tradingview.com/symbols/TWSE-8114/	POSIFLEX TECHNOLOGIES INC	528.74 M	0.8133	241.01 M	120.47 M	41.6 M	129.8 M	USD	0.46	USD	2.0982	D
+https://s3-symbol-logo.tradingview.com/compania-minera-poderosa-sa.svg	PODERC1	https://www.tradingview.com/symbols/BVL-PODERC1/	COMPANIA MINERA PODEROSA SA	695.74 M	0.3171	239.96 M	173.66 M	110.03 M	269.78 M	USD	0.1	USD	0.3396	D
+https://s3-symbol-logo.tradingview.com/propel-hldgs.svg	PRL	https://www.tradingview.com/symbols/TSX-PRL/	PROPEL HOLDINGS INC	476.7 M	0.4636	239.66 M	106.82 M	55.26 M	112.91 M	USD	1.39	USD	0.6292	D
+https://s3-symbol-logo.tradingview.com/shenyang-xingqi-ph.svg	300573	https://www.tradingview.com/symbols/SZSE-300573/	SHENYANG XINGQI PH	289.39 M	0.3883	235.38 M	71.21 M	61.88 M	—	USD	0.25		0.7463	D
+https://s3-symbol-logo.tradingview.com/jamjoom-pharmaceuticals-factory-co.svg	4015	https://www.tradingview.com/symbols/TADAWUL-4015/	JAMJOOM PHARMACEUTICALS FACTORY CO.	370.13 M	0.1741	229.96 M	109.42 M	109.29 M	120.09 M	USD	1.56	USD	0.3204	D
+https://s3-symbol-logo.tradingview.com/peptidream.svg	4587	https://www.tradingview.com/symbols/TSE-4587/	PEPTIDREAM INC	311.2 M	0.6689	229.94 M	140.8 M	98.82 M	155.25 M	USD	0.76	USD	5.0691	D
+https://s3-symbol-logo.tradingview.com/sezzle.svg	SEZL	https://www.tradingview.com/symbols/NASDAQ-SEZL/	Sezzle Inc.	329.06 M	0.9169	217.37 M	118.31 M	106.68 M	119.32 M	USD	2.96	USD	6.7636	
+https://s3-symbol-logo.tradingview.com/wesdome-gold-mines.svg	WDO	https://www.tradingview.com/symbols/TSX-WDO/	WESDOME GOLD MINES LTD	448.09 M	0.8044	215.95 M	195.53 M	130.1 M	265.7 M	USD	0.86	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/mineros-sa.svg	MINEROS	https://www.tradingview.com/symbols/BVC-MINEROS/	MINEROS S.A.	582.03 M	0.2141	208.01 M	183.93 M	107.44 M	233.67 M	USD	0.36	USD	1.3052	D
+https://s3-symbol-logo.tradingview.com/shanghai-friendess-electronic-technology-limited.svg	688188	https://www.tradingview.com/symbols/SSE-688188/	SHANGHAI BOCHU ELECTRONIC TECH CORP	251.41 M	0.2188	200.34 M	127.68 M	130.13 M	—	USD	0.63		0.1919	D
+https://s3-symbol-logo.tradingview.com/aradel.svg	ARADEL	https://www.tradingview.com/symbols/NSENG-ARADEL/	ARADEL	416.07 M	1.2389	198.51 M	188.3 M	164.92 M	242.6 M	USD	0.04	USD	2.9541	
+https://s3-symbol-logo.tradingview.com/headwater-exploration.svg	HWX	https://www.tradingview.com/symbols/TSX-HWX/	HEADWATER EXPLORATION INC	375.77 M	0.2048	198.01 M	182.11 M	139.25 M	271.33 M	USD	0.58	USD	0.2233	D
+https://s3-symbol-logo.tradingview.com/hugel.svg	145020	https://www.tradingview.com/symbols/KRX-145020/	HUGEL, INC.	262.28 M	0.1788	195.56 M	122.12 M	97.25 M	132.26 M	USD	8.65	USD	0.529	D
+https://s3-symbol-logo.tradingview.com/cairn-homes-plc.svg	CRN	https://www.tradingview.com/symbols/LSE-CRN/	CAIRN HOMES PLC ORD EUR0.001 (CDI)	890.16 M	0.2307	193.55 M	155.29 M	118.61 M	158.11 M	USD	0.18	USD	0.347	
+https://s3-symbol-logo.tradingview.com/fuzhou-rockchip-electronics-co-ltd.svg	603893	https://www.tradingview.com/symbols/SSE-603893/	FUZHOU ROCKCHIP ELECTRONICS CO LTD	475.48 M	0.4742	192.96 M	78.54 M	101.49 M	—	USD	0.24		2.3244	D
+https://s3-symbol-logo.tradingview.com/jusung-engineering-coltd.svg	36930	https://www.tradingview.com/symbols/KRX-036930/	JUSUNG ENGINEERING CO.,LTD.	319.73 M	0.7375	192.88 M	82.58 M	79.95 M	95.13 M	USD	1.71	USD	2.0221	D
+https://s3-symbol-logo.tradingview.com/basilea-n.svg	BSLN	https://www.tradingview.com/symbols/SIX-BSLN/	BASILEA N	229.62 M	0.323	187.03 M	67.36 M	85.44 M	71.25 M	USD	6.41	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/pharmaresearch.svg	214450	https://www.tradingview.com/symbols/KRX-214450/	PHARMARESEARCH	264.81 M	0.3997	186.06 M	97.28 M	74.91 M	106.91 M	USD	5.81	USD	0.163	D
+https://s3-symbol-logo.tradingview.com/navigator-global-invts-ltd.svg	NGI	https://www.tradingview.com/symbols/ASX-NGI/	NAVIGATOR GLOBAL INVESTMENTS LIMITED	360.99 M	0.2909	180.06 M	163.98 M	137.01 M	172.01 M	USD	0.3	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/hilan.svg	HLAN	https://www.tradingview.com/symbols/TASE-HLAN/	HILAN	781.45 M	0.2287	179.66 M	90.91 M	68.38 M	122.28 M	USD	2.93	USD	0.3986	D
+https://s3-symbol-logo.tradingview.com/ifast.svg	AIY	https://www.tradingview.com/symbols/SGX-AIY/	IFAST	302.4 M	0.3998	175.48 M	70.34 M	52.95 M	91.77 M	USD	0.17	USD	0.7778	D
+https://s3-symbol-logo.tradingview.com/raya-for-financial-investments.svg	RAYA	https://www.tradingview.com/symbols/EGX-RAYA/	RAYA HOLDING FOR FINANCIAL INVESTMENTS	830.87 M	0.4121	173.93 M	73.82 M	23.53 M	86.01 M	USD	0	USD	1	D
+https://s3-symbol-logo.tradingview.com/silicon-2-coltd.svg	257720	https://www.tradingview.com/symbols/KRX-257720/	SILICON 2 CO.,LTD.	531.41 M	0.8108	171.18 M	105.2 M	90.44 M	109.45 M	USD	1.48	USD	1.3439	D
+https://s3-symbol-logo.tradingview.com/celebi.svg	CLEBI	https://www.tradingview.com/symbols/BIST-CLEBI/	CELEBI	541.26 M	0.6496	169.57 M	121.11 M	92.16 M	147.39 M	USD	3.79	USD	0.7205	D
+https://s3-symbol-logo.tradingview.com/vt.svg	18290	https://www.tradingview.com/symbols/KRX-018290/	VT	290.48 M	0.2316	167.97 M	78.27 M	70.4 M	81.91 M	USD	2.02	USD	1.4841	D
+https://s3-symbol-logo.tradingview.com/tianli-international-ltd.svg	1773	https://www.tradingview.com/symbols/HKEX-1773/	TIANLI INTERNATIONAL HOLDINGS LTD	493.24 M	0.1687	167.71 M	129.18 M	95.09 M	169.41 M	USD	0.05	USD	0.515	D
+https://s3-symbol-logo.tradingview.com/anji-microelectronics-technology-shanghai.svg	688019	https://www.tradingview.com/symbols/SSE-688019/	ANJI MICROELECTRONICS TECHNOLOGY	275.43 M	0.486	167.57 M	77.8 M	82.3 M	—	USD	0.64		0.3805	D
+https://s3-symbol-logo.tradingview.com/united-states-lime-and-minerals.svg	USLM	https://www.tradingview.com/symbols/NASDAQ-USLM/	United States Lime & Minerals, Inc.	337.29 M	0.1783	159.2 M	139.06 M	120.51 M	163.31 M	USD	4.2	USD	0.5009	
+	3227	https://www.tradingview.com/symbols/TPEX-3227/	PIXART IMAGING	269.32 M	0.3769	159.17 M	60.74 M	62.2 M	71.72 M	USD	0.42	USD	0.8595	
+https://s3-symbol-logo.tradingview.com/ufp-technologies.svg	UFPT	https://www.tradingview.com/symbols/NASDAQ-UFPT/	UFP Technologies, Inc.	547.56 M	0.3443	158.76 M	91.73 M	63.47 M	108.08 M	USD	8.16	USD	0.3151	
+https://s3-symbol-logo.tradingview.com/naturgy.svg	GBAN	https://www.tradingview.com/symbols/BCBA-GBAN/	NATURGY BAN SA	502.19 M	2.1415	156 M	96.4 M	77.79 M	111.31 M	USD	0.24	USD	5.88	D
+https://s3-symbol-logo.tradingview.com/syn-prop-tecon-nm.svg	SYNE3	https://www.tradingview.com/symbols/BMFBOVESPA-SYNE3/	SYN PROP TECON NM	290.35 M	2.7686	154.06 M	137.55 M	97.7 M	151.14 M	USD	0.64	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/zeal-network-se.svg	TIMA	https://www.tradingview.com/symbols/XETR-TIMA/	ZEAL NETWORK SE	219.86 M	0.62	153.38 M	66.74 M	50.6 M	75.89 M	USD	2.36	USD	0.5884	D
+https://s3-symbol-logo.tradingview.com/technology-one-limited.svg	TNE	https://www.tradingview.com/symbols/ASX-TNE/	TECHNOLOGY ONE LIMITED	344.26 M	0.1752	142.64 M	103.78 M	83.02 M	150.61 M	USD	0.25	USD	0.2064	D
+https://s3-symbol-logo.tradingview.com/argan.svg	AGX	https://www.tradingview.com/symbols/NYSE-AGX/	Argan, Inc.	874.18 M	0.5247	142.48 M	91.59 M	85.46 M	93.89 M	USD	6.11	USD	1.5568	
+https://s3-symbol-logo.tradingview.com/psk.svg	319660	https://www.tradingview.com/symbols/KRX-319660/	PSK INC.	285.03 M	0.2207	142.34 M	57.52 M	52.95 M	63.9 M	USD	1.83	USD	0.2626	D
+	214150	https://www.tradingview.com/symbols/KRX-214150/	CLASSYS INC.	182.03 M	0.408	140.48 M	90.93 M	68.58 M	97.41 M	USD	1.05	USD	0.2263	D
+https://s3-symbol-logo.tradingview.com/wanguo-gold-ltd.svg	3939	https://www.tradingview.com/symbols/HKEX-3939/	WANGUO GOLD GROUP LTD	261.67 M	0.4022	139.1 M	112.81 M	80.28 M	126.41 M	USD	0.08	USD	0.4648	D
+https://s3-symbol-logo.tradingview.com/aspeed-technology.svg	5274	https://www.tradingview.com/symbols/TPEX-5274/	ASPEED TECHNOLOGY INC	225.76 M	1.1619	138.56 M	106.97 M	92.17 M	115.11 M	USD	2.43	USD	1.5266	
+https://s3-symbol-logo.tradingview.com/apex-mining-company.svg	APX	https://www.tradingview.com/symbols/PSE-APX/	APEX MINING COMPANY, INC.	270.57 M	0.2549	138.4 M	128.81 M	87.86 M	152.76 M	USD	0.02	USD	0.3162	D
+https://s3-symbol-logo.tradingview.com/centrus.svg	LEU	https://www.tradingview.com/symbols/AMEX-LEU/	Centrus Energy Corp.	471.4 M	0.5872	130.3 M	79.4 M	106.5 M	90.4 M	USD	6.38	USD	0.4028	
+https://s3-symbol-logo.tradingview.com/simplex-hldgs.svg	4373	https://www.tradingview.com/symbols/TSE-4373/	SIMPLEX HLDGS INC	315.93 M	0.1642	130.13 M	71.59 M	51.87 M	89.96 M	USD	0.87	USD	0.2589	D
+https://s3-symbol-logo.tradingview.com/port.svg	7047	https://www.tradingview.com/symbols/TSE-7047/	PORT INC	146.41 M	0.3214	126.6 M	17.85 M	12.63 M	22.31 M	USD	0.93	USD	0.2154	D
+https://s3-symbol-logo.tradingview.com/suzhou-hengmingda.svg	2947	https://www.tradingview.com/symbols/SZSE-002947/	SUZHOU HENGMINGDA	371.66 M	0.4303	125.72 M	69.51 M	68.14 M	—	USD	0.28		0.4781	D
+https://s3-symbol-logo.tradingview.com/asian-terminals.svg	ATI	https://www.tradingview.com/symbols/PSE-ATI/	ASIAN TERMINALS, INC.	253.16 M	0.1573	125.26 M	126.84 M	90.17 M	162.79 M	USD	0.05	USD	0.2908	D
+https://s3-symbol-logo.tradingview.com/golden-throat-hldgs-co-ltd.svg	6896	https://www.tradingview.com/symbols/HKEX-6896/	GOLDEN THROAT HLDGS GROUP CO LTD	165.34 M	0.2089	123.6 M	58.76 M	44.46 M	63.78 M	USD	0.06	USD	0.2498	D
+https://s3-symbol-logo.tradingview.com/gambling-com-group.svg	GAMB	https://www.tradingview.com/symbols/NASDAQ-GAMB/	Gambling.com Group Limited	138.6 M	0.2467	122.1 M	39.48 M	34.61 M	48.43 M	USD	0.96	USD	0.9526	
+https://s3-symbol-logo.tradingview.com/economic-investment.svg	EVT	https://www.tradingview.com/symbols/TSX-EVT/	ECONOMIC INVESTMENT TRUST	123.02 M	4.1345	121.79 M	196.36 M	181.16 M	196.36 M	USD	3.34	USD	0.3411	D
+	3030	https://www.tradingview.com/symbols/TWSE-3030/	TEST RESEARCH INC	203.95 M	0.4199	120.25 M	66.39 M	58.88 M	72.25 M	USD	0.25	USD	0.6525	D
+https://s3-symbol-logo.tradingview.com/alexandria-containers-and-goods.svg	ALCN	https://www.tradingview.com/symbols/EGX-ALCN/	ALEXANDRIA CONTAINERS AND GOODS	152.19 M	1.3747	119.78 M	112.11 M	146.52 M	114.82 M	USD	0.05	USD	2.0555	D
+https://s3-symbol-logo.tradingview.com/friedrich-vorwerk-se.svg	VH2	https://www.tradingview.com/symbols/XETR-VH2/	FRIEDRICH VORWERK GRP SE	600.08 M	0.4714	116.04 M	71.14 M	46.27 M	94.77 M	USD	2.31	USD	2.9036	D
+https://s3-symbol-logo.tradingview.com/eugene-technology-co-ltd.svg	84370	https://www.tradingview.com/symbols/KRX-084370/	EUGENE TECHNOLOGY CO., LTD.	238.15 M	0.3195	115.52 M	44.83 M	43.78 M	57.62 M	USD	1.97	USD	2.2126	D
+https://s3-symbol-logo.tradingview.com/quechen-silicon-chemical.svg	605183	https://www.tradingview.com/symbols/SSE-605183/	QUECHEN SILICON CHEMICAL CO LTD	302.11 M	0.1546	111.46 M	80.93 M	76.62 M	—	USD	0.19		0.2425	D
+https://s3-symbol-logo.tradingview.com/ememory-technology.svg	3529	https://www.tradingview.com/symbols/TPEX-3529/	EMEMORY TECHNOLOGY INC.	111.66 M	0.1663	106.97 M	62.77 M	56.07 M	67.45 M	USD	0.75	USD	0.1719	
+	1442	https://www.tradingview.com/symbols/TWSE-1442/	ADVANCETEK ENTERPRICE	248.61 M	0.239	106.13 M	86.08 M	77.51 M	86.57 M	USD	0.21	USD	0.2307	D
+https://s3-symbol-logo.tradingview.com/thor-exploration-ltd.svg	THX	https://www.tradingview.com/symbols/TSXV-THX/	THOR EXPLORATIONS	184.43 M	0.3936	106.03 M	96.18 M	87.17 M	127.35 M	USD	0.13	USD	7.5247	D
+https://s3-symbol-logo.tradingview.com/infracap-mlp.svg	AIO	https://www.tradingview.com/symbols/NYSE-AIO/	Virtus Artificial Intelligence & Technology Opportunities Fund	116.94 M	1.4829	105.6 M	169.14 M	161.67 M	169.14 M	USD	4.7	USD	0.8912	
+https://s3-symbol-logo.tradingview.com/gan-shmuel.svg	GSFI	https://www.tradingview.com/symbols/TASE-GSFI/	GAN SHMUEL	313.14 M	0.1933	104.82 M	59.51 M	43.08 M	67.77 M	USD	2.87	USD	1.8235	D
+https://s3-symbol-logo.tradingview.com/hemnet-ab.svg	HEM	https://www.tradingview.com/symbols/OMXSTO-HEM/	HEMNET GROUP AB	145.79 M	0.3761	104.32 M	66.42 M	50.78 M	75.12 M	USD	0.53	USD	0.4389	D
+https://s3-symbol-logo.tradingview.com/netwealth.svg	NWL	https://www.tradingview.com/symbols/ASX-NWL/	NETWEALTH GROUP LIMITED	172.97 M	0.2424	103.65 M	81.7 M	62.9 M	84.38 M	USD	0.26	USD	0.3376	D
+https://s3-symbol-logo.tradingview.com/fap-agri-tbk.svg	FAPA	https://www.tradingview.com/symbols/IDX-FAPA/	FAP AGRI TBK	371.66 M	0.2529	100.99 M	74 M	49.53 M	111.3 M	USD	0.01	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/mandalay-resources.svg	MND	https://www.tradingview.com/symbols/TSX-MND/	MANDALAY RESOURCES CORP	245.97 M	0.413	100.61 M	89.88 M	55 M	123.96 M	USD	0.58	USD	3.4158	D
+	2718	https://www.tradingview.com/symbols/TPEX-2718/	ALLMIND HOLDINGS CORPORATION	119.54 M	1.3768	98.77 M	94.04 M	91.73 M	94.66 M	USD	1.04	USD	4.7266	
+https://s3-symbol-logo.tradingview.com/smartgroup-ltd.svg	SIQ	https://www.tradingview.com/symbols/ASX-SIQ/	SMARTGROUP CORPORATION LTD	189.22 M	0.2155	97.16 M	67.88 M	46.77 M	74.55 M	USD	0.36	USD	0.2165	D
+https://s3-symbol-logo.tradingview.com/invisio-ab.svg	IVSO	https://www.tradingview.com/symbols/OMXSTO-IVSO/	INVISIO AB	181.86 M	0.484	96.88 M	37.64 M	29.26 M	41.49 M	USD	0.62	USD	0.8736	D
+https://s3-symbol-logo.tradingview.com/landk-engineering-suzhou-coltd.svg	603929	https://www.tradingview.com/symbols/SSE-603929/	L AND K ENGINEERING (SUZHOU) CO LTD	704.4 M	0.2876	96.58 M	87.62 M	82.8 M	—	USD	0.39		0.6197	D
+https://s3-symbol-logo.tradingview.com/national-foods.svg	NATF	https://www.tradingview.com/symbols/PSX-NATF/	NATIONAL FOODS LTD	340.71 M	0.1597	95.93 M	24.88 M	11.43 M	35.52 M	USD	0.05	USD	0.4348	D
+https://s3-symbol-logo.tradingview.com/mesabi-trust.svg	MSB	https://www.tradingview.com/symbols/NYSE-MSB/	Mesabi Trust	98.6 M	3.3126	93.27 M	93.27 M	93.27 M	93.27 M	USD	7.11	USD	3.9135	
+https://s3-symbol-logo.tradingview.com/climb-global-solutions.svg	CLMB	https://www.tradingview.com/symbols/NASDAQ-CLMB/	Climb Global Solutions, Inc.	511.23 M	0.4225	92.32 M	31.58 M	19.11 M	37.3 M	USD	4.26	USD	0.6502	
+	6187	https://www.tradingview.com/symbols/TPEX-6187/	ALL RING TECH CO	182.09 M	2.5623	92.03 M	50.01 M	44.56 M	51.66 M	USD	0.48	USD	3.6963	
+https://s3-symbol-logo.tradingview.com/cicor-tech-n.svg	CICN	https://www.tradingview.com/symbols/SIX-CICN/	CICOR TECH N	529.44 M	0.2333	91.76 M	42.47 M	30.01 M	64.25 M	USD	8.03	USD	2.7962	D
+https://s3-symbol-logo.tradingview.com/pro-medicus.svg	PME	https://www.tradingview.com/symbols/ASX-PME/	PRO MEDICUS LIMITED	114.19 M	0.2987	89.33 M	82.43 M	60.81 M	86.92 M	USD	0.58	USD	0.4097	D
+https://s3-symbol-logo.tradingview.com/next-vision-stabil.svg	NXSN	https://www.tradingview.com/symbols/TASE-NXSN/	NEXT VISION STABIL	122.46 M	0.7376	89.14 M	78.4 M	71.61 M	79.69 M	USD	0.86	USD	0.8448	D
+https://s3-symbol-logo.tradingview.com/daewonsanup.svg	5710	https://www.tradingview.com/symbols/KRX-005710/	DAEWONSANUP	672.96 M	0.2822	87.36 M	61.3 M	59.91 M	73.6 M	USD	2.99	USD	1.2299	D
+https://s3-symbol-logo.tradingview.com/psk.svg	31980	https://www.tradingview.com/symbols/KRX-031980/	PSK HOLDINGS INC.	140.78 M	0.769	87.11 M	55.76 M	62.42 M	60.24 M	USD	2.89	USD	0.6925	D
+https://s3-symbol-logo.tradingview.com/global-standard-technology-co-ltd.svg	83450	https://www.tradingview.com/symbols/KRX-083450/	GLOBAL STANDARD TECHNOLOGY CO., LTD.	233.06 M	0.2058	87.05 M	40.59 M	30.46 M	43.76 M	USD	1.66	USD	0.2451	D
+https://s3-symbol-logo.tradingview.com/pharmanutra.svg	PHN	https://www.tradingview.com/symbols/MIL-PHN/	PHARMANUTRA	127.83 M	0.1778	87.01 M	29.14 M	17.76 M	32.69 M	USD	1.85	USD	0.6372	
+https://s3-symbol-logo.tradingview.com/fortnox-ab.svg	FNOX	https://www.tradingview.com/symbols/OMXSTO-FNOX/	FORTNOX AB	212.39 M	0.2319	86.7 M	86.7 M	76.38 M	107.14 M	USD	0.13	USD	0.2561	D
+https://s3-symbol-logo.tradingview.com/six-of-october-development-and-investment-sodic.svg	OCDI	https://www.tradingview.com/symbols/EGX-OCDI/	SIX OF OCTOBER DEVELOPMENT & INVESTMENT (SODIC)	238.76 M	0.4865	85.79 M	49.45 M	35.75 M	52.34 M	USD	0.1	USD	0.8936	D
+https://s3-symbol-logo.tradingview.com/paradise-entertainment-ltd.svg	1180	https://www.tradingview.com/symbols/HKEX-1180/	PARADISE ENTERTAINMENT LIMITED	139.6 M	0.7104	85.24 M	47.81 M	46.46 M	54.98 M	USD	0.04	USD	4.4912	D
+https://s3-symbol-logo.tradingview.com/supreme-plc-ord-gbp010.svg	SUP	https://www.tradingview.com/symbols/LSE-SUP/	SUPREME PLC ORD GBP0.10	306.44 M	0.169	84.29 M	46.32 M	31.87 M	54.38 M	USD	0.26	USD	0.3453	
+https://s3-symbol-logo.tradingview.com/avant.svg	3836	https://www.tradingview.com/symbols/TSE-3836/	AVANT GROUP CORPORATION	183.66 M	0.1957	82.71 M	30.99 M	20.98 M	34.37 M	USD	0.57	USD	0.461	D
+https://s3-symbol-logo.tradingview.com/atlas-honda.svg	ATLH	https://www.tradingview.com/symbols/PSX-ATLH/	ATLAS HONDA LTD	719.34 M	0.28	82.45 M	57.82 M	53.81 M	—	USD	0.43		0.571	D
+	3450	https://www.tradingview.com/symbols/TWSE-3450/	ELITE ADVANCED LASER CORP	271.71 M	0.6674	82.29 M	52.82 M	25.63 M	77.45 M	USD	0.18	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/innodata.svg	INOD	https://www.tradingview.com/symbols/NASDAQ-INOD/	Innodata Inc.	202.3 M	1.1421	80.34 M	30.93 M	35.46 M	37.02 M	USD	1.04	USD	#ERROR!	
+https://s3-symbol-logo.tradingview.com/tegma.svg	TGMA3	https://www.tradingview.com/symbols/BMFBOVESPA-TGMA3/	TEGMA ON NM	374.73 M	0.3084	79.88 M	60.97 M	48.35 M	70.92 M	USD	0.73	USD	0.4998	D
+https://s3-symbol-logo.tradingview.com/t-and-s-communicat.svg	300570	https://www.tradingview.com/symbols/SZSE-300570/	T AND S COMMUNICAT	208.33 M	0.6617	79.84 M	43.78 M	42.55 M	—	USD	0.19		0.9577	D
+https://s3-symbol-logo.tradingview.com/tes-co-ltd.svg	95610	https://www.tradingview.com/symbols/KRX-095610/	TES CO., LTD.	190.62 M	0.8479	76.99 M	35.5 M	34.84 M	39.29 M	USD	1.99	USD	5.3506	D
+https://s3-symbol-logo.tradingview.com/tasmea-limited.svg	TEA	https://www.tradingview.com/symbols/ASX-TEA/	TASMEA LIMITED	280.47 M	0.2477	75.41 M	34.93 M	26.22 M	41.78 M	USD	0.12	USD	0.7063	D
+	4162	https://www.tradingview.com/symbols/TPEX-4162/	PHARMAENGINE INC	76.53 M	2.3336	75.05 M	62.35 M	53.25 M	62.64 M	USD	0.37	USD	5.4414	
+https://s3-symbol-logo.tradingview.com/tokai-carbon-korea-co-ltd.svg	64760	https://www.tradingview.com/symbols/KRX-064760/	TOKAI CARBON KOREA CO., LTD	199.2 M	0.3292	74.09 M	58.63 M	51.25 M	68.5 M	USD	4.39	USD	0.2691	D
+https://s3-symbol-logo.tradingview.com/estec.svg	69510	https://www.tradingview.com/symbols/KRX-069510/	ESTEC CORPORATION	356.07 M	0.2386	72.33 M	31.93 M	32.34 M	37.61 M	USD	3.85	USD	0.8355	D
+https://s3-symbol-logo.tradingview.com/suzhou-shihua-new-material-technology.svg	688093	https://www.tradingview.com/symbols/SSE-688093/	SUZHOU SHIHUA NEW MATERIAL TECHNOLO	124.99 M	0.6296	71.52 M	47.68 M	44.85 M	—	USD	0.17		0.5987	D
+https://s3-symbol-logo.tradingview.com/bolsa-de-valores-de-colombia-sa.svg	BVC	https://www.tradingview.com/symbols/BVC-BVC/	BOLSA DE VALORES DE COLOMBIA S.A.	79.85 M	0.1961	70.53 M	38.03 M	22.55 M	43.57 M	USD	0.37	USD	0.73	D
+https://s3-symbol-logo.tradingview.com/tien-phong-plastic.svg	NTP	https://www.tradingview.com/symbols/HNX-NTP/	TIEN PHONG PLASTIC JSC	228.82 M	0.2161	70.43 M	37.42 M	31.96 M	43.31 M	USD	0.22	USD	0.49	D
+https://s3-symbol-logo.tradingview.com/china-beststudy-education.svg	3978	https://www.tradingview.com/symbols/HKEX-3978/	CHINA BESTSTUDY EDUCATION GROUP	153.78 M	1.2206	69.83 M	34.58 M	26.86 M	47.36 M	USD	0.04	USD	1.289	D
+https://s3-symbol-logo.tradingview.com/fawry-for-banking-technology-and-electronic-payment.svg	FWRY	https://www.tradingview.com/symbols/EGX-FWRY/	FAWRY FOR BANKING TECHNOLOGY AND ELECTRONIC PAYMENT	106.19 M	1.6299	69.8 M	30.1 M	30.96 M	38.3 M	USD	0.01	USD	8.9915	D
+https://s3-symbol-logo.tradingview.com/indiamart.svg	INDIAMART	https://www.tradingview.com/symbols/NSE-INDIAMART/	INDIAMART INTERMESH LTD	162.46 M	0.1601	64.71 M	58.29 M	64.44 M	62.14 M	USD	1.07	USD	0.6625	
+https://s3-symbol-logo.tradingview.com/john-hancock-corporate.svg	BTO	https://www.tradingview.com/symbols/NYSE-BTO/	John Hancock Financial Opportunities Fund	71.27 M	0.1517	62.27 M	148.51 M	140.94 M	148.51 M	USD	7.14	USD	#ERROR!	
+https://s3-symbol-logo.tradingview.com/penguin-intl.svg	BTM	https://www.tradingview.com/symbols/SGX-BTM/	PENGUIN INTL	172.64 M	0.2929	61.86 M	37.45 M	26.01 M	50.58 M	USD	0.12	USD	1.1237	D
+https://s3-symbol-logo.tradingview.com/plover-bay-technologies-ltd.svg	1523	https://www.tradingview.com/symbols/HKEX-1523/	PLOVER BAY TECHNOLOGIES LTD	117.27 M	0.235	61.15 M	43.74 M	38.2 M	47 M	USD	0.03	USD	0.3473	D
+https://s3-symbol-logo.tradingview.com/tandl-co-ltd.svg	340570	https://www.tradingview.com/symbols/KRX-340570/	T&L CO., LTD.	135.94 M	0.7786	60.85 M	47.28 M	37.23 M	50.03 M	USD	4.61	USD	1.0675	D
+https://s3-symbol-logo.tradingview.com/novoray.svg	688300	https://www.tradingview.com/symbols/SSE-688300/	NOVORAY CORPORATION	136.26 M	0.2986	59.61 M	36.58 M	36.19 M	—	USD	0.19		0.3341	D
+https://s3-symbol-logo.tradingview.com/trimegah-sekuritas.svg	TRIM	https://www.tradingview.com/symbols/IDX-TRIM/	TRIMEGAH SEKURITAS INDONESIA TBK	61.1 M	0.2739	59.48 M	30.79 M	20.05 M	31.89 M	USD	0	USD	0.816	D
+https://s3-symbol-logo.tradingview.com/metals-x-ltd.svg	MLX	https://www.tradingview.com/symbols/ASX-MLX/	METALS X LIMITED	135.38 M	0.4229	58.94 M	53.55 M	63.32 M	—	USD	0.07		6.0435	D
+https://s3-symbol-logo.tradingview.com/prosperous-industrial-hldgs-ltd.svg	1731	https://www.tradingview.com/symbols/HKEX-1731/	PROSPEROUS INDUSTRIAL (HLDGS) LTD	244.65 M	0.1666	58.68 M	29.36 M	29.98 M	35.18 M	USD	0.03	USD	0.999	D
+	3131	https://www.tradingview.com/symbols/TPEX-3131/	GRAND PROCESS TECHNOLOGY CO	132.73 M	0.217	58.1 M	30.33 M	27.91 M	33.04 M	USD	0.95	USD	0.3586	
+	3217	https://www.tradingview.com/symbols/TPEX-3217/	ARGOSY RESEARCH	111.65 M	0.1998	56.75 M	35.67 M	32.47 M	39.82 M	USD	0.36	USD	0.2961	
+https://s3-symbol-logo.tradingview.com/central-omega-resources-tbk.svg	DKFT	https://www.tradingview.com/symbols/IDX-DKFT/	CENTRAL OMEGA RESOURCES TBK	108.14 M	1.0215	56.43 M	31.95 M	29.34 M	—	USD	0.01		3.5612	D
+https://s3-symbol-logo.tradingview.com/vitzrocell-co-ltd.svg	82920	https://www.tradingview.com/symbols/KRX-082920/	VITZROCELL CO., LTD.	153.33 M	0.2805	56.31 M	38.39 M	35.3 M	48.08 M	USD	1.58	USD	0.5026	D
+https://s3-symbol-logo.tradingview.com/q-p-hldgs-ltd.svg	1412	https://www.tradingview.com/symbols/HKEX-1412/	Q P GROUP HLDGS LTD	155.82 M	0.1653	55.94 M	17.6 M	16.61 M	25.61 M	USD	0.03	USD	0.6116	D
+https://s3-symbol-logo.tradingview.com/australian-ethical-investment.svg	AEF	https://www.tradingview.com/symbols/ASX-AEF/	AUSTRALIAN ETHICAL INVESTMENT LIMITED	68.55 M	0.1911	55.89 M	18.06 M	9.17 M	18.85 M	USD	0.08	USD	0.2386	D
+https://s3-symbol-logo.tradingview.com/havanna-sa.svg	HAVAD	https://www.tradingview.com/symbols/BCBA-HAVAD/	HAVANNA HOLDING SA	101.52 M	1.0778	54.64 M	21.03 M	10.4 M	25.82 M	USD	0.22	USD	0.3271	D
+https://s3-symbol-logo.tradingview.com/united-bankers-oyj.svg	UNITED	https://www.tradingview.com/symbols/OMXHEX-UNITED/	UNITED BANKERS OYJ	64.3 M	0.1911	54.6 M	24.21 M	18.68 M	27.04 M	USD	1.7	USD	0.3337	D
+	3526	https://www.tradingview.com/symbols/TPEX-3526/	ALLTOP TECHNOLOGY CO LTD	106.62 M	0.3894	54.08 M	35.64 M	33.2 M	40.29 M	USD	0.48	USD	0.3221	
+https://s3-symbol-logo.tradingview.com/okomu-oil-palm-co-plc.svg	OKOMUOIL	https://www.tradingview.com/symbols/NSENG-OKOMUOIL/	OKOMU OIL PALM CO PLC	88.55 M	0.5349	52.04 M	36.13 M	25.05 M	42.16 M	USD	0.03	USD	0.57	
+https://s3-symbol-logo.tradingview.com/cardig-aero-services-tbk.svg	CASS	https://www.tradingview.com/symbols/IDX-CASS/	CAHAYA AERO SERVICES TBK	169.79 M	0.2452	51.59 M	51.97 M	23.29 M	60.85 M	USD	0.01	USD	0.7953	D
+https://s3-symbol-logo.tradingview.com/national-petroleum-services.svg	NAPESCO	https://www.tradingview.com/symbols/KSE-NAPESCO/	NATIONAL PETROLEUM SERVICES	148.64 M	0.1675	50.69 M	37.94 M	47.86 M	48.08 M	USD	0.53	USD	0.7744	D
+https://s3-symbol-logo.tradingview.com/sectra-ab-npv-b.svg	SECT_B	https://www.tradingview.com/symbols/OMXSTO-SECT_B/	SECTRA AB SER B	289.18 M	0.1554	50.17 M	46.15 M	52.98 M	51.81 M	USD	0.27	USD	0.3912	D
+	PM	https://www.tradingview.com/symbols/SET-PM/	PREMIER MARKETING PUBLIC CO LTD	156.34 M	0.2591	49.92 M	22.12 M	18.72 M	25.69 M	USD	0.03	USD	0.492	D
+https://s3-symbol-logo.tradingview.com/haleon-pakistan.svg	HALEON	https://www.tradingview.com/symbols/PSX-HALEON/	HALEON PAKISTAN LTD	138.59 M	0.2375	49.61 M	29.57 M	18.62 M	31.53 M	USD	0.16	USD	2.9327	D
+https://s3-symbol-logo.tradingview.com/lubawa-sa.svg	LBW	https://www.tradingview.com/symbols/GPW-LBW/	LUBAWA	123.31 M	0.3512	49.52 M	29.24 M	24.36 M	32.71 M	USD	0.16	USD	1.2102	D
+https://s3-symbol-logo.tradingview.com/hellenic-exchanges-ase-sa.svg	EXAE	https://www.tradingview.com/symbols/ATHEX-EXAE/	HELLENIC EXCHANGES (CR)	56.18 M	0.1504	49.52 M	20.15 M	17.95 M	24.51 M	USD	0.31	USD	0.3338	D
+https://s3-symbol-logo.tradingview.com/e-finance-for-digital-and-financial-investments.svg	EFIH	https://www.tradingview.com/symbols/EGX-EFIH/	E-FINANCE FOR DIGITAL AND FINANCIAL INVESTMENTS	92.96 M	0.7594	48.18 M	29.27 M	25.81 M	33.95 M	USD	0.01	USD	0.6305	D
+https://s3-symbol-logo.tradingview.com/supply-network-limited.svg	SNL	https://www.tradingview.com/symbols/ASX-SNL/	SUPPLY NETWORK LIMITED	203.19 M	0.1797	47.93 M	34.21 M	23.37 M	40.2 M	USD	0.55	USD	0.2387	D
+https://s3-symbol-logo.tradingview.com/jbm-healthcare-ltd.svg	2161	https://www.tradingview.com/symbols/HKEX-2161/	JBM (HEALTHCARE) LTD	92.67 M	0.1806	46.64 M	24.56 M	21.08 M	30.53 M	USD	0.03	USD	0.8057	D
+https://s3-symbol-logo.tradingview.com/highnoon-laboratories.svg	HINOON	https://www.tradingview.com/symbols/PSX-HINOON/	HIGHNOON LABORATORIES LTD	90.01 M	0.2177	46.49 M	20.39 M	12.55 M	21.73 M	USD	0.24	USD	0.3463	D
+https://s3-symbol-logo.tradingview.com/gas-arabian-services-co.svg	9528	https://www.tradingview.com/symbols/TADAWUL-9528/	GAS ARABIAN SERVICES CO.	290.7 M	0.5149	45.85 M	22.03 M	30.31 M	25.55 M	USD	0.19	USD	0.3976	D
+	6143	https://www.tradingview.com/symbols/TPEX-6143/	NETRONIX INC	230.43 M	0.1971	45.59 M	24.05 M	18.06 M	29.16 M	USD	0.21	USD	0.2653	
+https://s3-symbol-logo.tradingview.com/middle-east-glass-manufacturing.svg	MEGM	https://www.tradingview.com/symbols/EGX-MEGM/	MIDDLE EAST GLASS MANUFACTURING	101.97 M	0.3253	44.57 M	31.75 M	19.4 M	37.39 M	USD	0.31	USD	2.3226	D
+	6788	https://www.tradingview.com/symbols/TPEX-6788/	BRILLIAN NETWORK & AUTOMATION INTEG	70.92 M	0.6942	43.19 M	22.66 M	17.08 M	23.46 M	USD	0.46	USD	1.0906	
+https://s3-symbol-logo.tradingview.com/genusplus-ltd.svg	GNP	https://www.tradingview.com/symbols/ASX-GNP/	GENUSPLUS GROUP LTD	392.3 M	0.3502	43.14 M	20.78 M	14.79 M	29.44 M	USD	0.08	USD	0.4486	D
+https://s3-symbol-logo.tradingview.com/hunan-sunday-scien.svg	300515	https://www.tradingview.com/symbols/SZSE-300515/	HUNAN SUNDAY SCIEN	80.6 M	0.2443	42.58 M	18.1 M	20.94 M	—	USD	0.1		1.7244	D
+	AAI	https://www.tradingview.com/symbols/SET-AAI/	ASIAN ALLIANCE INTERNATIONAL PCL	213.01 M	0.3074	42.29 M	31 M	30.01 M	37.77 M	USD	0.01	USD	0.8454	D
+https://s3-symbol-logo.tradingview.com/naturelgaz.svg	NTGAZ	https://www.tradingview.com/symbols/BIST-NTGAZ/	NATURELGAZ	161.68 M	0.3659	41.86 M	27.1 M	16.69 M	36.05 M	USD	0.02	USD	5.3785	D
+	6728	https://www.tradingview.com/symbols/TPEX-6728/	UP YOUNG CORNERSTONE CORP	115.88 M	0.3974	41.49 M	13.54 M	10.47 M	16.75 M	USD	0.37	USD	0.3483	
+https://s3-symbol-logo.tradingview.com/spyrosoft-sa.svg	SPR	https://www.tradingview.com/symbols/GPW-SPR/	SPYROSOFT	129.34 M	0.1929	41.31 M	12.86 M	10.3 M	15.95 M	USD	9.44	USD	1.3017	D
+https://s3-symbol-logo.tradingview.com/norbit-asa.svg	NORBT	https://www.tradingview.com/symbols/OSL-NORBT/	NORBIT ASA	177.51 M	0.2082	40.97 M	40.97 M	28.76 M	53.46 M	USD	0.46	USD	0.762	D
+https://s3-symbol-logo.tradingview.com/mako-mining.svg	MKO	https://www.tradingview.com/symbols/TSXV-MKO/	MAKO MINING CORP	87.84 M	0.4171	40.89 M	32.77 M	18.23 M	40.18 M	USD	0.26	USD	1.7646	D
+https://s3-symbol-logo.tradingview.com/system1-plc-ord-gbp001.svg	SYS1	https://www.tradingview.com/symbols/LSE-SYS1/	SYSTEM1 GROUP PLC ORD GBP0.01	46.86 M	0.3367	39.2 M	5.8 M	4.23 M	7.32 M	USD	0.33	USD	1.5496	
+https://s3-symbol-logo.tradingview.com/mips-ab.svg	MIPS	https://www.tradingview.com/symbols/OMXSTO-MIPS/	MIPS AB	51.09 M	0.4589	38.69 M	18.95 M	14.68 M	—	USD	0.55		1.3799	D
+https://s3-symbol-logo.tradingview.com/nicolas-correa.svg	NEA	https://www.tradingview.com/symbols/BME-NEA/	NICOLAS CORREA	125.76 M	0.2377	38.68 M	16.84 M	14.18 M	18.94 M	USD	1.17	USD	0.5068	D
+https://s3-symbol-logo.tradingview.com/serabi-gold-plc.svg	SRB	https://www.tradingview.com/symbols/LSE-SRB/	SERABI GOLD PLC ORD GBP0.10	92.46 M	0.444	38.55 M	31.01 M	27.16 M	35.32 M	USD	0.36	USD	3.1611	
+	SISB	https://www.tradingview.com/symbols/SET-SISB/	SISB PCL	71.09 M	0.1937	38.45 M	24.94 M	26.8 M	31.62 M	USD	0.03	USD	0.2897	D
+https://s3-symbol-logo.tradingview.com/southern-cross-electrical-engineering-ltd.svg	SXE	https://www.tradingview.com/symbols/ASX-SXE/	SOUTHERN CROSS ELECTRICAL ENGINEERING LTD	429.19 M	0.4923	38.29 M	27.87 M	17.6 M	32.58 M	USD	0.07	USD	0.4098	D
+https://s3-symbol-logo.tradingview.com/wam-capital-limited.svg	WAX	https://www.tradingview.com/symbols/ASX-WAX/	WAM RESEARCH LIMITED	46.11 M	1.0377	38.06 M	37.64 M	27.07 M	37.64 M	USD	0.13	USD	0.8588	D
+https://s3-symbol-logo.tradingview.com/nsl-foods.svg	NSL	https://www.tradingview.com/symbols/SET-NSL/	NSL FOODS PCL	182.44 M	0.2296	38.06 M	20.98 M	17.2 M	25.26 M	USD	0.06	USD	0.5156	D
+	GNG	https://www.tradingview.com/symbols/ASX-GNG/	GR ENGINEERING SERVICES LIMITED	314.84 M	0.2512	37.94 M	32.88 M	23.95 M	37.63 M	USD	0.14	USD	0.317	D
+https://s3-symbol-logo.tradingview.com/ailleron-sa.svg	ALL	https://www.tradingview.com/symbols/GPW-ALL/	AILLERON	135.27 M	0.1991	37.84 M	16.51 M	5.82 M	21.69 M	USD	0.47	USD	4.5329	D
+	IPG	https://www.tradingview.com/symbols/ASX-IPG/	IPD GROUP LTD	214.45 M	0.464	37.73 M	25.41 M	16.19 M	29.59 M	USD	0.16	USD	0.2678	D
+https://s3-symbol-logo.tradingview.com/nascon-allied-industries-plc.svg	NASCON	https://www.tradingview.com/symbols/NSENG-NASCON/	NASCON ALLIED INDUSTRIES PLC	84.84 M	0.5834	37.25 M	19.01 M	13.42 M	20.62 M	USD	0	USD	0.6983	
+https://s3-symbol-logo.tradingview.com/magni-tech-industries-bhd.svg	MAGNI	https://www.tradingview.com/symbols/MYX-MAGNI/	MAGNI-TECH INDUSTRIES BHD	335.27 M	0.1961	37.01 M	37.02 M	32.5 M	38.39 M	USD	0.07	USD	0.2111	D
+https://s3-symbol-logo.tradingview.com/hemisphere-energy.svg	HME	https://www.tradingview.com/symbols/TSXV-HME/	HEMISPHERE ENERGY CORPORATION	59.05 M	0.2264	36.9 M	33.28 M	24.5 M	40.96 M	USD	0.24	USD	0.4187	D
+	6741	https://www.tradingview.com/symbols/TPEX-6741/	91APP INC	49.86 M	0.1536	36.26 M	16.66 M	15.38 M	17.79 M	USD	0.13	USD	0.1594	
+https://s3-symbol-logo.tradingview.com/anapass.svg	123860	https://www.tradingview.com/symbols/KRX-123860/	ANAPASS, INC.	113.08 M	0.7733	35.52 M	14.78 M	13.01 M	17.59 M	USD	1.07	USD	2.6362	D
+https://s3-symbol-logo.tradingview.com/azeus.svg	BBW	https://www.tradingview.com/symbols/SGX-BBW/	AZEUS	48.8 M	0.3489	35.5 M	15.49 M	14.22 M	16.51 M	USD	0.47	USD	0.8375	D
+	6231	https://www.tradingview.com/symbols/TPEX-6231/	INSYDE SOFTWARE CORP	49.61 M	0.1687	35.44 M	11.59 M	10.29 M	13.79 M	USD	0.22	USD	0.514	
+https://s3-symbol-logo.tradingview.com/viol-co-ltd.svg	335890	https://www.tradingview.com/symbols/KRX-335890/	VIOL CO., LTD.	42.95 M	0.4367	35.02 M	26.96 M	23.75 M	27.74 M	USD	0.41	USD	0.4871	D
+	EZZ	https://www.tradingview.com/symbols/ASX-EZZ/	EZZ LIFE SCIENCE HOLDINGS LIMITED	46.42 M	0.7165	35.02 M	7.91 M	5.58 M	8.18 M	USD	0.13	USD	1.5277	D
+https://s3-symbol-logo.tradingview.com/plc-spa.svg	PLC	https://www.tradingview.com/symbols/MIL-PLC/	PLC	89.41 M	0.2959	33.38 M	7.8 M	11.73 M	9.98 M	USD	0.45	USD	#ERROR!	
+	5262	https://www.tradingview.com/symbols/TPEX-5262/	GIGASTONE CORPORATION	73.52 M	0.6376	33.03 M	6.88 M	5.49 M	7.4 M	USD	0.11	USD	1.8658	
+https://s3-symbol-logo.tradingview.com/ctcp-dv-hang-hoa-sai-gon.svg	SCS	https://www.tradingview.com/symbols/HOSE-SCS/	SAIGON CARGO SERVICE CORP	42.53 M	0.4431	32.88 M	30.28 M	27.9 M	32.06 M	USD	0.29	USD	0.3384	D
+https://s3-symbol-logo.tradingview.com/sygnity.svg	SGN	https://www.tradingview.com/symbols/GPW-SGN/	SYGNITY	78.39 M	0.4493	32.5 M	16.95 M	16.42 M	20.87 M	USD	0.72	USD	1.4514	D
+https://s3-symbol-logo.tradingview.com/transcorp-hotels-plc.svg	TRANSCOHOT	https://www.tradingview.com/symbols/NSENG-TRANSCOHOT/	TRANSCORP HOTELS PLC	47.31 M	0.5863	32.42 M	14.94 M	9.16 M	16.57 M	USD	0	USD	0.419	
+https://s3-symbol-logo.tradingview.com/misr-hotels.svg	MHOT	https://www.tradingview.com/symbols/EGX-MHOT/	MISR HOTELS	34.6 M	4.758	32.19 M	31.09 M	34.45 M	32.48 M	USD	0.09	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/taseco-air-services-joint-stock-company.svg	AST	https://www.tradingview.com/symbols/HOSE-AST/	TASECO AIR SERVICES JOINT STOCK COMPANY	51.87 M	0.2095	30.75 M	9.58 M	5.74 M	10.92 M	USD	0.13	USD	0.2864	D
+https://s3-symbol-logo.tradingview.com/pakistan-aluminium-beverage-cans.svg	PABC	https://www.tradingview.com/symbols/PSX-PABC/	PAKISTAN ALUMINIUM BEVERAGE CANS LIMITED	81.53 M	0.2059	29.94 M	21.72 M	22.86 M	23.9 M	USD	0.06	USD	0.4149	D
+https://s3-symbol-logo.tradingview.com/china-national-nuclear-power.svg	2302	https://www.tradingview.com/symbols/HKEX-2302/	CNNC INTERNATIONAL LTD.	236.94 M	2.1695	29.9 M	23.78 M	25.09 M	24.01 M	USD	0.05	USD	0.8343	D
+https://s3-symbol-logo.tradingview.com/oriental-precision-and-engineering-coltd.svg	14940	https://www.tradingview.com/symbols/KRX-014940/	ORIENTAL PRECISION & ENGINEERING CO.,LTD	145.28 M	0.2822	29.53 M	19.49 M	19.5 M	20.84 M	USD	0.43	USD	1.6779	D
+	6807	https://www.tradingview.com/symbols/TWSE-6807/	FY GROUP LTD	155.4 M	0.3238	28.56 M	14.63 M	14.66 M	18.02 M	USD	0.27	USD	0.5295	D
+	4571	https://www.tradingview.com/symbols/TWSE-4571/	KHGEARS INTERNATIONAL LTD	94.59 M	0.2432	28.4 M	15.36 M	15.51 M	19.89 M	USD	0.3	USD	0.6266	D
+https://s3-symbol-logo.tradingview.com/beng-kuang.svg	BEZ	https://www.tradingview.com/symbols/SGX-BEZ/	BENG KUANG	81.9 M	0.4133	28.35 M	13.3 M	8.45 M	15.3 M	USD	0.04	USD	2.3663	D
+https://s3-symbol-logo.tradingview.com/tss.svg	TSSI	https://www.tradingview.com/symbols/NASDAQ-TSSI/	TSS, Inc.	231.21 M	2.6287	28.1 M	12.36 M	8.94 M	13.11 M	USD	0.36	USD	8.1495	
+https://s3-symbol-logo.tradingview.com/hankook-cosmetics-manufacturing.svg	3350	https://www.tradingview.com/symbols/KRX-003350/	HANKOOK COSMETICS MANUFACTURING	114.97 M	0.4488	27.91 M	19.03 M	16.36 M	20.61 M	USD	4.51	USD	1.729	D
+https://s3-symbol-logo.tradingview.com/ausupreme-international-hldgs-ltd.svg	2031	https://www.tradingview.com/symbols/HKEX-2031/	AUSUPREME INTERNATIONAL HLDGS LTD	34.05 M	0.2278	27.75 M	4.4 M	3.7 M	6.35 M	USD	0	USD	0.7952	D
+https://s3-symbol-logo.tradingview.com/mega-polietilen.svg	MEGAP	https://www.tradingview.com/symbols/BIST-MEGAP/	MEGA POLIETILEN	329.87 M	1.8963	27.69 M	29.32 M	11.99 M	30.94 M	USD	0.04	USD	0.5582	D
+https://s3-symbol-logo.tradingview.com/cnmc-goldmine.svg	5TP	https://www.tradingview.com/symbols/SGX-5TP/	CNMC GOLDMINE	63.74 M	0.2428	27.61 M	18.2 M	9.63 M	24.79 M	USD	0.02	USD	1.3824	D
+https://s3-symbol-logo.tradingview.com/innoprise-plantations.svg	INNO	https://www.tradingview.com/symbols/MYX-INNO/	INNOPRISE PLANTATIONS BERHAD	64.38 M	0.2431	27.55 M	27.15 M	20.89 M	33.11 M	USD	0.04	USD	0.653	D
+https://s3-symbol-logo.tradingview.com/intercede-plc.svg	IGP	https://www.tradingview.com/symbols/LSE-IGP/	INTERCEDE GROUP ORD GBP0.01	28.77 M	0.6499	27.37 M	7.52 M	8.21 M	8.13 M	USD	0.13	USD	2.7808	
+	6683	https://www.tradingview.com/symbols/TPEX-6683/	KEYSTONE MICROTECH CO	54.38 M	0.2755	27.17 M	14.58 M	13.89 M	16.76 M	USD	0.51	USD	0.2139	
+	PT	https://www.tradingview.com/symbols/SET-PT/	PREMIER TECHNOLOGY PUBLIC CO LTD	119.24 M	0.2749	27.04 M	11.31 M	10.72 M	12.5 M	USD	0.04	USD	0.4204	D
+https://s3-symbol-logo.tradingview.com/mark-dynamics-indonesia.svg	MARK	https://www.tradingview.com/symbols/IDX-MARK/	MARK DYNAMICS INDONESIA	54.06 M	0.4047	25.36 M	21.12 M	17.06 M	22.94 M	USD	0	USD	0.4378	D
+https://s3-symbol-logo.tradingview.com/fidson-healthcare-plc.svg	FIDSON	https://www.tradingview.com/symbols/NSENG-FIDSON/	FIDSON HEALTHCARE PLC	61.4 M	0.6573	24.04 M	12.68 M	4.89 M	13.76 M	USD	0	USD	1.7042	
+https://s3-symbol-logo.tradingview.com/murree-brewery.svg	MUREB	https://www.tradingview.com/symbols/PSX-MUREB/	MURREE BREWERY LTD	99.47 M	0.2632	23.78 M	15.76 M	11.63 M	17.34 M	USD	0.42	USD	0.5766	D
+https://s3-symbol-logo.tradingview.com/m-tron-industries.svg	MPTI	https://www.tradingview.com/symbols/AMEX-MPTI/	M-tron Industries, Inc.	50.56 M	0.1762	23.27 M	9.62 M	7.78 M	10.62 M	USD	2.73	USD	0.6996	
+https://s3-symbol-logo.tradingview.com/mulia-boga-raya-tbk.svg	KEJU	https://www.tradingview.com/symbols/IDX-KEJU/	MULIA BOGA RAYA TBK	77.64 M	0.1824	23.22 M	11.71 M	9.74 M	13.42 M	USD	0	USD	0.7927	D
+https://s3-symbol-logo.tradingview.com/insolation-energy-limited.svg	INA	https://www.tradingview.com/symbols/BSE-INA/	INSOLATION ENERGY LIMITED	156.08 M	0.8093	23.04 M	17.77 M	14.77 M	18.85 M	USD	0.07	USD	1.2349	D
+https://s3-symbol-logo.tradingview.com/ekarat-engineering.svg	AKR	https://www.tradingview.com/symbols/SET-AKR/	EKARAT ENGINEERING	77.32 M	0.2625	22.91 M	11.03 M	9.81 M	13.24 M	USD	0.01	USD	0.6999	D
+https://s3-symbol-logo.tradingview.com/honeywell-flour-mills-plc.svg	HONYFLOUR	https://www.tradingview.com/symbols/NSENG-HONYFLOUR/	HONEYWELL FLOUR MILLS PLC	207.56 M	1.1619	22.7 M	15.98 M	4.78 M	22.85 M	USD	0	USD	4.1278	
+https://s3-symbol-logo.tradingview.com/ghandhara-nissan.svg	GHNI	https://www.tradingview.com/symbols/PSX-GHNI/	GHANDHARA INDUSTRIES CO LTD	94.34 M	1.3052	22.45 M	15.81 M	12.03 M	16.27 M	USD	0.28	USD	#ERROR!	D
+	4979	https://www.tradingview.com/symbols/TPEX-4979/	LUXNET CORPORATION	116.07 M	0.2356	22.33 M	18.02 M	19.31 M	20.04 M	USD	0.14	USD	0.2304	
+https://s3-symbol-logo.tradingview.com/elite.svg	ELITE	https://www.tradingview.com/symbols/BIST-ELITE/	ELITE NATUREL ORGANIK GIDA	42.56 M	0.6422	22.07 M	13.11 M	11.35 M	14.39 M	USD	0.09	USD	2.2862	D
+https://s3-symbol-logo.tradingview.com/estika-tata-tiara-tbk.svg	BEEF	https://www.tradingview.com/symbols/IDX-BEEF/	ESTIKA TATA TIARA TBK	424.25 M	7.6756	21.77 M	13.67 M	7.94 M	15.22 M	USD	0	USD	0.6905	D
+https://s3-symbol-logo.tradingview.com/genians.svg	263860	https://www.tradingview.com/symbols/KRX-263860/	GENIANS, INC.	35.08 M	0.2734	21.58 M	6.46 M	7.68 M	7.03 M	USD	0.89	USD	1.1448	D
+	179290	https://www.tradingview.com/symbols/KRX-179290/	MITECH CO., LTD.	38.97 M	0.1911	21.53 M	12.69 M	12.47 M	13.98 M	USD	0.39	USD	0.3734	D
+https://s3-symbol-logo.tradingview.com/woori-technology-investment-co-ltd.svg	41190	https://www.tradingview.com/symbols/KRX-041190/	WOORI TECHNOLOGY INVESTMENT CO., LTD	22.1 M	1.1678	21.2 M	121.98 M	103.78 M	122.26 M	USD	1.33	USD	0.2101	D
+https://s3-symbol-logo.tradingview.com/indonesia-kendaraan-terminal-tbk.svg	IPCC	https://www.tradingview.com/symbols/IDX-IPCC/	INDONESIA KENDARAAN TERMINAL TBK	51.13 M	0.1842	21.13 M	15.5 M	13.5 M	20.85 M	USD	0.01	USD	0.2038	D
+https://s3-symbol-logo.tradingview.com/global-mofy-ai-limited.svg	GMM	https://www.tradingview.com/symbols/NASDAQ-GMM/	Global Mofy AI Limited	41.36 M	0.5382	20.8 M	6 M	12.14 M	11.72 M	USD	0.42	USD	0.6803	
+https://s3-symbol-logo.tradingview.com/sandd-co-ltd.svg	260970	https://www.tradingview.com/symbols/KRX-260970/	S&D CO., LTD	86.42 M	0.3637	19.93 M	14.73 M	12.55 M	16 M	USD	4.26	USD	1.0258	D
+	3570	https://www.tradingview.com/symbols/TPEX-3570/	OTSUKA INFORMATION TECHNOLOGY CORP.	71.69 M	0.4026	19.52 M	9.08 M	7.3 M	9.94 M	USD	0.43	USD	0.1947	
+	ARYT	https://www.tradingview.com/symbols/TASE-ARYT/	ARYT	34.73 M	1.1861	19.5 M	16.14 M	16.38 M	16.68 M	USD	0.17	USD	4.5626	D
+	6028	https://www.tradingview.com/symbols/TPEX-6028/	GOLDEN INSURANCE BROKERS CO LTD	136.41 M	0.4719	19.11 M	8.99 M	7.28 M	11.7 M	USD	0.36	USD	1.0007	
+https://s3-symbol-logo.tradingview.com/rojukiss-international.svg	KISS	https://www.tradingview.com/symbols/SET-KISS/	ROJUKISS INTERNATIONAL PCL	35.35 M	0.2381	18.25 M	5.76 M	4.85 M	6.3 M	USD	0.01	USD	0.2166	D
+	4987	https://www.tradingview.com/symbols/TPEX-4987/	GODEX INTERNATIONA	39.68 M	0.1671	17.47 M	8.29 M	6.92 M	9.45 M	USD	0.22	USD	0.641	
+	2751	https://www.tradingview.com/symbols/TPEX-2751/	KINGZA INTERNATIONAL CO LTD	42.6 M	0.5385	17.41 M	2.4 M	2.51 M	7.14 M	USD	0.13	USD	3.9688	
+https://s3-symbol-logo.tradingview.com/sk-telecom.svg	408920	https://www.tradingview.com/symbols/KRX-408920/	MESSE ESANG	46.11 M	0.2923	16.73 M	11.63 M	9.21 M	12.78 M	USD	0.21	USD	0.5327	D
+https://s3-symbol-logo.tradingview.com/sure-global-tech-co.svg	9550	https://www.tradingview.com/symbols/TADAWUL-9550/	SURE GLOBAL TECH CO	65.59 M	0.2693	16.32 M	10.02 M	8.88 M	10.75 M	USD	1.17	USD	0.1821	D
+https://s3-symbol-logo.tradingview.com/micro-contact-solution-coltd.svg	98120	https://www.tradingview.com/symbols/KRX-098120/	MICRO CONTACT SOLUTION CO.,LTD.	54.46 M	0.2445	16.2 M	8.91 M	8.75 M	10.38 M	USD	1.05	USD	0.7014	D
+https://s3-symbol-logo.tradingview.com/twareat-medical-care-co.svg	9627	https://www.tradingview.com/symbols/TADAWUL-9627/	TWAREAT MEDICAL CARE CO.	51.01 M	0.2397	16.13 M	6.76 M	6.25 M	7.82 M	USD	0.16	USD	0.6598	D
+https://s3-symbol-logo.tradingview.com/cogstate-ltd.svg	CGS	https://www.tradingview.com/symbols/ASX-CGS/	COGSTATE LTD	45.19 M	0.183	15.56 M	10 M	6.89 M	12.57 M	USD	0.04	USD	0.3631	D
+	6498	https://www.tradingview.com/symbols/TPEX-6498/	POWERTIP IMAGE CORP	32.93 M	0.6161	15.25 M	10.43 M	7.6 M	12.64 M	USD	0.18	USD	0.9528	
+https://s3-symbol-logo.tradingview.com/ms-hldgs-ltd.svg	1451	https://www.tradingview.com/symbols/HKEX-1451/	MS GROUP HLDGS LTD	54.19 M	0.7996	15.17 M	8.01 M	6.35 M	9.25 M	USD	0.03	USD	2.0332	D
+https://s3-symbol-logo.tradingview.com/idp-ltd.svg	332370	https://www.tradingview.com/symbols/KRX-332370/	IDP CORP., LTD.	31.86 M	0.3031	15.05 M	7.66 M	7.7 M	8.42 M	USD	0.61	USD	1.0518	D
+https://s3-symbol-logo.tradingview.com/kelly-partners-hldgs-ltd.svg	KPG	https://www.tradingview.com/symbols/ASX-KPG/	KELLY PARTNERS GROUP HOLDINGS LIMITED	74.37 M	0.2603	14.69 M	14.83 M	6.53 M	23.06 M	USD	0.15	USD	2.2033	D
+	4772	https://www.tradingview.com/symbols/TPEX-4772/	TAIWAN SPECIALITY CHEMICALS CORPORA	26.35 M	0.647	14.62 M	11.98 M	12.24 M	14.41 M	USD	0.09	USD	0.8968	
+https://s3-symbol-logo.tradingview.com/mcb-arif-habib-savings-and-investments.svg	MCBIM	https://www.tradingview.com/symbols/PSX-MCBIM/	MCB INVESTMENT MANAGEMENT LIMITED	14.54 M	1.523	14.25 M	5.49 M	5.5 M	5.73 M	USD	0.08	USD	0.9372	D
+https://s3-symbol-logo.tradingview.com/shifa-international-hospitals.svg	SHFA	https://www.tradingview.com/symbols/PSX-SHFA/	SHIFA INTERNATIONAL HOSPITALS LTD	93.96 M	0.1684	14.21 M	13.44 M	7.53 M	17.21 M	USD	0.12	USD	1.0228	D
+https://s3-symbol-logo.tradingview.com/ntg-clarity-networks.svg	NCI	https://www.tradingview.com/symbols/TSXV-NCI/	NTG CLARITY NETWORKS INC	39 M	1.0242	14.15 M	6.97 M	6.85 M	7.67 M	USD	0.16	USD	2.4456	D
+https://s3-symbol-logo.tradingview.com/cellecor-gadgets-ltd.svg	CELLECOR	https://www.tradingview.com/symbols/NSE-CELLECOR/	CELLECOR GADGETS LTD	120.06 M	1.05	13.99 M	6.27 M	3.62 M	6.37 M	USD	0.02	USD	0.8725	
+https://s3-symbol-logo.tradingview.com/ha-giang-mineral-mechanics-jsc.svg	HGM	https://www.tradingview.com/symbols/HNX-HGM/	HA GIANG MINERAL MECHANICS JSC	18.41 M	1.4951	13.55 M	12.54 M	10.47 M	12.69 M	USD	0.84	USD	3.047	D
+https://s3-symbol-logo.tradingview.com/cyberone-co-ltd.svg	356890	https://www.tradingview.com/symbols/KRX-356890/	CYBERONE CO., LTD.	32.5 M	0.8033	13.43 M	7.22 M	6.37 M	8.01 M	USD	0.53	USD	3.8523	D
+https://s3-symbol-logo.tradingview.com/i-jang-industria-co-ltd.svg	8342	https://www.tradingview.com/symbols/TPEX-8342/	I JANG INDUSTRIA CO LTD	52.07 M	0.1535	12.99 M	7.12 M	7.34 M	8.48 M	USD	0.22	USD	0.215	
+https://s3-symbol-logo.tradingview.com/comstock-holding-companies.svg	CHCI	https://www.tradingview.com/symbols/NASDAQ-CHCI/	Comstock Holding Companies, Inc.	53.3 M	0.1821	12.95 M	10.87 M	15.24 M	11.19 M	USD	1.52	USD	0.9377	
+	ADB	https://www.tradingview.com/symbols/MYX-ADB/	AUTOCOUNT DOTCOM BERHAD	16.28 M	0.6331	12.76 M	8.55 M	6.56 M	8.88 M	USD	0.01	USD	1.2553	D
+https://s3-symbol-logo.tradingview.com/dragon-mining-limited.svg	1712	https://www.tradingview.com/symbols/HKEX-1712/	DRAGON MINING LIMITED	48.22 M	0.1894	12.61 M	8.77 M	8.53 M	14.43 M	USD	0.05	USD	1.5027	D
+	APP	https://www.tradingview.com/symbols/SET-APP/	APPLICAD PCL	30.96 M	0.228	12.58 M	2.79 M	2.86 M	3.59 M	USD	0.01	USD	1.9242	D
+https://s3-symbol-logo.tradingview.com/plejd.svg	PLEJD	https://www.tradingview.com/symbols/NGM-PLEJD/	PLEJD AB	59.61 M	0.2901	12.32 M	12.32 M	9.42 M	18.45 M	USD	0.84	USD	1.3049	
+https://s3-symbol-logo.tradingview.com/ghandhara-nissan.svg	GAL	https://www.tradingview.com/symbols/PSX-GAL/	GHANDHARA AUTOMOBILES LTD	65.63 M	1.3132	12.31 M	9.85 M	9.05 M	11.09 M	USD	0.16	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/edarat-communication-and-information-technology-co.svg	9557	https://www.tradingview.com/symbols/TADAWUL-9557/	EDARAT COMMUNICATION AND INFORMATION TECHNOLOGY CO.	27.81 M	0.3032	11.89 M	7.28 M	6.56 M	8.2 M	USD	2.61	USD	0.4213	D
+https://s3-symbol-logo.tradingview.com/phuong-nam-education-inv-and-dev-jsc.svg	SED	https://www.tradingview.com/symbols/HNX-SED/	PHUONG NAM EDUCATION INV & DEV JSC	51.25 M	0.2424	11.75 M	2.99 M	2.29 M	—	USD	0.25		0.3914	D
+https://s3-symbol-logo.tradingview.com/zalaris-asa.svg	ZAL	https://www.tradingview.com/symbols/OSL-ZAL/	ZALARIS ASA	132.79 M	0.176	11.67 M	11.67 M	5.67 M	22.72 M	USD	0.24	USD	0.8921	D
+https://s3-symbol-logo.tradingview.com/earth-science-tech.svg	ETST	https://www.tradingview.com/symbols/OTC-ETST/	Earth Science Tech, Inc.	30.46 M	4.0898	11.5 M	3.57 M	2.31 M	3.72 M	USD	0.01	USD	6.5	D
+https://s3-symbol-logo.tradingview.com/renuka-holdings.svg	VLL.N0000	https://www.tradingview.com/symbols/CSELK-VLL.N0000/	VIDULLANKA PLC	20.6 M	0.1544	11.41 M	8.14 M	5.37 M	9.69 M	USD	0.01	USD	0.4851	
+https://s3-symbol-logo.tradingview.com/sks-technologies-limited.svg	SKS	https://www.tradingview.com/symbols/ASX-SKS/	SKS TECHNOLOGIES GROUP LIMITED	122.86 M	1.1332	10.98 M	7.99 M	6.55 M	9.48 M	USD	0.06	USD	4.0588	D
+https://s3-symbol-logo.tradingview.com/optex-systems.svg	OPXS	https://www.tradingview.com/symbols/NASDAQ-OPXS/	Optex Systems Holdings, Inc.	37.43 M	0.2177	10.78 M	6.07 M	4.89 M	6.6 M	USD	0.71	USD	0.3641	
+https://s3-symbol-logo.tradingview.com/trang.svg	TFC	https://www.tradingview.com/symbols/HNX-TFC/	TRANG CORPORATION	35.4 M	0.1604	10.23 M	6.43 M	5.87 M	6.62 M	USD	0.35	USD	1.8812	D
+	ATR	https://www.tradingview.com/symbols/GPW-ATR/	ATREM	51.12 M	0.2744	9.79 M	5.62 M	4.83 M	6.2 M	USD	0.52	USD	0.9792	D
+https://s3-symbol-logo.tradingview.com/idaho-strategic-resources.svg	IDR	https://www.tradingview.com/symbols/AMEX-IDR/	Idaho Strategic Resources, Inc.	27.14 M	0.6742	9.79 M	7.92 M	8.27 M	9.94 M	USD	0.62	USD	1.3652	
+	6855	https://www.tradingview.com/symbols/TPEX-6855/	ECLATORQ TECHNOLOGY CO LTD	19.18 M	0.2265	9.58 M	6.33 M	6.57 M	6.61 M	USD	0.28	USD	0.263	
+	AHC	https://www.tradingview.com/symbols/ASX-AHC/	AUSTCO HEALTHCARE LIMITED	44.68 M	0.631	9.47 M	5.34 M	5.47 M	6.98 M	USD	0.02	USD	2.8986	D
+https://s3-symbol-logo.tradingview.com/matriks-bilgi-dagitim.svg	MTRKS	https://www.tradingview.com/symbols/BIST-MTRKS/	MATRIKS FINANSAL TEKNOLOJILER	25.64 M	0.5466	9.35 M	7.62 M	3.37 M	11.26 M	USD	0.04	USD	0.7369	D
+	MAM	https://www.tradingview.com/symbols/ASX-MAM/	MICROEQUITIES ASSET MANAGEMENT GROUP LIMITED	9.37 M	0.195	9.24 M	7.48 M	4.63 M	7.61 M	USD	0.03	USD	0.2926	D
+https://s3-symbol-logo.tradingview.com/table-trac.svg	TBTC	https://www.tradingview.com/symbols/OTC-TBTC/	Table Trac, Inc.	12.68 M	0.3774	9.02 M	2.67 M	2.35 M	2.7 M	USD	0.51	USD	0.8203	D
+https://s3-symbol-logo.tradingview.com/ninh-binh-phosphate-fertilizer-jsc.svg	NFC	https://www.tradingview.com/symbols/HNX-NFC/	NINH BINH PHOSPHATE FERTILIZER JSC	42.41 M	0.2805	8.95 M	3.47 M	2.83 M	3.6 M	USD	0.18	USD	1.4141	D
+	7714	https://www.tradingview.com/symbols/TPEX-7714/	UNIFORCE TECHNOLOGY CORPORATION	43.22 M	0.3384	8.82 M	4.15 M	3.24 M	4.48 M	USD	0.17	USD	0.9433	
+https://s3-symbol-logo.tradingview.com/acorn-energy.svg	ACFN	https://www.tradingview.com/symbols/OTC-ACFN/	Acorn Energy, Inc.	11.95 M	0.4158	8.73 M	2.46 M	6.69 M	2.59 M	USD	2.67	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/loco-hong-kong-limited.svg	8162	https://www.tradingview.com/symbols/HKEX-8162/	LOCO HONG KONG HOLDINGS LIMITED	1.95 B	0.4104	8.62 M	6.42 M	4.14 M	7.02 M	USD	0	USD	0.8476	D
+	6898	https://www.tradingview.com/symbols/TPEX-6898/	CHAINSEA INFORMATION INTEGRATION CO	34.4 M	0.2195	8.47 M	5.7 M	5.56 M	6.37 M	USD	0.23	USD	0.3951	
+	CLOUDPT	https://www.tradingview.com/symbols/MYX-CLOUDPT/	CLOUDPOINT TECHNOLOGY BERHAD	32.38 M	0.3165	8.42 M	5.84 M	4.54 M	6.14 M	USD	0.01	USD	0.2525	D
+https://s3-symbol-logo.tradingview.com/amundi.svg	HNW	https://www.tradingview.com/symbols/AMEX-HNW/	Pioneer Diversified High Income Fund, Inc.	9.71 M	0.4764	8.31 M	24.56 M	21.81 M	24.56 M	USD	2.62	USD	1.19	
+https://s3-symbol-logo.tradingview.com/ever-glory.svg	ZKX	https://www.tradingview.com/symbols/SGX-ZKX/	EVER GLORY	54.66 M	0.5727	7.81 M	5.64 M	6.56 M	6.08 M	USD	0.03	USD	0.4809	D
+	6820	https://www.tradingview.com/symbols/TPEX-6820/	ACON OPTICS COMMUNICATIONS INC	23.19 M	0.2677	7.76 M	2.28 M	2.49 M	4.39 M	USD	0.11	USD	4.8072	
+https://s3-symbol-logo.tradingview.com/ulima-nitra-tbk.svg	UNIQ	https://www.tradingview.com/symbols/IDX-UNIQ/	ULIMA NITRA TBK	41.14 M	0.1689	7.71 M	5.96 M	4.12 M	12.53 M	USD	0	USD	0.5701	D
+https://s3-symbol-logo.tradingview.com/reclaims-global.svg	NEX	https://www.tradingview.com/symbols/SGX-NEX/	RECLAIMS GLOBAL	32.66 M	0.827	7.55 M	4.79 M	4.09 M	6.31 M	USD	0.03	USD	2.6638	D
+https://s3-symbol-logo.tradingview.com/sa-giang-import-export.svg	SGC	https://www.tradingview.com/symbols/HNX-SGC/	SA GIANG IMPORT-EXPORT CORPORATION	27.79 M	0.3528	7.42 M	4.39 M	3.87 M	5.22 M	USD	0.54	USD	0.4142	D
+https://s3-symbol-logo.tradingview.com/sahathai-printing-and-packaging-pcl.svg	STP	https://www.tradingview.com/symbols/SET-STP/	SAHATHAI PRINTING & PACKAGING PCL	21.37 M	0.2768	7.41 M	5.11 M	4.69 M	6.63 M	USD	0.05	USD	0.4427	D
+	6986	https://www.tradingview.com/symbols/TPEX-6986/	HEXUN BIOSCIENCES CO LTD	8.72 M	1.1936	7.41 M	4.74 M	4.48 M	5.46 M	USD	0.1	USD	3.4517	
+https://s3-symbol-logo.tradingview.com/js-momentum-factor-etf.svg	JSGCL	https://www.tradingview.com/symbols/PSX-JSGCL/	JS GLOBAL CAPITAL LTD	7.33 M	0.4988	6.97 M	2.6 M	1.95 M	2.88 M	USD	0.07	USD	1.5926	D
+https://s3-symbol-logo.tradingview.com/indexa-capital-sa.svg	INDXA	https://www.tradingview.com/symbols/BME-INDXA/	INDEXA CAPITAL GROUP, S.A.	6.87 M	0.3655	6.74 M	1.18 M	791.94 K	1.25 M	USD	0.05	USD	0.8754	D
+https://s3-symbol-logo.tradingview.com/arab-pharmaceuticals.svg	ADCI	https://www.tradingview.com/symbols/EGX-ADCI/	ARAB PHARMACEUTICALS	17.92 M	0.2866	6.68 M	3.44 M	2.37 M	3.74 M	USD	0.4	USD	0.4701	D
+https://s3-symbol-logo.tradingview.com/manforce-berhad.svg	MFGROUP	https://www.tradingview.com/symbols/MYX-MFGROUP/	MANFORCE GROUP BERHAD	40.63 M	0.2464	6.67 M	3.43 M	2.38 M	3.7 M	USD	0.01	USD	0.7113	D
+	LFECORP	https://www.tradingview.com/symbols/MYX-LFECORP/	LFE CORPORATION BHD	34.41 M	0.3475	6.31 M	4.89 M	5.67 M	—	USD	0.01		0.877	D
+https://s3-symbol-logo.tradingview.com/vinsys-it-services.svg	VINSYS	https://www.tradingview.com/symbols/NSE-VINSYS/	VINSYS IT SERVICES IND LTD	24.77 M	0.2416	5.84 M	4.19 M	3.51 M	4.64 M	USD	0.24	USD	0.3112	
+	ITECH	https://www.tradingview.com/symbols/OMXSTO-ITECH/	I-TECH AB	19.65 M	0.5428	5.72 M	5.72 M	4.43 M	6.53 M	USD	0.37	USD	1.0704	D
+	6955	https://www.tradingview.com/symbols/TWSE-6955/	BONRAYBIO CO LTD	7.39 M	0.4119	5.71 M	2.17 M	2.35 M	2.53 M	USD	0.11	USD	1.0621	D
+https://s3-symbol-logo.tradingview.com/may-and-baker-plc-nigeria.svg	MAYBAKER	https://www.tradingview.com/symbols/NSENG-MAYBAKER/	MAY AND BAKER PLC - NIGERIA	19.58 M	0.4628	5.67 M	1.87 M	1.29 M	2.36 M	USD	0	USD	0.5564	
+https://s3-symbol-logo.tradingview.com/vertikal-zrt.svg	VERTI	https://www.tradingview.com/symbols/BET-VERTI/	VERTIKAL GROUP ZRT	52.39 M	0.6737	5.62 M	5.62 M	5.29 M	6.7 M	USD	0	USD	1.5275	D
+https://s3-symbol-logo.tradingview.com/egyptian-transport-egytrans.svg	ETRS	https://www.tradingview.com/symbols/EGX-ETRS/	EGYPTIAN TRANSPORT (EGYTRANS)	15.01 M	0.9256	5.37 M	2.79 M	4.48 M	3.22 M	USD	0.03	USD	3.129	D
+https://s3-symbol-logo.tradingview.com/ikeja-hotel-plc.svg	IKEJAHOTEL	https://www.tradingview.com/symbols/NSENG-IKEJAHOTEL/	IKEJA HOTEL PLC	12.83 M	0.6196	5.22 M	3.88 M	2.72 M	4.15 M	USD	0	USD	2.6501	
+https://s3-symbol-logo.tradingview.com/cff-fluid-control-limited.svg	CFF	https://www.tradingview.com/symbols/BSE-CFF/	CFF FLUID CONTROL LIMITED	17.03 M	0.3622	4.97 M	4.05 M	2.79 M	4.77 M	USD	0.14	USD	0.4245	D
+https://s3-symbol-logo.tradingview.com/sealmatic-india-limited.svg	SEALMATIC	https://www.tradingview.com/symbols/BSE-SEALMATIC/	SEALMATIC INDIA LIMITED	11.82 M	0.4218	4.85 M	2.33 M	1.86 M	2.7 M	USD	0.21	USD	0.6149	D
+https://s3-symbol-logo.tradingview.com/bright-outdoor-media-limited.svg	BRIGHT	https://www.tradingview.com/symbols/BSE-BRIGHT/	BRIGHT OUTDOOR MEDIA LIMITED	14.64 M	0.3974	4.43 M	3.37 M	2.5 M	3.6 M	USD	0.18	USD	1.936	D
+https://s3-symbol-logo.tradingview.com/uzertas-boya.svg	INTEK	https://www.tradingview.com/symbols/BIST-INTEK/	INNOSA TEKNOLOJI	7.41 M	4.2814	4 M	2.61 M	3.39 M	3.9 M	USD	0.42	USD	#ERROR!	D
+https://s3-symbol-logo.tradingview.com/po-valley-energy-limited.svg	PVE	https://www.tradingview.com/symbols/ASX-PVE/	PO VALLEY ENERGY LIMITED	6.62 M	1.7605	3.82 M	3.28 M	2.43 M	3.89 M	USD	0	USD	3.25	D
+https://s3-symbol-logo.tradingview.com/mobilia-berhad.svg	MOBILIA	https://www.tradingview.com/symbols/MYX-MOBILIA/	MOBILIA HOLDINGS BERHAD	23.96 M	0.1738	3.69 M	3.69 M	3.01 M	4.41 M	USD	0	USD	0.3082	D
+https://s3-symbol-logo.tradingview.com/africa-prudential-registrars-plc.svg	AFRIPRUD	https://www.tradingview.com/symbols/NSENG-AFRIPRUD/	AFRICA PRUDENTIAL REGISTRARS PLC	3.72 M	0.7409	3.58 M	2.13 M	1.29 M	2.22 M	USD	0	USD	1.594	
+https://s3-symbol-logo.tradingview.com/aryaman-financial-services-ltd.svg	ARYACAPM	https://www.tradingview.com/symbols/BSE-ARYACAPM/	ARYAMAN CAPITAL MARKETS LIMITE	9.05 M	1.2534	3.5 M	3.15 M	2.68 M	3.16 M	USD	0.22	USD	2.5523	D
+	ENEST	https://www.tradingview.com/symbols/MYX-ENEST/	ENEST GROUP BERHAD	33.84 M	0.2742	3.49 M	2.1 M	1.88 M	2.31 M	USD	0	USD	0.2397	D
+https://s3-symbol-logo.tradingview.com/systango-technolog.svg	SYSTANGO	https://www.tradingview.com/symbols/NSE-SYSTANGO/	SYSTANGO TECHNOLOGIES LTD	7.86 M	0.2828	3.49 M	2.62 M	2.78 M	2.68 M	USD	0.19	USD	0.6956	
+https://s3-symbol-logo.tradingview.com/imago-mulia-persada-tbk.svg	LFLO	https://www.tradingview.com/symbols/IDX-LFLO/	IMAGO MULIA PERSADA TBK	7.45 M	0.4877	3.32 M	1.22 M	938 K	1.52 M	USD	0	USD	0.7143	D
+https://s3-symbol-logo.tradingview.com/kundan-edifice-lim.svg	KEL	https://www.tradingview.com/symbols/NSE-KEL/	KUNDAN EDIFICE LTD	11.49 M	0.1658	3.18 M	1.61 M	919.88 K	1.87 M	USD	0.09	USD	1.6576	
+https://s3-symbol-logo.tradingview.com/third-age-health-s-npv.svg	TAH	https://www.tradingview.com/symbols/NZX-TAH/	THIRD AGE HEALTH SERVICES LTD NPV	10.93 M	0.232	3.15 M	2.02 M	1.19 M	2.51 M	USD	0.12	USD	1.8543	D
+https://s3-symbol-logo.tradingview.com/namsys.svg	CTZ	https://www.tradingview.com/symbols/TSXV-CTZ/	NAMSYS INC	4.95 M	0.1647	3.14 M	1.91 M	1.63 M	1.92 M	USD	0.06	USD	0.4185	D
+	6979	https://www.tradingview.com/symbols/TPEX-6979/	VICTORY FOR TECHNOLOGY CO LTD	17.7 M	0.6941	3.1 M	1.39 M	1.26 M	2.14 M	USD	0.11	USD	#ERROR!	
+https://s3-symbol-logo.tradingview.com/b-i-g-industries.svg	BIG	https://www.tradingview.com/symbols/MYX-BIG/	B.I.G. INDUSTRIES BHD	9.5 M	0.1567	3.05 M	2.08 M	1.69 M	2.65 M	USD	0.03	USD	2.0459	D
+https://s3-symbol-logo.tradingview.com/esense-human-res.svg	ESENT	https://www.tradingview.com/symbols/BET-ESENT/	ESENSE HUMAN RES	14.5 M	0.4828	2.88 M	1.27 M	1.31 M	1.75 M	USD	0.13	USD	1.1286	D
+https://s3-symbol-logo.tradingview.com/berger-paints-plc-nigeria.svg	BERGER	https://www.tradingview.com/symbols/NSENG-BERGER/	BERGER PAINTS PLC - NIGERIA	7.01 M	0.3413	2.69 M	787.45 K	480.43 K	972.51 K	USD	0	USD	0.9574	
+https://s3-symbol-logo.tradingview.com/ztest-electronics.svg	ZTE	https://www.tradingview.com/symbols/CSE-ZTE/	ZTEST ELECTRONICS INC.	6.61 M	0.231	2.69 M	1.41 M	1.12 M	1.67 M	USD	0.03	USD	0.2381	
+https://s3-symbol-logo.tradingview.com/nozha-international-hospital.svg	NINH	https://www.tradingview.com/symbols/EGX-NINH/	NOZHA INTERNATIONAL HOSPITAL	8.52 M	0.4632	2.52 M	1.78 M	2.3 M	1.98 M	USD	0.01	USD	0.8694	D
+https://s3-symbol-logo.tradingview.com/matrix-parking-solution-berhad.svg	MPSOL	https://www.tradingview.com/symbols/MYX-MPSOL/	MATRIX PARKING SOLUTION HOLDINGS BERHAD	4.95 M	0.387	2.29 M	709.56 K	448.94 K	2.32 M	USD	0	USD	1.5	D
+	CSOC.A	https://www.tradingview.com/symbols/TSXV-CSOC.A/	CANSO SELECT OPPORTUNITIES CORP	2.07 M	2.235	2.07 M	7.26 M	6.44 M	7.26 M	USD	1.19	USD	1.111	D
+https://s3-symbol-logo.tradingview.com/urban-enviro-waste.svg	URBAN	https://www.tradingview.com/symbols/NSE-URBAN/	URBAN ENVIRO WASTE MGMT L	16.51 M	0.3765	2 M	2 M	1.2 M	2.93 M	USD	0.14	USD	0.4539	
+https://s3-symbol-logo.tradingview.com/the-initiates-plc.svg	TIP	https://www.tradingview.com/symbols/NSENG-TIP/	THE INITIATES PLC	3.4 M	1.8401	1.72 M	1.42 M	964.51 K	1.47 M	USD	0	USD	4.6109	
+https://s3-symbol-logo.tradingview.com/all-american-gold.svg	AAGC	https://www.tradingview.com/symbols/OTC-AAGC/	All American Gold Corp.	2.9 M	5.9451	1.71 M	595.62 K	595.62 K	595.63 K	USD	0	USD	2	D
+https://s3-symbol-logo.tradingview.com/techknowgreen-solutions-limite.svg	TECHKGREEN	https://www.tradingview.com/symbols/BSE-TECHKGREEN/	TECHKNOWGREEN SOLUTIONS LIMITE	3.86 M	0.4069	1.4 M	1.08 M	887.42 K	1.17 M	USD	0.12	USD	0.2414	D
+https://s3-symbol-logo.tradingview.com/shine-fashions-india-limited.svg	SHINEFASH	https://www.tradingview.com/symbols/BSE-SHINEFASH/	SHINE FASHIONS (INDIA) LIMITED	9.55 M	0.5072	1.31 M	1.09 M	816.86 K	1.09 M	USD	0.28	USD	0.7098	D
+https://s3-symbol-logo.tradingview.com/hoa-cam-concrete-jsc.svg	HCC	https://www.tradingview.com/symbols/HNX-HCC/	HOA CAM CONCRETE JSC	12.57 M	0.3731	1.27 M	804.73 K	615.35 K	1.13 M	USD	0.09	USD	0.8393	D
+	IDBTECH	https://www.tradingview.com/symbols/MYX-IDBTECH/	IDB TECHNOLOGIES BERHAD	2.05 M	0.2884	1.26 M	742.03 K	520.96 K	790.06 K	USD	0	USD	0.7407	D
+https://s3-symbol-logo.tradingview.com/meyer-plc.svg	MEYER	https://www.tradingview.com/symbols/NSENG-MEYER/	MEYER PLC.	2.19 M	0.5162	751.71 K	291 K	306.04 K	351.23 K	USD	0	USD	1.2938	
+https://s3-symbol-logo.tradingview.com/signoria-creation.svg	SIGNORIA	https://www.tradingview.com/symbols/NSE-SIGNORIA/	SIGNORIA CREATION LTD	3.18 M	0.3913	738.15 K	565.94 K	353.21 K	615.86 K	USD	0.07	USD	0.2537	
+https://s3-symbol-logo.tradingview.com/mineral-midrange.svg	MND	https://www.tradingview.com/symbols/NEWCONNECT-MND/	MINERAL MIDRANGE	4.39 M	0.5175	383.81 K	351.47 K	287.48 K	422.12 K	USD	0.07	USD	8.2564	D
+https://s3-symbol-logo.tradingview.com/sakana.svg	SKN	https://www.tradingview.com/symbols/NEWCONNECT-SKN/	SAKANA	5.89 M	0.2682	241.27 K	186.34 K	117.15 K	302.68 K	USD	0	USD	2.4182	D
+https://s3-symbol-logo.tradingview.com/xps-pensions-plc-ord-gbp00005.svg	XPS	https://www.tradingview.com/symbols/LSE-XPS/	XPS PENSIONS GROUP PLC ORD GBP0.0005	291.96 M	0.1841	—	58.22 M	82.56 M	75.6 M	USD	0.38		2.9802	
+https://s3-symbol-logo.tradingview.com/admiral-group.svg	ADM	https://www.tradingview.com/symbols/LSE-ADM/	ADMIRAL GROUP ORD GBP0.001	6.6 B	0.3486	—	1.13 B	829.85 M	—		2.71		0.959	
+https://s3-symbol-logo.tradingview.com/turkiye-sigorta.svg	TURSG	https://www.tradingview.com/symbols/BIST-TURSG/	TURKIYE SIGORTA	1.51 B	0.8477	—	436.53 M	358.13 M	—		0.08		0.6852	D
+https://s3-symbol-logo.tradingview.com/aksigorta.svg	AKGRT	https://www.tradingview.com/symbols/BIST-AKGRT/	AKSIGORTA	351.46 M	0.4165	—	36.22 M	47.21 M	—		0.03		0.668	D
+https://s3-symbol-logo.tradingview.com/vakif-fin-kir.svg	VAKFN	https://www.tradingview.com/symbols/BIST-VAKFN/	VAKIF FIN. KIR.	191.17 M	3.1138	—	170.86 M	42.31 M	171.2 M	USD	0.01		0.8733	D
+https://s3-symbol-logo.tradingview.com/avivasa-emeklilik-hayat.svg	AGESA	https://www.tradingview.com/symbols/BIST-AGESA/	AGESA HAYAT EMEKLILIK	720.73 M	0.5386	—	116.63 M	88.26 M	—		0.49		0.7909	D
+https://s3-symbol-logo.tradingview.com/tgs-dis-ticaret.svg	TGSAS	https://www.tradingview.com/symbols/BIST-TGSAS/	TGS DIS TICARET	5.74 M	0.6818	—	3.72 M	2.34 M	3.72 M	USD	0.16		2.5568	D
+https://s3-symbol-logo.tradingview.com/tf-bank-ab-tf-bank-ord-shs.svg	TFBANK	https://www.tradingview.com/symbols/OMXSTO-TFBANK/	TF BANK AB	355.74 M	0.2377	—	71.9 M	62.88 M	—		2.92		0.5898	D
+	211050	https://www.tradingview.com/symbols/KRX-211050/	INCAR FINANCIAL SERVICE CO.,LTD.	591.56 M	0.4001	—	60.4 M	43.95 M	—		0.9		0.9873	D
+https://s3-symbol-logo.tradingview.com/capitec-bank-hldgs-ltd.svg	CPI	https://www.tradingview.com/symbols/JSE-CPI/	CAPITEC BANK HLDGS LTD	3.43 B	0.2004	—	945.68 M	733.84 M	—		6.34		0.3004	
+https://s3-symbol-logo.tradingview.com/dunav-osiguranje-a.svg	DNOS	https://www.tradingview.com/symbols/BELEX-DNOS/	DUNAV OSIGURANJE A	456.97 M	0.245	—	46.61 M	31.13 M	—		2.05		0.4401	D
+https://s3-symbol-logo.tradingview.com/damaan-islamic-insurance-qpsc.svg	BEMA	https://www.tradingview.com/symbols/QSE-BEMA/	DAMAAN ISLAMIC INSURANCE QPSC	136.7 M	0.4639	—	36.11 M	25.34 M	—		0.13		0.2691	D
+https://s3-symbol-logo.tradingview.com/the-philippine-stock-exchange.svg	PSE	https://www.tradingview.com/symbols/PSE-PSE/	THE PHILIPPINE STOCK EXCHANGE	33.87 M	0.3008	—	22.94 M	20.66 M	27.32 M	USD	0.25		0.4561	D
+https://s3-symbol-logo.tradingview.com/asia-united-bank.svg	AUB	https://www.tradingview.com/symbols/PSE-AUB/	ASIA UNITED BANK CORPORATION	478.7 M	0.1971	—	254.8 M	211.5 M	—		0.29		0.4165	D
+https://s3-symbol-logo.tradingview.com/gma-pdr.svg	GMAP	https://www.tradingview.com/symbols/PSE-GMAP/	GMA HOLDINGS, INC. (PDR)	66.13 K	0.3251	—	49.7 K	41.34 K	49.7 K	USD	0		0.8485	D
+https://s3-symbol-logo.tradingview.com/united-insurance-co-of-pakistan.svg	UNIC	https://www.tradingview.com/symbols/PSX-UNIC/	UNITED INSURANCE CO OF PAKISTAN LTD	24.09 M	0.4412	—	10.58 M	7.66 M	—		0.02		1.0871	D
+https://s3-symbol-logo.tradingview.com/east-west-insurance-co.svg	EWIC	https://www.tradingview.com/symbols/PSX-EWIC/	EAST WEST INSURANCE CO LTD	20.47 M	0.2405	—	4.59 M	3.75 M	—		0.01		0.3683	D
+https://s3-symbol-logo.tradingview.com/protector-forsikring-asa.svg	PROT	https://www.tradingview.com/symbols/OSL-PROT/	PROTECTOR FORSIKRING ASA	1.31 B	0.2001	—	252.31 M	173.37 M	—		2.1		0.3629	D
+https://s3-symbol-logo.tradingview.com/ecobank-transnational.svg	ETI	https://www.tradingview.com/symbols/NSENG-ETI/	ECOBANK TRANSNATIONAL INC	2.68 B	0.8566	—	780.02 M	327.94 M	—		0.01		1.2369	
+https://s3-symbol-logo.tradingview.com/wema-bank-plc.svg	WEMABANK	https://www.tradingview.com/symbols/NSENG-WEMABANK/	WEMA BANK PLC	298.59 M	0.8188	—	81.52 M	70.36 M	—		0		0.7289	
+https://s3-symbol-logo.tradingview.com/fidelity-bank-plc.svg	FIDELITYBK	https://www.tradingview.com/symbols/NSENG-FIDELITYBK/	FIDELITY BANK PLC	722.46 M	0.8158	—	278.47 M	206.71 M	—		0.01		1.0401	
+https://s3-symbol-logo.tradingview.com/tower-ltd-npv.svg	TWR	https://www.tradingview.com/symbols/NZX-TWR/	TOWER LTD NPV	345.4 M	0.2399	—	71.44 M	50.07 M	—		0.14		1.1962	D
+https://s3-symbol-logo.tradingview.com/boursa-kuwait-securities-co-kpsc.svg	BOURSA	https://www.tradingview.com/symbols/KSE-BOURSA/	BOURSA KUWAIT SECURITIES CO KPSC	129.91 M	0.2797	—	84.44 M	69.43 M	87.29 M	USD	0.35		0.3267	D
+https://s3-symbol-logo.tradingview.com/ibi-lion.svg	IBI	https://www.tradingview.com/symbols/TASE-IBI/	IBI INV HOUSE	285.24 M	0.5667	—	78.92 M	48.9 M	94.42 M	USD	3.62		0.8928	D
+	ANLT	https://www.tradingview.com/symbols/TASE-ANLT/	ANALYST	97.91 M	1.3844	—	29.26 M	17.79 M	31.43 M	USD	1.53		1.678	D
+https://s3-symbol-logo.tradingview.com/idi-insur.svg	IDIN	https://www.tradingview.com/symbols/TASE-IDIN/	IDI INSUR	965.21 M	0.289	—	112.96 M	70.56 M	—		4.8		0.8445	D
+https://s3-symbol-logo.tradingview.com/al-baraka-bank-egypt.svg	SAUD	https://www.tradingview.com/symbols/EGX-SAUD/	AL BARAKA BANK EGYPT	385.32 M	0.5581	—	82.31 M	49.83 M	—		0.07		0.3043	D
+https://s3-symbol-logo.tradingview.com/export-development-bank-of-egypt-edbe.svg	EXPA	https://www.tradingview.com/symbols/EGX-EXPA/	EXPORT DEVELOPMENT BANK OF EGYPT	545.92 M	1.9577	—	145.05 M	100.27 M	—		0.1		1.7045	D
+https://s3-symbol-logo.tradingview.com/abu-dhabi-islamic-bank-egypt.svg	ADIB	https://www.tradingview.com/symbols/EGX-ADIB/	ABU DHABI ISLAMIC BANK- EGYPT	775.6 M	0.8461	—	232.11 M	173.59 M	—		0.29		0.8161	D
+https://s3-symbol-logo.tradingview.com/commercial-international-bank-egypt.svg	COMI	https://www.tradingview.com/symbols/EGX-COMI/	COMMERCIAL INTERNATIONAL BANK-EGYPT (CIB)	4.22 B	0.4576	—	1.61 B	1.04 B	—		0.34		0.7243	D
+https://s3-symbol-logo.tradingview.com/uttara-bank-ltd.svg	UTTARABANK	https://www.tradingview.com/symbols/DSEBD-UTTARABANK/	UTTARA BANK PLC	226.85 M	0.3211	—	83.25 M	44.34 M	—		0.05		0.6995	D
+https://s3-symbol-logo.tradingview.com/banco-patagonia.svg	BPAT	https://www.tradingview.com/symbols/BCBA-BPAT/	BANCO PATAGONIA SA	2.35 B	0.2697	—	896.66 M	180.88 M	—		0.25		1.4001	D
+https://s3-symbol-logo.tradingview.com/gpo-fin-galicia.svg	GGAL	https://www.tradingview.com/symbols/BCBA-GGAL/	GRUPO FINANCIERO GALICIA SA	9.57 B	0.7226	—	3.28 B	1.44 B	—		0.94		3.7316	D
+https://s3-symbol-logo.tradingview.com/utg.svg	UTGN	https://www.tradingview.com/symbols/OTC-UTGN/	UTG, Inc.	90.17 M	0.9993	—	67.16 M	52.93 M	—		16.73		1.9399	D
+https://s3-symbol-logo.tradingview.com/progressive-ohio.svg	PGR	https://www.tradingview.com/symbols/NYSE-PGR/	Progressive Corporation (The)	78.51 B	0.2074	—	11.29 B	8.72 B	—		14.85		0.5202	
+https://s3-symbol-logo.tradingview.com/palomar-holdings.svg	PLMR	https://www.tradingview.com/symbols/NASDAQ-PLMR/	Palomar Holdings, Inc.	609.06 M	0.5029	—	170.13 M	134.11 M	—		5.01		0.4371	
+https://s3-symbol-logo.tradingview.com/houlihan-lokey.svg	HLI	https://www.tradingview.com/symbols/NYSE-HLI/	Houlihan Lokey, Inc.	2.39 B	0.2488	—	522.24 M	399.71 M	563.51 M	USD	5.81		0.4121	
+https://s3-symbol-logo.tradingview.com/pjt-partners.svg	PJT	https://www.tradingview.com/symbols/NYSE-PJT/	PJT Partners Inc.	1.49 B	0.1604	—	268.9 M	155.79 M	297.67 M	USD	5.68		0.5196	
+https://s3-symbol-logo.tradingview.com/hamilton-lane.svg	HLNE	https://www.tradingview.com/symbols/NASDAQ-HLNE/	Hamilton Lane Incorporated	691.66 M	0.4116	—	332.38 M	215.28 M	341.85 M	USD	5.36		0.6481	
+https://s3-symbol-logo.tradingview.com/optimumbank.svg	OPHC	https://www.tradingview.com/symbols/AMEX-OPHC/	OptimumBank Holdings, Inc.	65.79 M	0.4398	—	19.61 M	14.62 M	—		1.34		0.3101	
+https://s3-symbol-logo.tradingview.com/century-next-financial.svg	CTUY	https://www.tradingview.com/symbols/OTC-CTUY/	Century Next Financial Corp	53.03 M	0.1814	—	16.16 M	12.93 M	—		7.1		0.5276	D
+https://s3-symbol-logo.tradingview.com/mercury-general-corp.svg	MCY	https://www.tradingview.com/symbols/NYSE-MCY/	Mercury General Corporation	5.6 B	0.1664	—	373.61 M	286.16 M	—		5.17		0.3304	
+https://s3-symbol-logo.tradingview.com/luduson-g.svg	LDSN	https://www.tradingview.com/symbols/OTC-LDSN/	Luduson G Inc.	12.5 M	7.3333	—	10.99 M	10.95 M	10.99 M	USD	0.02		9.4286	D

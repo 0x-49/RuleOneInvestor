@@ -1,122 +1,110 @@
-import OpenAI from "openai";
 import { InsertFinancialMetrics } from "@shared/schema";
-
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { geminiService } from "./geminiService";
+import { braveSearchService } from "./braveSearchService";
 
 interface CompanyFilingData {
   symbol: string;
   year: string;
-  revenue?: number;
-  earnings?: number;
-  freeCashFlow?: number;
-  bookValue?: number;
-  eps?: number;
-  operatingCashFlow?: number;
-  capitalExpenditures?: number;
-  debt?: number;
-  sharesOutstanding?: number;
+  revenue?: number | null;
+  earnings?: number | null;
+  freeCashFlow?: number | null;
+  bookValue?: number | null;
+  eps?: number | null;
+  operatingCashFlow?: number | null;
+  capitalExpenditures?: number | null;
+  debt?: number | null;
+  sharesOutstanding?: number | null;
 }
 
-interface SECFilingSearchResult {
+interface DocumentSearchResult {
   url: string;
-  filingType: string;
-  filingDate: string;
-  year: string;
+  title: string;
+  description: string;
+  type: string;
+  year?: string;
 }
 
 export class DeepSearchAgent {
   
   /**
-   * Main entry point: Attempt to extract 10-year financial data using AI
+   * Main entry point: Extract 10-year financial data using AI-powered web search
    */
   async extractFinancialDataForStock(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {
-    console.log(`🔍 Starting deep search for ${symbol}...`);
+    console.log(`Starting deep search for ${symbol}...`);
     
     try {
-      // Step 1: Find SEC filings for the company
-      const filings = await this.findSECFilings(symbol);
-      console.log(`📄 Found ${filings.length} relevant filings for ${symbol}`);
+      // Step 1: Use Gemini AI to analyze company and create search strategy
+      const companyAnalysis = await geminiService.analyzeCompanyForFilings(symbol);
+      console.log(`AI analysis complete for ${symbol}`);
       
-      if (filings.length === 0) {
-        console.log(`❌ No SEC filings found for ${symbol}`);
+      // Step 2: Use Brave Search to find actual financial documents
+      const documents = await this.findFinancialDocuments(symbol, companyAnalysis);
+      console.log(`Found ${documents.length} financial documents for ${symbol}`);
+      
+      if (documents.length === 0) {
+        console.log(`No financial documents found for ${symbol}`);
         return [];
       }
       
-      // Step 2: Extract data from each filing
+      // Step 3: Extract data from each document using Gemini AI
       const extractedData: CompanyFilingData[] = [];
       
-      for (const filing of filings.slice(0, 10)) { // Limit to 10 most recent years
+      for (const doc of documents.slice(0, 10)) { // Limit processing
         try {
-          const data = await this.extractDataFromFiling(symbol, filing);
+          const data = await this.extractDataFromDocument(symbol, doc);
           if (data) {
             extractedData.push(data);
           }
         } catch (error) {
-          console.warn(`⚠️ Failed to extract data from ${filing.filingType} for ${symbol} (${filing.year}):`, error instanceof Error ? error.message : error);
+          console.warn(`Failed to extract data from document for ${symbol}:`, error instanceof Error ? error.message : error);
         }
       }
       
-      // Step 3: Convert to our schema format
+      // Step 4: Convert to financial metrics format
       const metrics = this.convertToFinancialMetrics(extractedData, stockId);
       
-      console.log(`✅ Deep search extracted ${metrics.length} years of data for ${symbol}`);
+      console.log(`Deep search extracted ${metrics.length} years of data for ${symbol}`);
       return metrics;
       
     } catch (error) {
-      console.error(`❌ Deep search failed for ${symbol}:`, error instanceof Error ? error.message : error);
+      console.error(`Deep search failed for ${symbol}:`, error instanceof Error ? error.message : error);
       return [];
     }
   }
   
   /**
-   * Find SEC filings for a company using AI-powered search
+   * Find financial documents using Brave Search API
    */
-  private async findSECFilings(symbol: string): Promise<SECFilingSearchResult[]> {
-    // Use OpenAI to help identify and locate SEC filings
-    const prompt = `
-You are a financial data expert. I need to find SEC filings (10-K annual reports and 10-Q quarterly reports) for the company with stock symbol: ${symbol}
-
-Based on the symbol, help me identify:
-1. The company's full legal name
-2. Their likely CIK (Central Index Key) number
-3. Expected SEC EDGAR database URLs for their filings
-
-Respond in JSON format with this structure:
-{
-  "companyName": "Full Legal Company Name",
-  "cik": "1234567890",
-  "searchStrategy": "How to find their filings",
-  "expectedFilingPattern": "What their filing URLs typically look like"
-}
-`;
-
+  private async findFinancialDocuments(symbol: string, companyAnalysis: any): Promise<DocumentSearchResult[]> {
     try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "You are a financial data expert specializing in SEC filings and EDGAR database navigation. Provide accurate, actionable guidance for finding company financial documents."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.1
-      });
+      const searchQueries = companyAnalysis.searchQueries || [
+        `${symbol} SEC 10-K annual report`,
+        `${symbol} investor relations financial statements`,
+        `${symbol} annual report filetype:pdf`
+      ];
 
-      const aiGuidance = JSON.parse(response.choices[0].message.content);
-      console.log(`🤖 AI guidance for ${symbol}:`, aiGuidance);
+      const documents = await braveSearchService.searchFinancialDocuments(symbol, searchQueries);
       
-      // For now, return mock filing structure - in production this would use the AI guidance
-      // to actually search SEC EDGAR database
-      return this.generateMockFilingList(symbol);
-      
+      // Also search for investor relations pages
+      const irPages = await braveSearchService.findInvestorRelationsPages(
+        symbol, 
+        companyAnalysis.companyInfo?.legalName || symbol
+      );
+
+      // Combine and deduplicate results
+      const allDocuments = [...documents, ...irPages];
+      const uniqueDocuments = this.deduplicateByUrl(allDocuments);
+
+      return uniqueDocuments.map(doc => ({
+        url: doc.url,
+        title: doc.title,
+        description: doc.description,
+        type: doc.type,
+        year: this.extractYearFromDocument(doc.title + " " + doc.description)
+      }));
+
     } catch (error) {
-      console.error("Failed to get AI guidance for SEC filings:", error);
+      console.error("Failed to find financial documents:", error);
       return [];
     }
   }

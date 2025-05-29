@@ -23,6 +23,7 @@ import { eq, ilike, or } from "drizzle-orm";
 export interface IStorage {
   // Stock operations
   getStock(symbol: string): Promise<Stock | undefined>;
+  getStockBySymbol(symbol: string): Promise<Stock | undefined>;
   createStock(stock: InsertStock): Promise<Stock>;
   updateStock(symbol: string, updates: Partial<InsertStock>): Promise<Stock | undefined>;
   searchStocks(query: string): Promise<Stock[]>;
@@ -101,6 +102,10 @@ export class MemStorage implements IStorage {
 
   async getStock(symbol: string): Promise<Stock | undefined> {
     return this.stocks.get(symbol.toUpperCase());
+  }
+
+  async getStockBySymbol(symbol: string): Promise<Stock | undefined> {
+    return this.getStock(symbol);
   }
 
   async createStock(stock: InsertStock): Promise<Stock> {

@@ -111,6 +111,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Deep search API route - extract financial data from SEC filings using AI
+  app.post("/api/stocks/:symbol/deep-search", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      
+      // Get or create the stock first
+      let stock = await storage.getStock(symbol.toUpperCase());
+      if (!stock) {
+        const stockData = await financialDataService.fetchStockData(symbol);
+        if (!stockData) {
+          return res.status(404).json({ error: "Stock not found" });
+        }
+        stock = await storage.createStock(stockData);
+      }
+      
+      // Perform deep search with AI extraction from SEC filings
+      const metrics = await financialDataService.fetchFinancialMetrics(symbol, stock.id, true);
+      
+      if (metrics.length === 0) {
+        return res.status(404).json({ 
+          error: "No financial data could be extracted from SEC filings",
+          message: "The AI agent was unable to locate sufficient financial data in company filings"
+        });
+      }
+      
+      // Store the extracted metrics
+      for (const metric of metrics) {
+        await storage.createFinancialMetrics(metric);
+      }
+      
+      const stockWithMetrics = await storage.getStockWithMetrics(symbol.toUpperCase());
+      
+      res.json({
+        success: true,
+        yearsFound: metrics.length,
+        stockData: stockWithMetrics,
+        message: `Successfully extracted ${metrics.length} years of financial data from SEC filings`
+      });
+      
+    } catch (error) {
+      console.error("Deep search error:", error);
+      res.status(500).json({ 
+        error: "Deep search failed",
+        message: "AI extraction from SEC filings encountered an error"
+      });
+    }
+  });
+
   // Fetch real-time stock data from external API
   app.post("/api/stocks/fetch/:symbol", async (req, res) => {
     try {

@@ -249,29 +249,35 @@ export class FinancialDataService {
     }
   }
 
+  private isHighPriorityStock(symbol: string): boolean {
+    // Focus Alpha Vantage usage on major US stocks most likely to have data
+    const highPrioritySymbols = [
+      'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'BRK.B', 
+      'JNJ', 'V', 'WMT', 'PG', 'MA', 'HD', 'UNH', 'DIS', 'BAC', 'ADBE'
+    ];
+    return highPrioritySymbols.includes(symbol);
+  }
+
   async fetchFinancialMetrics(symbol: string, stockId: number, useDeepSearch: boolean = false): Promise<InsertFinancialMetrics[]> {
     try {
-      // Try Financial Modeling Prep first for better 10-year data
-      const fmpMetrics = await this.fetchFMPFinancialMetrics(symbol, stockId);
-      if (fmpMetrics && fmpMetrics.length >= 7) {
-        console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`, fmpMetrics.map(m => `${m.year}: $${(m.revenue || 0) / 1e9}B revenue`));
-        return fmpMetrics;
-      }
-
-      // Try Alpha Vantage for international stocks
-      console.log(`⚠️ FMP returned insufficient data for ${symbol}, trying Alpha Vantage...`);
-      const alphaMetrics = await this.fetchAlphaVantageFinancialMetrics(symbol, stockId);
-      if (alphaMetrics && alphaMetrics.length >= 7) {
-        console.log(`✅ Got ${alphaMetrics.length} years of data from Alpha Vantage for ${symbol}`);
-        return alphaMetrics;
-      }
-
-      // Fallback to Yahoo Finance
-      console.log(`⚠️ Alpha Vantage returned insufficient data for ${symbol}, trying Yahoo Finance...`);
+      // Skip FMP if we know it's over limit to save API calls
+      // Try Yahoo Finance first (most generous free tier)
+      console.log(`Fetching financial metrics for ${symbol} from Yahoo Finance...`);
       const yahooMetrics = await this.fetchYahooFinancialMetrics(symbol, stockId);
-      if (yahooMetrics && yahooMetrics.length >= 7) {
+      if (yahooMetrics && yahooMetrics.length >= 5) { // Reduced threshold for Yahoo
         console.log(`✅ Got ${yahooMetrics.length} years of data from Yahoo for ${symbol}`);
         return yahooMetrics;
+      }
+
+      // Skip Alpha Vantage to preserve daily limit
+      console.log(`⚠️ Skipping Alpha Vantage for ${symbol} to preserve daily API limit`);
+
+      // Skip FMP to avoid hitting paid limits
+      console.log(`⚠️ Skipping FMP for ${symbol} to avoid API costs`);
+      const fmpMetrics: InsertFinancialMetrics[] = [];
+      if (fmpMetrics && fmpMetrics.length >= 5) {
+        console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`);
+        return fmpMetrics;
       }
 
       // If deep search is requested and API data is insufficient, try AI extraction from SEC filings

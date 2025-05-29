@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { StockWithMetrics } from "@shared/schema";
+import { motion } from "framer-motion";
 
 interface FinancialTrendsProps {
   stockData?: StockWithMetrics;
@@ -134,7 +135,12 @@ export default function FinancialTrends({ stockData, isLoading }: FinancialTrend
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
+        <motion.div 
+          className="mb-4"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart data={chartData}>
               <defs>
@@ -159,8 +165,10 @@ export default function FinancialTrends({ stockData, isLoading }: FinancialTrend
                   backgroundColor: '#f8fafc',
                   border: '1px solid #e2e8f0',
                   borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 }}
                 formatter={(value: number) => [config.formatter(value), config.label]}
+                animationDuration={200}
               />
               <Area
                 type="monotone"
@@ -180,31 +188,65 @@ export default function FinancialTrends({ stockData, isLoading }: FinancialTrend
                   strokeWidth: 2,
                   fill: '#ffffff'
                 }}
+                animationDuration={1500}
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
         
         {/* Key Statistics */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-          <div className="text-center">
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+          >
             <div className="text-sm text-slate-600 dark:text-slate-400">CAGR (10yr)</div>
-            <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
+            <motion.div 
+              className="text-xl font-bold text-slate-900 dark:text-slate-100"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               {cagr.toFixed(1)}%
-            </div>
-          </div>
-          <div className="text-center">
+            </motion.div>
+          </motion.div>
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            whileHover={{ scale: 1.05 }}
+          >
             <div className="text-sm text-slate-600 dark:text-slate-400">Consistency</div>
-            <div className="text-xl font-bold text-green-600 dark:text-green-400">
+            <motion.div 
+              className="text-xl font-bold text-green-600 dark:text-green-400"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
               {consistency}/10
-            </div>
-          </div>
-          <div className="text-center">
+            </motion.div>
+          </motion.div>
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+            whileHover={{ scale: 1.05 }}
+          >
             <div className="text-sm text-slate-600 dark:text-slate-400">Latest Year</div>
-            <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
+            <motion.div 
+              className="text-xl font-bold text-slate-900 dark:text-slate-100"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
               {config.formatter(latest)}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </CardContent>
     </Card>

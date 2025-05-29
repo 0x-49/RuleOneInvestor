@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Settings, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface WatchlistProps {
   onStockSelect: (symbol: string) => void;
@@ -103,48 +104,88 @@ export default function Watchlist({ onStockSelect }: WatchlistProps) {
           </div>
         ) : (
           <div className="space-y-3">
-            {watchlistItems.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => handleStockClick(item.stockSymbol)}
-                className="group flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-              >
-                <div className="flex-1">
-                  <div className="font-semibold text-slate-900 dark:text-slate-100">
-                    {item.stock?.symbol || item.stockSymbol}
-                  </div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">
-                    {item.stock?.name || "Loading..."}
-                  </div>
-                </div>
-                
-                {item.stock && (
-                  <div className="text-right mr-8">
-                    <div className="font-semibold text-slate-900 dark:text-slate-100">
-                      ${item.stock.price.toFixed(2)}
-                    </div>
-                    <div className={cn(
-                      "text-sm",
-                      item.stock.changePercent >= 0 
-                        ? "text-green-600 dark:text-green-400" 
-                        : "text-red-600 dark:text-red-400"
-                    )}>
-                      {item.stock.changePercent >= 0 ? '+' : ''}{item.stock.changePercent.toFixed(1)}%
-                    </div>
-                  </div>
-                )}
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => handleRemoveStock(e, item.stockSymbol)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500"
-                  disabled={removeFromWatchlistMutation.isPending}
+            <AnimatePresence>
+              {watchlistItems.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleStockClick(item.stockSymbol)}
+                  className="group flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer hover:shadow-md"
                 >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+                  <div className="flex-1">
+                    <motion.div 
+                      className="font-semibold text-slate-900 dark:text-slate-100"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.1 + 0.2 }}
+                    >
+                      {item.stock?.symbol || item.stockSymbol}
+                    </motion.div>
+                    <motion.div 
+                      className="text-sm text-slate-600 dark:text-slate-400"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.1 + 0.3 }}
+                    >
+                      {item.stock?.name || "Loading..."}
+                    </motion.div>
+                  </div>
+                  
+                  {item.stock && (
+                    <motion.div 
+                      className="text-right mr-8"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1 + 0.4 }}
+                    >
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">
+                        ${item.stock.price.toFixed(2)}
+                      </div>
+                      <motion.div 
+                        className={cn(
+                          "text-sm",
+                          item.stock.changePercent >= 0 
+                            ? "text-green-600 dark:text-green-400" 
+                            : "text-red-600 dark:text-red-400"
+                        )}
+                        animate={{ 
+                          color: item.stock.changePercent >= 0 ? "#16a34a" : "#dc2626" 
+                        }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {item.stock.changePercent >= 0 ? '+' : ''}{item.stock.changePercent.toFixed(1)}%
+                      </motion.div>
+                    </motion.div>
+                  )}
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleRemoveStock(e, item.stockSymbol)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500"
+                      disabled={removeFromWatchlistMutation.isPending}
+                    >
+                      <motion.div
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-4 w-4" />
+                      </motion.div>
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
       </CardContent>

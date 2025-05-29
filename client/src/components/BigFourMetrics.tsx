@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { TrendingUp, DollarSign, BarChart3, PiggyBank, Info } from "lucide-react";
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { StockWithMetrics } from "@shared/schema";
+import { motion } from "framer-motion";
 
 interface BigFourMetricsProps {
   stockData?: StockWithMetrics;
@@ -214,43 +215,86 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
             return (
-              <div
+              <motion.div
                 key={index}
-                className={`bg-gradient-to-r ${metric.bgColor} rounded-lg p-4 border`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.02,
+                  transition: { duration: 0.2 }
+                }}
+                whileTap={{ scale: 0.98 }}
+                className={`bg-gradient-to-r ${metric.bgColor} rounded-lg p-4 border cursor-pointer hover:shadow-lg transition-shadow duration-300`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     {metric.title}
                   </span>
-                  <Icon className={`h-5 w-5 ${metric.color}`} />
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <Icon className={`h-5 w-5 ${metric.color}`} />
+                  </motion.div>
                 </div>
-                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                <motion.div 
+                  className="text-2xl font-bold text-slate-900 dark:text-slate-100"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
+                >
                   {metric.value.toFixed(1)}%
-                </div>
+                </motion.div>
                 <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
-                  <div className="flex justify-between">
+                  <motion.div 
+                    className="flex justify-between"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 + 0.4 }}
+                  >
                     <span>10Y:</span>
                     <span className="font-medium">{metric.tenYear.toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between">
+                  </motion.div>
+                  <motion.div 
+                    className="flex justify-between"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 + 0.5 }}
+                  >
                     <span>5Y:</span>
                     <span className="font-medium">{metric.fiveYear.toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between">
+                  </motion.div>
+                  <motion.div 
+                    className="flex justify-between"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 + 0.6 }}
+                  >
                     <span>1Y:</span>
                     <span className="font-medium">{metric.oneYear.toFixed(1)}%</span>
-                  </div>
-                  <div className="text-green-600 dark:text-green-400 font-medium pt-1">
+                  </motion.div>
+                  <motion.div 
+                    className="text-green-600 dark:text-green-400 font-medium pt-1"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 + 0.7 }}
+                  >
                     Target: &gt;10%
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
         
         {/* Chart */}
-        <div className="mt-6">
+        <motion.div 
+          className="mt-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -269,8 +313,10 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
                   backgroundColor: '#f8fafc',
                   border: '1px solid #e2e8f0',
                   borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 }}
                 formatter={(value: number) => [`${value.toFixed(1)}%`, '']}
+                animationDuration={200}
               />
               <Legend />
               <Line
@@ -280,6 +326,8 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
                 strokeWidth={2}
                 name="Sales Growth"
                 dot={{ fill: '#059669', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#059669', strokeWidth: 2, fill: '#fff' }}
+                animationDuration={1000}
               />
               <Line
                 type="monotone"
@@ -288,6 +336,8 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
                 strokeWidth={2}
                 name="EPS Growth"
                 dot={{ fill: '#1E40AF', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#1E40AF', strokeWidth: 2, fill: '#fff' }}
+                animationDuration={1000}
               />
               <Line
                 type="monotone"
@@ -296,6 +346,8 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
                 strokeWidth={2}
                 name="Equity Growth"
                 dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#F59E0B', strokeWidth: 2, fill: '#fff' }}
+                animationDuration={1000}
               />
               <Line
                 type="monotone"
@@ -304,10 +356,12 @@ export default function BigFourMetrics({ stockData, isLoading }: BigFourMetricsP
                 strokeWidth={2}
                 name="FCF Growth"
                 dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#8B5CF6', strokeWidth: 2, fill: '#fff' }}
+                animationDuration={1000}
               />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       </CardContent>
     </Card>
   );

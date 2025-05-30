@@ -23,6 +23,7 @@ import BigFourMetrics from "./BigFourMetrics";
 import { BatchAnalysisPanel } from "./BatchAnalysisPanel";
 import Watchlist from "./Watchlist";
 import ValuationTools from "./ValuationTools";
+import StockSearch from "./StockSearch";
 
 interface DashboardStats {
   totalCompanies: number;
@@ -70,7 +71,7 @@ export function EnhancedDashboard() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center space-y-4"
+          className="text-center space-y-6"
         >
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
             Rule One Investing Assistant
@@ -78,6 +79,22 @@ export function EnhancedDashboard() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             AI-powered analysis of 400+ global companies using Phil Town's Rule One methodology
           </p>
+          
+          {/* Prominent Stock Search Bar */}
+          <div className="max-w-md mx-auto">
+            <Card className="border-2 border-primary/20 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                  <span className="font-semibold text-primary">Search Stocks</span>
+                </div>
+                <StockSearch onStockSelect={handleStockSelect} />
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Search by symbol (AAPL, MSFT) or company name
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </motion.div>
 
         {/* Stats Grid */}

@@ -376,16 +376,29 @@ export class FinancialDataService {
 
   private async fetchYahooFinancialMetrics(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {
     try {
+      // Normalize symbol for Yahoo Finance
+      const normalizedSymbol = this.normalizeSymbolForYahoo(symbol);
+      console.log(`Trying Yahoo Finance with symbol: ${normalizedSymbol}`);
+      
+      // Add delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const response = await fetch(
-        `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory,defaultKeyStatistics,financialData`
+        `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${normalizedSymbol}?modules=incomeStatementHistory,cashflowStatementHistory,balanceSheetHistory,defaultKeyStatistics,financialData`
       );
       
-      if (!response.ok) return [];
+      if (!response.ok) {
+        console.log(`Yahoo Finance returned ${response.status} for ${normalizedSymbol}`);
+        return [];
+      }
       
       const data: YahooFinancialData = await response.json();
-      const result = data.quoteSummary.result[0];
+      const result = data.quoteSummary?.result?.[0];
       
-      if (!result) return [];
+      if (!result) {
+        console.log(`No Yahoo Finance data for ${normalizedSymbol}`);
+        return [];
+      }
 
       const metrics: InsertFinancialMetrics[] = [];
       
@@ -394,36 +407,40 @@ export class FinancialDataService {
       const cashflowStatements = result.cashflowStatementHistory?.cashflowStatements || [];
       const balanceSheets = result.balanceSheetHistory?.balanceSheetStatements || [];
 
-      // Get last 10 years of data
-      console.log(`Fetching financial data for ${symbol}: Found ${incomeStatements.length} income statements`);
+      // Get available years of data
+      console.log(`Yahoo Finance data for ${normalizedSymbol}: Found ${incomeStatements.length} income statements`);
       
       for (let i = 0; i < Math.min(10, incomeStatements.length); i++) {
         const income = incomeStatements[i];
         const cashflow = cashflowStatements[i];
         const balance = balanceSheets[i];
         
-        if (income && cashflow && balance) {
+        if (income?.endDate?.raw && income?.totalRevenue?.raw) {
           const year = new Date(income.endDate.raw * 1000).getFullYear().toString();
           
-          // Calculate ROIC (simplified)
-          const equity = balance.totalStockholderEquity?.raw || 0;
-          const debt = balance.totalDebt?.raw || 0;
+          // Calculate ROIC if balance sheet data is available
+          const equity = balance?.totalStockholderEquity?.raw || 0;
+          const debt = balance?.totalDebt?.raw || 0;
           const investedCapital = equity + debt;
           const netIncome = income.netIncome?.raw || 0;
-          const roic = investedCapital > 0 ? (netIncome / investedCapital) * 100 : 0;
+          const roic = investedCapital > 0 ? (netIncome / investedCapital) * 100 : null;
 
           metrics.push({
             stockId,
             year,
-            revenue: income.totalRevenue?.raw || null,
+            revenue: income.totalRevenue.raw,
             earnings: income.netIncome?.raw || null,
-            freeCashFlow: cashflow.freeCashflow?.raw || null,
-            bookValue: equity || null,
-            eps: null, // Will be calculated from other data
-            roic: roic || null,
-            debt: balance.totalDebt?.raw || null
+            freeCashFlow: cashflow?.freeCashflow?.raw || null,
+            bookValue: equity > 0 ? equity : null,
+            eps: null, // Yahoo doesn't provide consistent EPS data
+            roic: roic,
+            debt: debt > 0 ? debt : null
           });
         }
+      }
+
+      if (metrics.length > 0) {
+        console.log(`✅ Yahoo Finance found ${metrics.length} years of data for ${normalizedSymbol}`);
       }
 
       return metrics.reverse(); // Return in chronological order
@@ -431,6 +448,56 @@ export class FinancialDataService {
       console.error(`Yahoo Finance metrics error for ${symbol}:`, error);
       return [];
     }
+  }
+
+  private normalizeSymbolForYahoo(symbol: string): string {
+    // Handle international stock symbols for Yahoo Finance
+    const exchangeMappings: Record<string, string> = {
+      // Brazilian stocks
+      'SBSP3': 'SBSP3.SA',
+      // Chinese stocks (numeric symbols)
+      '300274': '300274.SZ',
+      '600660': '600660.SS', 
+      '605499': '605499.SS',
+      '300866': '300866.SZ',
+      '002001': '002001.SZ',
+      // Japanese stocks
+      '6857': '6857.T',
+      '2379': '2379.TW',
+      // Korean stocks  
+      '259960': '259960.KS',
+      // Hong Kong stocks
+      '9992': '9992.HK',
+      '1308': '1308.HK',
+      // Canadian stocks
+      'CSU': 'CSU.TO',
+      'K': 'K.TO',
+      // European stocks
+      'ADYEN': 'ADYEN.AS',
+      'WISE': 'WISE.L',
+      'GMAB': 'GMAB.CO',
+      'ORNAV': 'ORNAV.HE',
+      'RHM': 'RHM.DE',
+      'EMG': 'EMG.L'
+    };
+
+    // Check if we have a specific mapping
+    if (exchangeMappings[symbol]) {
+      return exchangeMappings[symbol];
+    }
+
+    // Handle numeric Chinese stocks generically
+    if (/^\d+$/.test(symbol)) {
+      const num = parseInt(symbol);
+      if (num >= 600000 && num <= 699999) {
+        return `${symbol}.SS`; // Shanghai Stock Exchange
+      } else if (num >= 1 && num <= 399999) {
+        return `${symbol}.SZ`; // Shenzhen Stock Exchange
+      }
+    }
+
+    // Return symbol as-is for US stocks
+    return symbol;
   }
 
   private async fetchFMPFinancialMetrics(symbol: string, stockId: number): Promise<InsertFinancialMetrics[]> {

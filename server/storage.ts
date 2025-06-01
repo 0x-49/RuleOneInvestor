@@ -212,7 +212,7 @@ export class MemStorage implements IStorage {
     const metrics = await this.getFinancialMetrics(stock.id);
     
     // Calculate big four growth rates
-    const bigFourGrowth = this.calculateBigFourGrowth(metrics);
+    const bigFourGrowth = calculateReliableBigFourGrowth(metrics);
     
     // Calculate Rule One quality indicators
     const ruleOneQuality = this.calculateRuleOneQuality(metrics, stock);
@@ -477,7 +477,7 @@ export class DatabaseStorage implements IStorage {
     const metrics = await this.getFinancialMetrics(stock.id);
     
     // Calculate big four growth rates
-    const bigFourGrowth = this.calculateBigFourGrowth(metrics);
+    const bigFourGrowth = calculateReliableBigFourGrowth(metrics);
     
     // Calculate Rule One quality indicators
     const ruleOneQuality = this.calculateRuleOneQuality(metrics, stock);

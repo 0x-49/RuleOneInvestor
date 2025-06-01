@@ -10,23 +10,41 @@ import Screening from "@/pages/Screening";
 import StockDetail from "@/pages/StockDetail";
 import Landing from "@/pages/Landing";
 import NotFound from "@/pages/not-found";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
   return (
-    <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/screening" component={Screening} />
-          <Route path="/stock/:symbol" component={StockDetail} />
-        </>
-      )}
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen flex flex-col">
+      {/* Header - shown on all authenticated pages */}
+      {isAuthenticated && <Header />}
+      
+      {/* Main Content */}
+      <main className="flex-1">
+        <Switch>
+          {isLoading || !isAuthenticated ? (
+            <Route path="/" component={Landing} />
+          ) : (
+            <>
+              <Route path="/" component={Dashboard} />
+              <Route path="/search" component={Screening} />
+              <Route path="/screening" component={Screening} />
+              <Route path="/stock/:symbol" component={StockDetail} />
+              <Route path="/watchlist" component={Dashboard} />
+              <Route path="/batch-analysis" component={Dashboard} />
+              <Route path="/valuation" component={Dashboard} />
+              <Route path="/market" component={Dashboard} />
+            </>
+          )}
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      
+      {/* Footer - shown on all authenticated pages */}
+      {isAuthenticated && <Footer />}
+    </div>
   );
 }
 

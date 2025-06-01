@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { financialDataService } from "./financialDataService";
+import { alphaVantageService } from "./alphaVantageService";
 import { batchAnalysisService } from "./batchAnalysisService";
 import { companyDataParser } from "./companyDataParser";
 import { insertStockSchema, insertWatchlistItemSchema, insertValuationInputsSchema } from "@shared/schema";
@@ -517,6 +518,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching batch results:', error);
       res.status(500).json({ error: 'Failed to fetch batch results' });
+    }
+  });
+
+  // Enhanced Analysis API Routes using Alpha Vantage
+  
+  // News and Sentiment Analysis
+  app.get("/api/news/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const newsData = await alphaVantageService.getNewsAndSentiment(symbol);
+      res.json(newsData);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      res.status(500).json({ error: "Failed to fetch news data" });
+    }
+  });
+
+  // Dividend Analysis
+  app.get("/api/dividends/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const dividendData = await alphaVantageService.getDividends(symbol);
+      res.json(dividendData);
+    } catch (error) {
+      console.error("Error fetching dividends:", error);
+      res.status(500).json({ error: "Failed to fetch dividend data" });
+    }
+  });
+
+  // Technical Analysis - RSI
+  app.get("/api/technical/rsi/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const rsiData = await alphaVantageService.getRSI(symbol);
+      res.json(rsiData);
+    } catch (error) {
+      console.error("Error fetching RSI:", error);
+      res.status(500).json({ error: "Failed to fetch RSI data" });
+    }
+  });
+
+  // Technical Analysis - MACD
+  app.get("/api/technical/macd/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const macdData = await alphaVantageService.getMACD(symbol);
+      res.json(macdData);
+    } catch (error) {
+      console.error("Error fetching MACD:", error);
+      res.status(500).json({ error: "Failed to fetch MACD data" });
+    }
+  });
+
+  // Technical Analysis - Moving Averages
+  app.get("/api/technical/sma/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const { period = '20' } = req.query;
+      const smaData = await alphaVantageService.getSMA(symbol, 'daily', parseInt(period as string));
+      res.json(smaData);
+    } catch (error) {
+      console.error("Error fetching SMA:", error);
+      res.status(500).json({ error: "Failed to fetch SMA data" });
+    }
+  });
+
+  // Daily Price Data with Volume
+  app.get("/api/technical/prices/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const priceData = await alphaVantageService.getDailyPrices(symbol);
+      res.json(priceData);
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+      res.status(500).json({ error: "Failed to fetch price data" });
     }
   });
 

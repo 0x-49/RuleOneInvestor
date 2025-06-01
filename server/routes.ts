@@ -596,6 +596,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Company list management endpoints
+  app.get("/api/companies/analyze", async (req, res) => {
+    try {
+      const { companyListProcessor } = await import("./companyListProcessor");
+      
+      const duplicateReport = companyListProcessor.generateDuplicateReport();
+      const missingCompanies = await companyListProcessor.findMissingCompanies();
+      const existingCompanies = await companyListProcessor.getExistingCompanies();
+      
+      res.json({
+        totalParsed: companyListProcessor.parseCompanyData().length,
+        totalUnique: companyListProcessor.removeDuplicates(companyListProcessor.parseCompanyData()).length,
+        totalExisting: existingCompanies.length,
+        totalMissing: missingCompanies.length,
+        duplicateSymbols: duplicateReport.duplicateSymbols,
+        similarNames: duplicateReport.similarNames,
+        missingCompanies: missingCompanies.slice(0, 100) // First 100 for preview
+      });
+    } catch (error) {
+      console.error("Company analysis error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/companies/add-missing", async (req, res) => {
+    try {
+      const { companyListProcessor } = await import("./companyListProcessor");
+      const addedCount = await companyListProcessor.addMissingCompanies();
+      
+      res.json({
+        message: `Successfully added ${addedCount} new companies to the database`,
+        addedCount
+      });
+    } catch (error) {
+      console.error("Add missing companies error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -10,6 +10,10 @@ export function calculateReliableBigFourGrowth(metrics: any[]): {
 
   const sortedMetrics = metrics.sort((a, b) => parseInt(a.year) - parseInt(b.year));
   
+  // Filter out invalid data points and fill gaps for international stocks
+  const validMetrics = sortedMetrics.filter(m => m.revenue && m.revenue > 0);
+  if (validMetrics.length < 2) return null;
+  
   // Proper CAGR calculation with error handling
   const calculateCAGR = (endValue: number | null, startValue: number | null, years: number): number | null => {
     if (!endValue || !startValue || endValue <= 0 || startValue <= 0 || years <= 0) {
@@ -31,9 +35,19 @@ export function calculateReliableBigFourGrowth(metrics: any[]): {
   const first = sortedMetrics[0];
   const last = sortedMetrics[sortedMetrics.length - 1];
 
+  // Enhanced EPS calculation for international stocks
+  let epsGrowth = calculateCAGR(last.eps, first.eps, years);
+  
+  // For international stocks like Novo Nordisk, try alternative EPS calculations
+  if (!epsGrowth && last.earnings && first.earnings && last.sharesOutstanding && first.sharesOutstanding) {
+    const startEps = first.earnings / first.sharesOutstanding;
+    const endEps = last.earnings / last.sharesOutstanding;
+    epsGrowth = calculateCAGR(endEps, startEps, years);
+  }
+
   return {
     salesGrowth: calculateCAGR(last.revenue, first.revenue, years),
-    epsGrowth: calculateCAGR(last.eps, first.eps, years),
+    epsGrowth: epsGrowth,
     equityGrowth: calculateCAGR(last.bookValue, first.bookValue, years),
     fcfGrowth: calculateCAGR(last.freeCashFlow, first.freeCashFlow, years),
   };

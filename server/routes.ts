@@ -264,6 +264,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stock refresh endpoint for fixing data issues
+  app.post("/api/stocks/:symbol/refresh", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      
+      // Attempt to fetch fresh data from financial APIs
+      const freshData = await financialDataService.getStockData(symbol);
+      
+      if (!freshData) {
+        return res.status(404).json({ error: "No data available from financial providers" });
+      }
+      
+      // Update existing stock or create new one
+      let stock = await storage.getStock(symbol);
+      if (stock) {
+        stock = await storage.updateStock(symbol, freshData);
+      } else {
+        stock = await storage.createStock(freshData);
+      }
+      
+      res.json({ message: "Stock data refreshed successfully", stock });
+    } catch (error) {
+      console.error("Error refreshing stock data:", error);
+      res.status(500).json({ error: "Failed to refresh stock data" });
+    }
+  });
+
+  // Quick analysis endpoint for international stocks
+  app.post("/api/stocks/:symbol/quick-analysis", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      
+      // Use alternative data sources for international stocks
+      const analysisData = await alphaVantageService.getDailyPrices(symbol);
+      
+      if (!analysisData || analysisData.length === 0) {
+        return res.status(404).json({ error: "Unable to perform quick analysis - no market data available" });
+      }
+      
+      // Create basic stock entry with available data
+      const stockData = {
+        symbol: symbol.toUpperCase(),
+        name: symbol.toUpperCase(),
+        price: analysisData[0]?.close || 0,
+        marketCap: null,
+        exchange: "Unknown"
+      };
+      
+      let stock = await storage.getStock(symbol);
+      if (stock) {
+        stock = await storage.updateStock(symbol, stockData);
+      } else {
+        stock = await storage.createStock(stockData);
+      }
+      
+      res.json({ message: "Quick analysis completed", stock });
+    } catch (error) {
+      console.error("Error performing quick analysis:", error);
+      res.status(500).json({ error: "Failed to perform quick analysis" });
+    }
+  });
+
   // Company list processing endpoint
   app.post("/api/admin/process-company-list", async (req, res) => {
     try {

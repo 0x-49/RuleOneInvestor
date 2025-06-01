@@ -12,6 +12,7 @@ import ValuationTools from "@/components/ValuationTools";
 import FinancialTrends from "@/components/FinancialTrends";
 import RuleOneAnalysis from "@/components/RuleOneAnalysis";
 import AdvancedFinancialCharts from "@/components/AdvancedFinancialCharts";
+import DetailedFinancialTable from "@/components/DetailedFinancialTable";
 import { StockWithMetrics } from "@shared/schema";
 
 export default function StockDetail() {
@@ -190,6 +191,43 @@ export default function StockDetail() {
             </CardHeader>
             <CardContent>
               <BigFourMetrics stockData={stock} isLoading={false} />
+              
+              {/* Detailed Financial Data Tables for Each Big Four Metric */}
+              {stock.metrics && stock.metrics.length > 0 && (
+                <div className="space-y-4 mt-6">
+                  <DetailedFinancialTable 
+                    metrics={stock.metrics}
+                    metricType="revenue"
+                    title="Sales Revenue"
+                    unit="Revenue"
+                    growthRate={stock.bigFourGrowth?.salesGrowth || null}
+                  />
+                  
+                  <DetailedFinancialTable 
+                    metrics={stock.metrics}
+                    metricType="eps"
+                    title="Earnings Per Share"
+                    unit="EPS"
+                    growthRate={stock.bigFourGrowth?.epsGrowth || null}
+                  />
+                  
+                  <DetailedFinancialTable 
+                    metrics={stock.metrics}
+                    metricType="bookValue"
+                    title="Book Value (Equity)"
+                    unit="Equity"
+                    growthRate={stock.bigFourGrowth?.equityGrowth || null}
+                  />
+                  
+                  <DetailedFinancialTable 
+                    metrics={stock.metrics}
+                    metricType="freeCashFlow"
+                    title="Free Cash Flow"
+                    unit="FCF"
+                    growthRate={stock.bigFourGrowth?.fcfGrowth || null}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 

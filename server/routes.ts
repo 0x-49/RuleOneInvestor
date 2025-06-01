@@ -73,13 +73,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!metrics || metrics.length === 0) {
         // Fetch from live APIs if not in database
+        console.log(`Fetching financial metrics for ${upperSymbol} with stock ID ${stock.id}`);
         const liveMetrics = await financialDataService.fetchFinancialMetrics(upperSymbol, stock.id);
+        console.log(`Retrieved ${liveMetrics.length} metrics for ${upperSymbol}`);
         if (liveMetrics.length > 0) {
           // Store metrics in database
           for (const metric of liveMetrics) {
             await storage.createFinancialMetrics(metric);
           }
           metrics = await storage.getFinancialMetrics(stock.id);
+          console.log(`Stored and retrieved ${metrics.length} metrics for ${upperSymbol}`);
+        } else {
+          console.log(`No financial metrics retrieved for ${upperSymbol}`);
         }
       }
       

@@ -251,23 +251,68 @@ export class MemStorage implements IStorage {
   }
 
   private calculateRuleOneQuality(metrics: FinancialMetrics[], stock: Stock) {
-    if (metrics.length === 0) return undefined;
+    if (metrics.length === 0) return {
+      isExcellent: false,
+      debtPayoffYears: 99,
+      roic: 0,
+      marginOfSafety: 0,
+      qualityScore: 0,
+      stickerPrice: 0,
+      investmentStory: "Insufficient data for analysis"
+    };
 
+    const bigFourGrowth = calculateReliableBigFourGrowth(metrics);
     const latestMetrics = metrics[metrics.length - 1];
     const roic = latestMetrics.roic || 0;
     const debt = latestMetrics.debt || 0;
     const fcf = latestMetrics.freeCashFlow || 0;
     const debtPayoffYears = fcf > 0 ? debt / fcf : 99;
 
-    // Simple margin of safety calculation (this would be more complex in real implementation)
-    const pe = stock.price / (latestMetrics.eps || 1);
-    const marginOfSafety = pe < 15 ? ((15 - pe) / 15) * 100 : 0;
+    // Calculate Big Four quality scores
+    const salesScore = bigFourGrowth?.salesGrowth && bigFourGrowth.salesGrowth >= 10 ? 25 : 
+                      bigFourGrowth?.salesGrowth && bigFourGrowth.salesGrowth >= 5 ? 15 : 0;
+    const epsScore = bigFourGrowth?.epsGrowth && bigFourGrowth.epsGrowth >= 10 ? 25 : 
+                     bigFourGrowth?.epsGrowth && bigFourGrowth.epsGrowth >= 5 ? 15 : 0;
+    const equityScore = bigFourGrowth?.equityGrowth && bigFourGrowth.equityGrowth >= 10 ? 25 : 
+                        bigFourGrowth?.equityGrowth && bigFourGrowth.equityGrowth >= 5 ? 15 : 0;
+    const fcfScore = bigFourGrowth?.fcfGrowth && bigFourGrowth.fcfGrowth >= 10 ? 25 : 
+                     bigFourGrowth?.fcfGrowth && bigFourGrowth.fcfGrowth >= 5 ? 15 : 0;
+
+    const qualityScore = salesScore + epsScore + equityScore + fcfScore;
+
+    // Calculate sticker price based on EPS growth and PE ratio
+    const currentEPS = latestMetrics.eps || 0;
+    const growthRate = bigFourGrowth?.epsGrowth || 0;
+    const futureEPS = currentEPS * Math.pow(1 + (growthRate / 100), 10);
+    const futurePE = Math.min(growthRate * 2, 25); // Conservative PE estimate
+    const futurePrice = futureEPS * futurePE;
+    const stickerPrice = futurePrice / Math.pow(1.15, 10); // 15% required return
+    const marginOfSafetyPrice = stickerPrice * 0.5; // 50% margin of safety
+
+    // Investment story based on analysis
+    let investmentStory = "";
+    if (qualityScore >= 80) {
+      investmentStory = "Excellent Rule One company with strong growth across all Big Four metrics.";
+    } else if (qualityScore >= 60) {
+      investmentStory = "Good Rule One company with solid fundamentals and growth potential.";
+    } else if (qualityScore >= 40) {
+      investmentStory = "Moderate quality company with some positive growth indicators.";
+    } else {
+      investmentStory = "Below Rule One standards - consider waiting for better entry or different company.";
+    }
+
+    const isExcellent = qualityScore >= 80 && roic > 15 && debtPayoffYears < 3;
 
     return {
-      isExcellent: roic > 10 && debtPayoffYears < 5,
+      isExcellent,
       debtPayoffYears,
       roic,
-      marginOfSafety,
+      marginOfSafety: ((stock.price || 0) < marginOfSafetyPrice) ? 
+        ((marginOfSafetyPrice - (stock.price || 0)) / marginOfSafetyPrice) * 100 : 0,
+      qualityScore,
+      stickerPrice,
+      marginOfSafetyPrice,
+      investmentStory
     };
   }
 

@@ -2,6 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown, Shield, Target, DollarSign, BarChart3 } from "lucide-react";
+import NoDataFallback from "@/components/NoDataFallback";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface RuleOneData {
   salesGrowth: number | null;
@@ -24,6 +27,8 @@ interface Props {
 }
 
 export default function RuleOneAnalysis({ ruleOneData, currentPrice, symbol }: Props) {
+  const queryClient = useQueryClient();
+  
   const {
     salesGrowth,
     epsGrowth,
@@ -37,6 +42,38 @@ export default function RuleOneAnalysis({ ruleOneData, currentPrice, symbol }: P
     qualityScore,
     investmentStory
   } = ruleOneData;
+
+  const refreshMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", `/api/stocks/${symbol}/refresh`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stocks', symbol] });
+    }
+  });
+
+  const quickAnalysisMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", `/api/stocks/${symbol}/quick-analysis`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stocks', symbol] });
+    }
+  });
+
+  // Check if we have no meaningful data
+  const hasData = salesGrowth !== null || epsGrowth !== null || equityGrowth !== null || fcfGrowth !== null;
+  
+  if (!hasData && qualityScore === 0) {
+    return (
+      <NoDataFallback
+        symbol={symbol}
+        onRefresh={() => refreshMutation.mutate()}
+        onQuickAnalysis={() => quickAnalysisMutation.mutate()}
+        isRefreshing={refreshMutation.isPending}
+      />
+    );
+  }
 
   const formatPercentage = (value: number | null) => {
     if (value === null) return "N/A";

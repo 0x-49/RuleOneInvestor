@@ -118,6 +118,10 @@ export interface StockWithMetrics extends Stock {
     debtPayoffYears: number;
     roic: number;
     marginOfSafety: number;
+    qualityScore: number;
+    stickerPrice: number;
+    marginOfSafetyPrice: number;
+    investmentStory: string;
   };
 }
 

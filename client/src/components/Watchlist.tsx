@@ -56,6 +56,7 @@ export default function Watchlist({ onStockSelect }: WatchlistProps) {
 
   const handleStockClick = (symbol: string) => {
     onStockSelect(symbol);
+    setLocation(`/stock/${symbol}`);
   };
 
   const handleRemoveStock = (e: React.MouseEvent, symbol: string) => {

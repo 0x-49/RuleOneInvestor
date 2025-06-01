@@ -118,19 +118,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Force fetch fresh financial metrics
       console.log(`Force refreshing financial data for ${upperSymbol}`);
+      
+      // Clear existing metrics first to prevent duplicates
+      await storage.clearFinancialMetrics(stock.id);
+      
       const freshMetrics = await financialDataService.fetchFinancialMetrics(upperSymbol, stock.id, false);
       
       if (freshMetrics.length > 0) {
-        // Clear existing metrics first
-        await storage.clearFinancialMetrics(stock.id);
-        
-        // Store fresh metrics
+        // Store fresh metrics one by one to prevent duplicates
+        const storedMetrics: any[] = [];
         for (const metric of freshMetrics) {
-          await storage.createFinancialMetrics(metric);
+          try {
+            const stored = await storage.createFinancialMetrics(metric);
+            storedMetrics.push(stored);
+          } catch (error) {
+            console.warn(`Skipped duplicate metric for ${upperSymbol} year ${metric.year}`);
+          }
         }
         
-        console.log(`Successfully refreshed ${freshMetrics.length} years of data for ${upperSymbol}`);
-        res.json({ message: "Financial data refreshed successfully", years: freshMetrics.length });
+        console.log(`Successfully refreshed ${storedMetrics.length} years of data for ${upperSymbol}`);
+        res.json({ message: "Financial data refreshed successfully", years: storedMetrics.length });
       } else {
         res.status(400).json({ error: "No financial data could be retrieved" });
       }

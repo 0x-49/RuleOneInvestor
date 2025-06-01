@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "@/pages/Dashboard";
 import Screening from "@/pages/Screening";
+import StockDetail from "@/pages/StockDetail";
 import Landing from "@/pages/Landing";
 import NotFound from "@/pages/not-found";
 
@@ -21,6 +22,7 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/screening" component={Screening} />
+          <Route path="/stock/:symbol" component={StockDetail} />
         </>
       )}
       <Route component={NotFound} />

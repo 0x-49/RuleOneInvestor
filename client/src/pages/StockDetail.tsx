@@ -1,0 +1,170 @@
+import { useParams, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, TrendingUp, TrendingDown, DollarSign, Target } from "lucide-react";
+import BigFourMetrics from "@/components/BigFourMetrics";
+import ValuationTools from "@/components/ValuationTools";
+import FinancialTrends from "@/components/FinancialTrends";
+import { StockWithMetrics } from "@shared/schema";
+
+export default function StockDetail() {
+  const { symbol } = useParams<{ symbol: string }>();
+  
+  const { data: stock, isLoading, error } = useQuery<StockWithMetrics>({
+    queryKey: [`/api/stocks/${symbol}`],
+    enabled: !!symbol,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+        <div className="container mx-auto px-4 py-6">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-muted rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !stock) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+        <div className="container mx-auto px-4 py-6">
+          <Link href="/">
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          <Card>
+            <CardContent className="p-8 text-center">
+              <h2 className="text-xl font-semibold mb-2">Stock Not Found</h2>
+              <p className="text-muted-foreground">
+                Could not load data for {symbol?.toUpperCase()}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const changePercent = stock.changePercent || 0;
+  const isPositive = changePercent >= 0;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <Link href="/">
+            <Button variant="ghost">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+        </div>
+
+        {/* Stock Overview */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-3xl font-bold">{stock.symbol}</CardTitle>
+                <CardDescription className="text-lg">{stock.name}</CardDescription>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold">${stock.price.toFixed(2)}</div>
+                <div className={`flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                  {isPositive ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
+                  {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Market Cap</div>
+                <div className="font-semibold">
+                  ${((stock.price * (stock.sharesOutstanding || 1)) / 1e9).toFixed(1)}B
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Volume</div>
+                <div className="font-semibold">{(stock.volume || 0).toLocaleString()}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Exchange</div>
+                <div className="font-semibold">{stock.exchange}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Sector</div>
+                <div className="font-semibold">{stock.sector || 'N/A'}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Analysis Tabs */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* Big Four Metrics */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Target className="h-5 w-5 mr-2" />
+                Rule One Analysis
+              </CardTitle>
+              <CardDescription>
+                Phil Town's Big Four growth metrics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BigFourMetrics symbol={stock.symbol} />
+            </CardContent>
+          </Card>
+
+          {/* Valuation Tools */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <DollarSign className="h-5 w-5 mr-2" />
+                Valuation Analysis
+              </CardTitle>
+              <CardDescription>
+                Margin of safety and fair value calculations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ValuationTools symbol={stock.symbol} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Financial Trends */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Historical Financial Trends</CardTitle>
+            <CardDescription>
+              10-year revenue, earnings, and cash flow analysis
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FinancialTrends symbol={stock.symbol} />
+          </CardContent>
+        </Card>
+
+      </div>
+    </div>
+  );
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Stock } from "@shared/schema";
@@ -34,10 +35,14 @@ export default function StockSearch({ onStockSelect }: StockSearchProps) {
     setIsOpen(value.length >= 2);
   };
 
+  const [, setLocation] = useLocation();
+
   const handleStockSelect = (symbol: string) => {
     setQuery(symbol);
     setIsOpen(false);
     onStockSelect(symbol);
+    // Navigate to stock detail page
+    setLocation(`/stock/${symbol}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

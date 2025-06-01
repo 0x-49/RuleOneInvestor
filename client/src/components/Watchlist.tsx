@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +28,7 @@ interface WatchlistItemWithStock {
 export default function Watchlist({ onStockSelect }: WatchlistProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const { data: watchlistItems = [], isLoading } = useQuery<WatchlistItemWithStock[]>({
     queryKey: ["/api/watchlist"],

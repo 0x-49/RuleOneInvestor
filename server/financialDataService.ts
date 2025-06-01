@@ -231,7 +231,7 @@ interface FMPBalanceSheetData {
 export class FinancialDataService {
   private readonly FMP_API_KEY = process.env.FMP_API_KEY || "LKODerELb8EZDzg1tl275H8MQoupFnY1";
   private readonly FMP_BASE_URL = "https://financialmodelingprep.com/api/v3";
-  private readonly ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "WXNYFQPLJCO2ECMN";
+  private readonly ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "3IP18P3AX39PJ02L";
   private readonly ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/query";
 
   async fetchStockData(symbol: string): Promise<InsertStock | null> {
@@ -260,25 +260,24 @@ export class FinancialDataService {
 
   async fetchFinancialMetrics(symbol: string, stockId: number, useDeepSearch: boolean = false): Promise<InsertFinancialMetrics[]> {
     try {
-      // Skip FMP if we know it's over limit to save API calls
-      // Try Yahoo Finance first (most generous free tier)
-      console.log(`Fetching financial metrics for ${symbol} from Yahoo Finance...`);
+      // Use Alpha Vantage as primary source (premium account)
+      console.log(`Fetching financial metrics for ${symbol} from Alpha Vantage (premium)...`);
+      const alphaMetrics = await this.fetchAlphaVantageFinancialMetrics(symbol, stockId);
+      if (alphaMetrics && alphaMetrics.length >= 5) {
+        console.log(`✅ Got ${alphaMetrics.length} years of data from Alpha Vantage for ${symbol}`);
+        return alphaMetrics;
+      }
+
+      // Fallback to Yahoo Finance if Alpha Vantage has no data
+      console.log(`⚠️ Alpha Vantage returned insufficient data for ${symbol}, trying Yahoo Finance...`);
       const yahooMetrics = await this.fetchYahooFinancialMetrics(symbol, stockId);
-      if (yahooMetrics && yahooMetrics.length >= 5) { // Reduced threshold for Yahoo
+      if (yahooMetrics && yahooMetrics.length >= 5) {
         console.log(`✅ Got ${yahooMetrics.length} years of data from Yahoo for ${symbol}`);
         return yahooMetrics;
       }
 
-      // Skip Alpha Vantage to preserve daily limit
-      console.log(`⚠️ Skipping Alpha Vantage for ${symbol} to preserve daily API limit`);
-
-      // Skip FMP to avoid hitting paid limits
-      console.log(`⚠️ Skipping FMP for ${symbol} to avoid API costs`);
-      const fmpMetrics: InsertFinancialMetrics[] = [];
-      if (fmpMetrics && fmpMetrics.length >= 5) {
-        console.log(`✅ Got ${fmpMetrics.length} years of data from FMP for ${symbol}`);
-        return fmpMetrics;
-      }
+      // Skip FMP for now since it's over limit
+      console.log(`⚠️ No financial data found from primary sources for ${symbol}`);
 
       // If deep search is requested and API data is insufficient, try AI extraction from SEC filings
       if (useDeepSearch) {

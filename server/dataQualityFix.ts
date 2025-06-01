@@ -1,26 +1,25 @@
-// Temporary fix for data quality issues
-export function calculateReliableBigFourGrowth(metrics: any[]) {
-  if (metrics.length < 2) return undefined;
+// Fixed calculation functions for proper Rule One metrics
 
-  const sortedMetrics = metrics.sort((a: any, b: any) => parseInt(a.year) - parseInt(b.year));
+export function calculateReliableBigFourGrowth(metrics: any[]) {
+  if (metrics.length < 2) return null;
+
+  const sortedMetrics = metrics.sort((a, b) => parseInt(a.year) - parseInt(b.year));
   
-  // Log data quality warning for insufficient years
-  if (metrics.length < 10) {
-    console.warn(`Data Quality Warning: Only ${metrics.length} years of data available. Rule One methodology requires 10 years for reliable analysis.`);
-  }
-  
-  const calculateReliableCAGR = (endValue: number, startValue: number, years: number) => {
-    if (startValue <= 0) return 0;
-    
-    const cagr = (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
-    
-    // Cap unrealistic growth rates - anything over 200% indicates bad data
-    if (Math.abs(cagr) > 200) {
-      console.warn(`Data Quality Warning: Extreme growth rate of ${cagr.toFixed(1)}% detected. This indicates potential data quality issues. Capping at 200%.`);
-      return cagr > 0 ? 200 : -200;
+  // Proper CAGR calculation with error handling
+  const calculateCAGR = (endValue: number | null, startValue: number | null, years: number): number | null => {
+    if (!endValue || !startValue || endValue <= 0 || startValue <= 0 || years <= 0) {
+      return null;
     }
     
-    return cagr;
+    const ratio = endValue / startValue;
+    if (ratio <= 0) return null;
+    
+    const cagr = (Math.pow(ratio, 1 / years) - 1) * 100;
+    
+    // Cap at reasonable limits to prevent display issues
+    if (cagr > 500 || cagr < -90) return null;
+    
+    return Math.round(cagr * 100) / 100; // Round to 2 decimal places
   };
 
   const years = sortedMetrics.length - 1;
@@ -28,9 +27,9 @@ export function calculateReliableBigFourGrowth(metrics: any[]) {
   const last = sortedMetrics[sortedMetrics.length - 1];
 
   return {
-    salesGrowth: calculateReliableCAGR(last.revenue || 0, first.revenue || 1, years),
-    epsGrowth: calculateReliableCAGR(last.eps || 0, first.eps || 1, years),
-    equityGrowth: calculateReliableCAGR(last.bookValue || 0, first.bookValue || 1, years),
-    fcfGrowth: calculateReliableCAGR(last.freeCashFlow || 0, first.freeCashFlow || 1, years),
+    salesGrowth: calculateCAGR(last.revenue, first.revenue, years),
+    epsGrowth: calculateCAGR(last.eps, first.eps, years),
+    equityGrowth: calculateCAGR(last.bookValue, first.bookValue, years),
+    fcfGrowth: calculateCAGR(last.freeCashFlow, first.freeCashFlow, years),
   };
 }

@@ -397,9 +397,18 @@ export class DatabaseStorage implements IStorage {
     const first = sortedMetrics[0];
     const last = sortedMetrics[sortedMetrics.length - 1];
 
+    // Calculate EPS growth using earnings if EPS data is missing
+    const calculateEPSGrowth = () => {
+      const firstEPS = first.eps || (first.earnings && first.earnings > 0 ? first.earnings / 1000000000 : 0); // Estimate EPS from earnings
+      const lastEPS = last.eps || (last.earnings && last.earnings > 0 ? last.earnings / 1000000000 : 0);
+      
+      if (firstEPS <= 0 || lastEPS <= 0) return 0;
+      return calculateCAGR(lastEPS, firstEPS, years);
+    };
+
     return {
       salesGrowth: this.capGrowthRate(calculateCAGR(last.revenue || 0, first.revenue || 1, years)),
-      epsGrowth: this.capGrowthRate(calculateCAGR(last.eps || 0, first.eps || 1, years)),
+      epsGrowth: this.capGrowthRate(calculateEPSGrowth()),
       equityGrowth: this.capGrowthRate(calculateCAGR(last.bookValue || 0, first.bookValue || 1, years)),
       fcfGrowth: this.capGrowthRate(calculateCAGR(last.freeCashFlow || 0, first.freeCashFlow || 1, years)),
     };

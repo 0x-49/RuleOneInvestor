@@ -467,17 +467,29 @@ VAKFN   VAKIF FIN. KIR.
     
     for (const line of lines) {
       if (line.trim()) {
-        const parts = line.split('\t');
+        // Split by tabs first, then by multiple spaces if no tabs
+        let parts = line.includes('\t') ? line.split('\t') : line.split(/\s{2,}/);
+        
+        // If still not properly split, try single space after symbol pattern
+        if (parts.length < 2) {
+          const match = line.match(/^(\S+)\s+(.+)$/);
+          if (match) {
+            parts = [match[1], match[2]];
+          }
+        }
+        
         if (parts.length >= 2) {
           const symbol = parts[0].trim();
           const name = parts[1].trim();
           
-          companies.push({
-            symbol,
-            name,
-            exchange: this.determineExchange(symbol),
-            sector: 'Technology', // Default sector, can be updated later
-          });
+          if (symbol && name) {
+            companies.push({
+              symbol,
+              name,
+              exchange: this.determineExchange(symbol),
+              sector: 'Technology', // Default sector, can be updated later
+            });
+          }
         }
       }
     }
@@ -662,10 +674,7 @@ VAKFN   VAKIF FIN. KIR.
           change: 0,
           changePercent: 0,
           volume: null,
-          marketCap: null,
-          peRatio: null,
-          dividend: null,
-          dividendYield: null
+          marketCap: null
         });
         addedCount++;
       } catch (error) {

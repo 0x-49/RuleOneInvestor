@@ -328,6 +328,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug company parsing
+  app.get("/api/admin/test-parsing", (req, res) => {
+    const parsed = companyListProcessor.parseCompanyData();
+    res.json({
+      totalParsed: parsed.length,
+      sample: parsed.slice(0, 10)
+    });
+  });
+
   // Company list processing endpoint
   app.post("/api/admin/process-company-list", async (req, res) => {
     try {

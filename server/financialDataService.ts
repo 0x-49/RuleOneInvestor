@@ -236,11 +236,36 @@ export class FinancialDataService {
 
   async fetchStockData(symbol: string): Promise<InsertStock | null> {
     try {
-      // Try Yahoo Finance first
+      console.log(`Fetching comprehensive stock data for ${symbol} using Alpha Vantage...`);
+      
+      // Get price data and company overview from Alpha Vantage
+      const [priceData, overviewData] = await Promise.all([
+        this.fetchAlphaVantageStockPrice(symbol),
+        this.fetchAlphaVantageCompanyOverview(symbol)
+      ]);
+      
+      if (priceData) {
+        const stockData: InsertStock = {
+          symbol,
+          name: symbol, // Will be updated if we have better name from search
+          price: priceData.price,
+          change: priceData.change,
+          changePercent: priceData.changePercent,
+          volume: priceData.volume,
+          marketCap: overviewData?.marketCap,
+          exchange: overviewData?.exchange,
+          sector: overviewData?.sector
+        };
+        
+        console.log(`✅ Got comprehensive data for ${symbol}: price=${priceData.price}, volume=${priceData.volume}, marketCap=${overviewData?.marketCap}, sector=${overviewData?.sector}`);
+        return stockData;
+      }
+
+      // Fallback to Yahoo Finance
       const yahooData = await this.fetchYahooStockData(symbol);
       if (yahooData) return yahooData;
 
-      // Fallback to Financial Modeling Prep
+      // Final fallback to Financial Modeling Prep
       const fmpData = await this.fetchFMPStockData(symbol);
       return fmpData;
     } catch (error) {
@@ -613,7 +638,11 @@ export class FinancialDataService {
             name: match['2. name'],
             price: stockData?.price || 0,
             change: stockData?.change || 0,
-            changePercent: stockData?.changePercent || 0
+            changePercent: stockData?.changePercent || 0,
+            volume: stockData?.volume || null,
+            marketCap: null,
+            exchange: null,
+            sector: null
           });
         }
       }
@@ -625,7 +654,7 @@ export class FinancialDataService {
     }
   }
 
-  private async fetchAlphaVantageStockPrice(symbol: string): Promise<{price: number, change: number, changePercent: number} | null> {
+  private async fetchAlphaVantageStockPrice(symbol: string): Promise<{price: number, change: number, changePercent: number, volume?: number} | null> {
     try {
       const response = await fetch(
         `${this.ALPHA_VANTAGE_BASE_URL}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.ALPHA_VANTAGE_API_KEY}`
@@ -640,13 +669,39 @@ export class FinancialDataService {
         return {
           price: parseFloat(quote['05. price']),
           change: parseFloat(quote['09. change']) || 0,
-          changePercent: parseFloat(quote['10. change percent']?.replace('%', '')) || 0
+          changePercent: parseFloat(quote['10. change percent']?.replace('%', '')) || 0,
+          volume: parseFloat(quote['06. volume']) || 0
         };
       }
       
       return null;
     } catch (error) {
       console.error(`Alpha Vantage price error for ${symbol}:`, error);
+      return null;
+    }
+  }
+
+  private async fetchAlphaVantageCompanyOverview(symbol: string): Promise<{marketCap?: number, exchange?: string, sector?: string} | null> {
+    try {
+      const response = await fetch(
+        `${this.ALPHA_VANTAGE_BASE_URL}?function=OVERVIEW&symbol=${symbol}&apikey=${this.ALPHA_VANTAGE_API_KEY}`
+      );
+      
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      
+      if (data && data.Symbol) {
+        return {
+          marketCap: parseFloat(data.MarketCapitalization) || 0,
+          exchange: data.Exchange || '',
+          sector: data.Sector || ''
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error(`Alpha Vantage overview error for ${symbol}:`, error);
       return null;
     }
   }

@@ -70,13 +70,13 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Sample stocks
+    // Sample stocks with complete data structure
     const sampleStocks: Stock[] = [
-      { id: 1, symbol: "AAPL", name: "Apple Inc.", price: 175.43, change: 4.12, changePercent: 2.34, lastUpdated: new Date() },
-      { id: 2, symbol: "MSFT", name: "Microsoft Corporation", price: 338.11, change: 4.05, changePercent: 1.2, lastUpdated: new Date() },
-      { id: 3, symbol: "GOOGL", name: "Alphabet Inc.", price: 133.32, change: -1.07, changePercent: -0.8, lastUpdated: new Date() },
-      { id: 4, symbol: "AMZN", name: "Amazon.com Inc.", price: 145.69, change: 3.06, changePercent: 2.1, lastUpdated: new Date() },
-      { id: 5, symbol: "TSLA", name: "Tesla Inc.", price: 248.50, change: 8.46, changePercent: 3.4, lastUpdated: new Date() }
+      { id: 1, symbol: "AAPL", name: "Apple Inc.", price: 175.43, change: 4.12, changePercent: 2.34, marketCap: null, volume: null, exchange: null, sector: null, lastUpdated: new Date() },
+      { id: 2, symbol: "MSFT", name: "Microsoft Corporation", price: 338.11, change: 4.05, changePercent: 1.2, marketCap: null, volume: null, exchange: null, sector: null, lastUpdated: new Date() },
+      { id: 3, symbol: "GOOGL", name: "Alphabet Inc.", price: 133.32, change: -1.07, changePercent: -0.8, marketCap: null, volume: null, exchange: null, sector: null, lastUpdated: new Date() },
+      { id: 4, symbol: "AMZN", name: "Amazon.com Inc.", price: 145.69, change: 3.06, changePercent: 2.1, marketCap: null, volume: null, exchange: null, sector: null, lastUpdated: new Date() },
+      { id: 5, symbol: "TSLA", name: "Tesla Inc.", price: 248.50, change: 8.46, changePercent: 3.4, marketCap: null, volume: null, exchange: null, sector: null, lastUpdated: new Date() }
     ];
 
     sampleStocks.forEach(stock => {
@@ -115,6 +115,10 @@ export class MemStorage implements IStorage {
       ...stock,
       id: this.currentStockId++,
       symbol: stock.symbol.toUpperCase(),
+      marketCap: stock.marketCap ?? null,
+      volume: stock.volume ?? null,
+      exchange: stock.exchange ?? null,
+      sector: stock.sector ?? null,
       lastUpdated: new Date(),
     };
     this.stocks.set(newStock.symbol, newStock);

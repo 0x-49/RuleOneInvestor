@@ -10,6 +10,10 @@ export const stocks = pgTable("stocks", {
   price: real("price").notNull(),
   change: real("change").notNull(),
   changePercent: real("change_percent").notNull(),
+  marketCap: real("market_cap"),
+  volume: real("volume"),
+  exchange: text("exchange"),
+  sector: text("sector"),
   lastUpdated: timestamp("last_updated").defaultNow(),
 });
 

@@ -311,7 +311,7 @@ export class MemStorage implements IStorage {
         ((marginOfSafetyPrice - (stock.price || 0)) / marginOfSafetyPrice) * 100 : 0,
       qualityScore,
       stickerPrice,
-      marginOfSafetyPrice,
+      marginOfSafetyPrice: marginOfSafetyPrice,
       investmentStory
     };
   }

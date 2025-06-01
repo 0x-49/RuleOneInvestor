@@ -108,11 +108,11 @@ export type UpsertUser = typeof users.$inferInsert;
 export interface StockWithMetrics extends Stock {
   metrics?: FinancialMetrics[];
   bigFourGrowth?: {
-    salesGrowth: number;
-    epsGrowth: number;
-    equityGrowth: number;
-    fcfGrowth: number;
-  };
+    salesGrowth: number | null;
+    epsGrowth: number | null;
+    equityGrowth: number | null;
+    fcfGrowth: number | null;
+  } | null | undefined;
   ruleOneQuality?: {
     isExcellent: boolean;
     debtPayoffYears: number;

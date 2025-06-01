@@ -1,6 +1,11 @@
 // Fixed calculation functions for proper Rule One metrics
 
-export function calculateReliableBigFourGrowth(metrics: any[]) {
+export function calculateReliableBigFourGrowth(metrics: any[]): {
+  salesGrowth: number | null;
+  epsGrowth: number | null;
+  equityGrowth: number | null;
+  fcfGrowth: number | null;
+} | null {
   if (metrics.length < 2) return null;
 
   const sortedMetrics = metrics.sort((a, b) => parseInt(a.year) - parseInt(b.year));

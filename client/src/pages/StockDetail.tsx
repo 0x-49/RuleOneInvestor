@@ -155,7 +155,7 @@ export default function StockDetail() {
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Market Cap</div>
                 <div className="font-semibold">
-                  ${((stock.price * (stock.sharesOutstanding || 1)) / 1e9).toFixed(1)}B
+                  {stock.marketCap ? `$${(stock.marketCap / 1e12).toFixed(2)}T` : '$0.0B'}
                 </div>
               </div>
               <div className="text-center">
@@ -164,7 +164,7 @@ export default function StockDetail() {
               </div>
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Exchange</div>
-                <div className="font-semibold">{stock.exchange}</div>
+                <div className="font-semibold">{stock.exchange || 'N/A'}</div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Sector</div>
@@ -222,6 +222,34 @@ export default function StockDetail() {
             <FinancialTrends stockData={stock} isLoading={false} />
           </CardContent>
         </Card>
+
+        {/* Comprehensive Rule One Analysis */}
+        <RuleOneAnalysis 
+          ruleOneData={{
+            salesGrowth: stock.bigFourGrowth?.salesGrowth || null,
+            epsGrowth: stock.bigFourGrowth?.epsGrowth || null,
+            equityGrowth: stock.bigFourGrowth?.equityGrowth || null,
+            fcfGrowth: stock.bigFourGrowth?.fcfGrowth || null,
+            roic: stock.ruleOneQuality?.roic || null,
+            debtPayoffYears: stock.ruleOneQuality?.debtPayoffYears || null,
+            stickerPrice: stock.ruleOneQuality?.stickerPrice || null,
+            marginOfSafetyPrice: stock.ruleOneQuality?.marginOfSafety || null,
+            isExcellent: stock.ruleOneQuality?.isExcellent || false,
+            qualityScore: stock.ruleOneQuality?.qualityScore || 0,
+            investmentStory: stock.ruleOneQuality?.investmentStory || "Analysis pending..."
+          }}
+          currentPrice={stock.price}
+          symbol={stock.symbol}
+        />
+
+        {/* Advanced Financial Charts & Data Visualization */}
+        <AdvancedFinancialCharts 
+          metrics={stock.metrics}
+          symbol={stock.symbol}
+          marketCap={stock.marketCap}
+          sector={stock.sector}
+          exchange={stock.exchange}
+        />
 
       </div>
     </div>

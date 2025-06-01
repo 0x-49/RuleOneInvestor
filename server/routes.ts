@@ -6,6 +6,7 @@ import { financialDataService } from "./financialDataService";
 import { alphaVantageService } from "./alphaVantageService";
 import { batchAnalysisService } from "./batchAnalysisService";
 import { companyDataParser } from "./companyDataParser";
+import { companyListProcessor } from "./companyListProcessor";
 import { insertStockSchema, insertWatchlistItemSchema, insertValuationInputsSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -260,6 +261,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching stock data:", error);
       res.status(500).json({ error: "Failed to fetch real-time stock data" });
+    }
+  });
+
+  // Company list processing endpoint
+  app.post("/api/admin/process-company-list", async (req, res) => {
+    try {
+      const missing = await companyListProcessor.findMissingCompanies();
+      const added = await companyListProcessor.addMissingCompanies();
+      
+      res.json({
+        totalMissing: missing.length,
+        companiesAdded: added,
+        message: `Successfully added ${added} new companies to the platform`
+      });
+    } catch (error) {
+      console.error("Error processing company list:", error);
+      res.status(500).json({ error: "Failed to process company list" });
+    }
+  });
+
+  // Company analysis report endpoint
+  app.get("/api/admin/company-analysis", async (req, res) => {
+    try {
+      const parsed = companyListProcessor.parseCompanyData();
+      const deduped = companyListProcessor.removeDuplicates(parsed);
+      const duplicateReport = companyListProcessor.generateDuplicateReport();
+      
+      res.json({
+        totalParsed: parsed.length,
+        afterDeduplication: deduped.length,
+        duplicateSymbols: duplicateReport.duplicateSymbols,
+        similarNames: duplicateReport.similarNames
+      });
+    } catch (error) {
+      console.error("Error generating company analysis:", error);
+      res.status(500).json({ error: "Failed to generate company analysis" });
     }
   });
 

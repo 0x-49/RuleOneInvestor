@@ -97,6 +97,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Force refresh financial data for a stock
+  app.post("/api/stocks/:symbol/refresh", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const upperSymbol = symbol.toUpperCase();
+      
+      // Get or create stock
+      let stock = await storage.getStock(upperSymbol);
+      if (!stock) {
+        const stockData = await financialDataService.fetchStockData(upperSymbol);
+        if (stockData) {
+          stock = await storage.createStock(stockData);
+        }
+      }
+      
+      if (!stock) {
+        return res.status(404).json({ error: "Stock not found" });
+      }
+      
+      // Force fetch fresh financial metrics
+      console.log(`Force refreshing financial data for ${upperSymbol}`);
+      const freshMetrics = await financialDataService.fetchFinancialMetrics(upperSymbol, stock.id, false);
+      
+      if (freshMetrics.length > 0) {
+        // Clear existing metrics first
+        await storage.clearFinancialMetrics(stock.id);
+        
+        // Store fresh metrics
+        for (const metric of freshMetrics) {
+          await storage.createFinancialMetrics(metric);
+        }
+        
+        console.log(`Successfully refreshed ${freshMetrics.length} years of data for ${upperSymbol}`);
+        res.json({ message: "Financial data refreshed successfully", years: freshMetrics.length });
+      } else {
+        res.status(400).json({ error: "No financial data could be retrieved" });
+      }
+    } catch (error) {
+      console.error("Error refreshing stock data:", error);
+      res.status(500).json({ error: "Failed to refresh stock data" });
+    }
+  });
+
   // Update stock price (for real-time updates)
   app.patch("/api/stocks/:symbol", async (req, res) => {
     try {

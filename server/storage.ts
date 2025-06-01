@@ -31,6 +31,7 @@ export interface IStorage {
   // Financial metrics operations
   getFinancialMetrics(stockId: number): Promise<FinancialMetrics[]>;
   createFinancialMetrics(metrics: InsertFinancialMetrics): Promise<FinancialMetrics>;
+  clearFinancialMetrics(stockId: number): Promise<void>;
   
   // Watchlist operations
   getWatchlist(): Promise<WatchlistItem[]>;
@@ -164,6 +165,10 @@ export class MemStorage implements IStorage {
     this.metrics.set(metrics.stockId!, existing);
     
     return newMetrics;
+  }
+
+  async clearFinancialMetrics(stockId: number): Promise<void> {
+    this.metrics.delete(stockId);
   }
 
   async getWatchlist(): Promise<WatchlistItem[]> {
@@ -406,6 +411,10 @@ export class DatabaseStorage implements IStorage {
       .values(metrics)
       .returning();
     return newMetrics;
+  }
+
+  async clearFinancialMetrics(stockId: number): Promise<void> {
+    await db.delete(financialMetrics).where(eq(financialMetrics.stockId, stockId));
   }
 
   async getWatchlist(): Promise<WatchlistItem[]> {

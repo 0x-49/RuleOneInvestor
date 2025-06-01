@@ -1,9 +1,12 @@
 import { useParams, Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, TrendingUp, TrendingDown, DollarSign, Target } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { ArrowLeft, TrendingUp, TrendingDown, DollarSign, Target, RefreshCw } from "lucide-react";
 import BigFourMetrics from "@/components/BigFourMetrics";
 import ValuationTools from "@/components/ValuationTools";
 import FinancialTrends from "@/components/FinancialTrends";
@@ -11,10 +14,32 @@ import { StockWithMetrics } from "@shared/schema";
 
 export default function StockDetail() {
   const { symbol } = useParams<{ symbol: string }>();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { data: stock, isLoading, error } = useQuery<StockWithMetrics>({
     queryKey: [`/api/stocks/${symbol}`],
     enabled: !!symbol,
+  });
+
+  const refreshDataMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", `/api/stocks/${symbol}/refresh`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/stocks/${symbol}`] });
+      toast({
+        title: "Data Refreshed",
+        description: "Financial data has been updated with the latest information.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Refresh Failed",
+        description: "Could not refresh financial data. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -72,7 +97,39 @@ export default function StockDetail() {
               Back to Dashboard
             </Button>
           </Link>
+          
+          {stock && (!stock.metrics || stock.metrics.length === 0) && (
+            <Button 
+              onClick={() => refreshDataMutation.mutate()}
+              disabled={refreshDataMutation.isPending}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshDataMutation.isPending ? 'animate-spin' : ''}`} />
+              <span>
+                {refreshDataMutation.isPending ? 'Fetching Data...' : 'Refresh Financial Data'}
+              </span>
+            </Button>
+          )}
         </div>
+
+        {/* Loading Progress for Data Refresh */}
+        {refreshDataMutation.isPending && (
+          <Card>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Fetching Financial Data from Alpha Vantage</h3>
+                  <span className="text-sm text-muted-foreground">Premium API</span>
+                </div>
+                <Progress value={66} className="w-full" />
+                <p className="text-sm text-muted-foreground">
+                  Retrieving 10+ years of income statements, balance sheets, and cash flow data...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stock Overview */}
         <Card>

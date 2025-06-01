@@ -337,6 +337,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Process full company list directly
+  app.post("/api/admin/process-full-list", async (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.resolve('./attached_assets/Pasted-NVDA-NVIDIA-Corporation-2330-TAIWAN-SEMICONDUCTOR-MANUFACTURING-NOVO-B-NOVO-NORDISK-B-A-S-ASML-AS-1748786982199.txt');
+      const fullData = fs.readFileSync(filePath, 'utf-8');
+      const lines = fullData.trim().split('\n');
+      
+      let addedCount = 0;
+      let failedCount = 0;
+      const failures: string[] = [];
+      
+      for (const line of lines) {
+        if (line.trim()) {
+          const parts = line.includes('\t') ? line.split('\t') : line.split(/\s{2,}/);
+          
+          if (parts.length < 2) {
+            const match = line.match(/^(\S+)\s+(.+)$/);
+            if (match) {
+              parts[0] = match[1];
+              parts[1] = match[2];
+            }
+          }
+          
+          if (parts.length >= 2) {
+            const symbol = parts[0].trim();
+            const name = parts[1].trim();
+            
+            if (symbol && name) {
+              try {
+                // Check if company already exists
+                const existing = await storage.getStock(symbol);
+                if (!existing) {
+                  const exchange = symbol.match(/^\d+$/) ? 
+                    (symbol.length === 4 ? 'TSE' : symbol.length === 6 ? 'SSE' : 'ASIAN') :
+                    (symbol.includes('_') ? 'EUROPEAN' : 
+                     symbol.length <= 4 && /^[A-Z]+$/.test(symbol) ? 'NASDAQ' : 'OTHER');
+                  
+                  await storage.createStock({
+                    symbol,
+                    name,
+                    exchange,
+                    sector: 'Technology',
+                    price: 0,
+                    change: 0,
+                    changePercent: 0,
+                    volume: null,
+                    marketCap: null
+                  });
+                  addedCount++;
+                }
+              } catch (error) {
+                console.error(`Failed to add company ${symbol}:`, error);
+                failures.push(`${symbol}: ${error.message}`);
+                failedCount++;
+              }
+            }
+          }
+        }
+      }
+      
+      res.json({
+        totalLines: lines.length,
+        companiesAdded: addedCount,
+        companiesFailed: failedCount,
+        failures: failures.slice(0, 10), // Show first 10 failures
+        message: `Processed ${lines.length} companies. Added ${addedCount}, failed ${failedCount}`
+      });
+    } catch (error) {
+      console.error('Error processing full company list:', error);
+      res.status(500).json({ error: 'Failed to process full company list' });
+    }
+  });
+
   // Company list processing endpoint
   app.post("/api/admin/process-company-list", async (req, res) => {
     try {

@@ -98,7 +98,7 @@ export default function StockDetail() {
             </Button>
           </Link>
           
-          {stock && (!stock.metrics || stock.metrics.length === 0) && (
+          {stock && (
             <Button 
               onClick={() => refreshDataMutation.mutate()}
               disabled={refreshDataMutation.isPending}
@@ -187,7 +187,7 @@ export default function StockDetail() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <BigFourMetrics symbol={stock.symbol} />
+              <BigFourMetrics stockData={stock} isLoading={false} />
             </CardContent>
           </Card>
 
@@ -203,7 +203,7 @@ export default function StockDetail() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ValuationTools symbol={stock.symbol} />
+              <ValuationTools stockData={stock} isLoading={false} symbol={stock.symbol} />
             </CardContent>
           </Card>
         </div>
@@ -217,7 +217,7 @@ export default function StockDetail() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <FinancialTrends symbol={stock.symbol} />
+            <FinancialTrends stockData={stock} isLoading={false} />
           </CardContent>
         </Card>
 

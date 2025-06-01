@@ -10,6 +10,8 @@ import { ArrowLeft, TrendingUp, TrendingDown, DollarSign, Target, RefreshCw } fr
 import BigFourMetrics from "@/components/BigFourMetrics";
 import ValuationTools from "@/components/ValuationTools";
 import FinancialTrends from "@/components/FinancialTrends";
+import RuleOneAnalysis from "@/components/RuleOneAnalysis";
+import AdvancedFinancialCharts from "@/components/AdvancedFinancialCharts";
 import { StockWithMetrics } from "@shared/schema";
 
 export default function StockDetail() {

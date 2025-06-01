@@ -181,7 +181,8 @@ export default function PERatioAnalysis({
               <LineChart data={historicalPE}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="period" />
-                <YAxis domain={['dataMin - 2', 'dataMax + 2']} />
+                <YAxis yAxisId="left" domain={['dataMin - 2', 'dataMax + 2']} />
+                <YAxis yAxisId="right" orientation="right" domain={['dataMin - 10', 'dataMax + 10']} />
                 <Tooltip 
                   formatter={(value, name) => [
                     name === 'pe' ? `${Number(value).toFixed(1)}x` : `$${Number(value).toFixed(2)}`,
@@ -196,6 +197,7 @@ export default function PERatioAnalysis({
                   strokeWidth={3}
                   name="P/E Ratio"
                   dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                  yAxisId="left"
                 />
                 <Line 
                   type="monotone" 

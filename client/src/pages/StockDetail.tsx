@@ -13,6 +13,10 @@ import FinancialTrends from "@/components/FinancialTrends";
 import RuleOneAnalysis from "@/components/RuleOneAnalysis";
 import AdvancedFinancialCharts from "@/components/AdvancedFinancialCharts";
 import DetailedFinancialTable from "@/components/DetailedFinancialTable";
+import TechnicalAnalysis from "@/components/TechnicalAnalysis";
+import DividendAnalysis from "@/components/DividendAnalysis";
+import NewsAndSentiment from "@/components/NewsAndSentiment";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StockWithMetrics } from "@shared/schema";
 
 export default function StockDetail() {
@@ -280,14 +284,52 @@ export default function StockDetail() {
           symbol={stock.symbol}
         />
 
-        {/* Advanced Financial Charts & Data Visualization */}
-        <AdvancedFinancialCharts 
-          metrics={stock.metrics}
-          symbol={stock.symbol}
-          marketCap={stock.marketCap}
-          sector={stock.sector}
-          exchange={stock.exchange}
-        />
+        {/* Enhanced Analysis Suite - Simply Wall Street Style */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Comprehensive Stock Analysis</CardTitle>
+            <CardDescription>
+              Professional-grade analysis including technical indicators, dividends, and market sentiment
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="advanced" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="advanced">Advanced Charts</TabsTrigger>
+                <TabsTrigger value="technical">Technical Analysis</TabsTrigger>
+                <TabsTrigger value="dividends">Dividends</TabsTrigger>
+                <TabsTrigger value="news">News & Sentiment</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="advanced" className="mt-6">
+                <AdvancedFinancialCharts 
+                  metrics={stock.metrics}
+                  symbol={stock.symbol}
+                  marketCap={stock.marketCap}
+                  sector={stock.sector}
+                  exchange={stock.exchange}
+                />
+              </TabsContent>
+              
+              <TabsContent value="technical" className="mt-6">
+                <TechnicalAnalysis 
+                  symbol={stock.symbol}
+                  currentPrice={stock.price || 0}
+                  priceChange={stock.priceChange || 0}
+                  priceChangePercent={stock.priceChangePercent || 0}
+                />
+              </TabsContent>
+              
+              <TabsContent value="dividends" className="mt-6">
+                <DividendAnalysis symbol={stock.symbol} />
+              </TabsContent>
+              
+              <TabsContent value="news" className="mt-6">
+                <NewsAndSentiment symbol={stock.symbol} />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
       </div>
     </div>

@@ -569,16 +569,85 @@ export class FinancialDataService {
 
   async searchStocks(query: string): Promise<InsertStock[]> {
     try {
-      // Try Yahoo Finance search first
+      // Use Alpha Vantage Symbol Search for accurate ticker symbols
+      console.log(`Searching for symbols: "${query}"`);
+      const alphaResults = await this.searchAlphaVantageSymbols(query);
+      if (alphaResults.length > 0) {
+        console.log(`Found ${alphaResults.length} symbols from Alpha Vantage`);
+        return alphaResults;
+      }
+
+      // Fallback to Yahoo Finance search
       const yahooResults = await this.searchYahooStocks(query);
       if (yahooResults.length > 0) return yahooResults;
 
-      // Fallback to FMP search
+      // Final fallback to FMP search
       const fmpResults = await this.searchFMPStocks(query);
       return fmpResults;
     } catch (error) {
       console.error(`Error searching stocks for ${query}:`, error);
       return [];
+    }
+  }
+
+  private async searchAlphaVantageSymbols(query: string): Promise<InsertStock[]> {
+    try {
+      const response = await fetch(
+        `${this.ALPHA_VANTAGE_BASE_URL}?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${this.ALPHA_VANTAGE_API_KEY}`
+      );
+      
+      if (!response.ok) return [];
+      
+      const data = await response.json();
+      const matches = data.bestMatches || [];
+      
+      const results: InsertStock[] = [];
+      
+      for (const match of matches.slice(0, 10)) {
+        if (match['1. symbol'] && match['2. name']) {
+          // Fetch current price for the symbol
+          const stockData = await this.fetchAlphaVantageStockPrice(match['1. symbol']);
+          
+          results.push({
+            symbol: match['1. symbol'],
+            name: match['2. name'],
+            price: stockData?.price || 0,
+            change: stockData?.change || 0,
+            changePercent: stockData?.changePercent || 0
+          });
+        }
+      }
+      
+      return results;
+    } catch (error) {
+      console.error(`Alpha Vantage symbol search error for ${query}:`, error);
+      return [];
+    }
+  }
+
+  private async fetchAlphaVantageStockPrice(symbol: string): Promise<{price: number, change: number, changePercent: number} | null> {
+    try {
+      const response = await fetch(
+        `${this.ALPHA_VANTAGE_BASE_URL}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.ALPHA_VANTAGE_API_KEY}`
+      );
+      
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      const quote = data['Global Quote'];
+      
+      if (quote && quote['05. price']) {
+        return {
+          price: parseFloat(quote['05. price']),
+          change: parseFloat(quote['09. change']) || 0,
+          changePercent: parseFloat(quote['10. change percent']?.replace('%', '')) || 0
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error(`Alpha Vantage price error for ${symbol}:`, error);
+      return null;
     }
   }
 

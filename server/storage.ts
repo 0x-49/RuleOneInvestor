@@ -110,6 +110,10 @@ export class MemStorage implements IStorage {
     return this.getStock(symbol);
   }
 
+  async getAllStocks(): Promise<Stock[]> {
+    return Array.from(this.stocks.values());
+  }
+
   async createStock(stock: InsertStock): Promise<Stock> {
     const newStock: Stock = {
       ...stock,
@@ -408,6 +412,10 @@ export class DatabaseStorage implements IStorage {
 
   async getStockBySymbol(symbol: string): Promise<Stock | undefined> {
     return this.getStock(symbol);
+  }
+
+  async getAllStocks(): Promise<Stock[]> {
+    return await db.select().from(stocks);
   }
 
   async createStock(stock: InsertStock): Promise<Stock> {

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, Cell } from "recharts";
 import { TrendingUp, BarChart3, Target, Info } from "lucide-react";
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
@@ -140,9 +140,9 @@ export default function PERatioAnalysis({
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip formatter={(value) => [`${Number(value).toFixed(1)}x`, 'P/E Ratio']} />
-                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                   {comparisonData.map((entry, index) => (
-                    <Bar key={index} fill={entry.color} />
+                    <Cell key={index} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>

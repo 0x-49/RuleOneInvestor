@@ -19,7 +19,7 @@ interface Props {
 
 export default function DividendAnalysis({ symbol }: Props) {
   // Fetch dividend data from Alpha Vantage
-  const { data: dividendData, isLoading } = useQuery({
+  const { data: dividendData, isLoading } = useQuery<DividendData[]>({
     queryKey: ['/api/dividends', symbol],
     enabled: !!symbol,
   });
@@ -43,7 +43,7 @@ export default function DividendAnalysis({ symbol }: Props) {
     );
   }
 
-  if (!dividendData || dividendData.length === 0) {
+  if (!dividendData || !Array.isArray(dividendData) || dividendData.length === 0) {
     return (
       <Card>
         <CardHeader>

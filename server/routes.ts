@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { symbol } = req.params;
       
       // Attempt to fetch fresh data from financial APIs
-      const freshData = await financialDataService.getStockData(symbol);
+      const freshData = await financialDataService.fetchStockData(symbol);
       
       if (!freshData) {
         return res.status(404).json({ error: "No data available from financial providers" });
@@ -308,6 +308,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         symbol: symbol.toUpperCase(),
         name: symbol.toUpperCase(),
         price: analysisData[0]?.close || 0,
+        change: 0,
+        changePercent: 0,
         marketCap: null,
         exchange: "Unknown"
       };

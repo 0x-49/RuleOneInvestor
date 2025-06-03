@@ -394,7 +394,7 @@ export class AlphaVantageComprehensiveService {
       const changePercent = parseFloat(overview.ChangePercent?.replace('%', '')) || 0;
       const marketCap = overview.MarketCapitalization || null;
 
-      await storage.updateStock(stock.id, {
+      await storage.updateStock(stock.symbol, {
         price,
         change,
         changePercent,

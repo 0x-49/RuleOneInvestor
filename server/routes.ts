@@ -768,6 +768,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process ultimate expansion to reach 4000 companies target
+  app.post("/api/admin/batch-process-ultimate-expansion", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor13').then(m => m.processUSSmallCapBatch()),
+        import('./batchProcessor13').then(m => m.processEuropeanSmallCapBatch()),
+        import('./batchProcessor13').then(m => m.processAsianSmallCapBatch()),
+        import('./batchProcessor13').then(m => m.processEmergingMarketStocksBatch()),
+        import('./batchProcessor13').then(m => m.processCryptoStocksBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `Ultimate expansion batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in ultimate expansion batch processing:', error);
+      res.status(500).json({ error: 'Failed to process ultimate expansion batch' });
+    }
+  });
+
+  // Process global expansion to reach 4000 companies target
+  app.post("/api/admin/batch-process-global-expansion", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor14').then(m => m.processFTSEEuropeanBatch()),
+        import('./batchProcessor14').then(m => m.processSP500RemainingBatch()),
+        import('./batchProcessor14').then(m => m.processTSXCanadianBatch()),
+        import('./batchProcessor14').then(m => m.processASXAustralianBatch()),
+        import('./batchProcessor14').then(m => m.processJSESouthAfricanBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `Global expansion batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in global expansion batch processing:', error);
+      res.status(500).json({ error: 'Failed to process global expansion batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

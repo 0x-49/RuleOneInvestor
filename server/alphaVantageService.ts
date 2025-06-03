@@ -35,7 +35,7 @@ interface TechnicalIndicator {
 }
 
 export class AlphaVantageService {
-  private readonly apiKey = process.env.ALPHA_VANTAGE_API_KEY!;
+  private readonly apiKey = process.env.ALPHA_VANTAGE_API_KEY || "3IP18P3AX39PJ02";
   private readonly baseUrl = "https://www.alphavantage.co/query";
 
   /**
@@ -220,6 +220,110 @@ export class AlphaVantageService {
       return data;
     } catch (error) {
       console.error(`Alpha Vantage overview error for ${symbol}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch income statement data
+   */
+  async getIncomeStatement(symbol: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}?function=INCOME_STATEMENT&symbol=${symbol}&apikey=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data['Error Message']) {
+        throw new Error(data['Error Message']);
+      }
+
+      return data.annualReports || data.quarterlyReports || [];
+    } catch (error) {
+      console.error(`Alpha Vantage income statement error for ${symbol}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch balance sheet data
+   */
+  async getBalanceSheet(symbol: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}?function=BALANCE_SHEET&symbol=${symbol}&apikey=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data['Error Message']) {
+        throw new Error(data['Error Message']);
+      }
+
+      return data.annualReports || data.quarterlyReports || [];
+    } catch (error) {
+      console.error(`Alpha Vantage balance sheet error for ${symbol}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch cash flow data
+   */
+  async getCashFlow(symbol: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}?function=CASH_FLOW&symbol=${symbol}&apikey=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data['Error Message']) {
+        throw new Error(data['Error Message']);
+      }
+
+      return data.annualReports || data.quarterlyReports || [];
+    } catch (error) {
+      console.error(`Alpha Vantage cash flow error for ${symbol}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch earnings data
+   */
+  async getEarnings(symbol: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}?function=EARNINGS&symbol=${symbol}&apikey=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data['Error Message']) {
+        throw new Error(data['Error Message']);
+      }
+
+      return data.annualEarnings || data.quarterlyEarnings || [];
+    } catch (error) {
+      console.error(`Alpha Vantage earnings error for ${symbol}:`, error);
       throw error;
     }
   }

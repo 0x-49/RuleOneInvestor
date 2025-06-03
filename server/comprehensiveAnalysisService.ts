@@ -171,29 +171,22 @@ export class ComprehensiveAnalysisService {
         this.currentBatch.currentSymbol = stock.symbol;
       }
 
-      // Try FMP service first
+      // Get comprehensive data from Alpha Vantage
       let financialData;
       try {
-        financialData = await fmpService.getCompanyFinancials(stock.symbol);
-        if (financialData && financialData.length > 0) {
-          result.dataSource = 'fmp';
+        const [overview, income, balance, earnings] = await Promise.all([
+          alphaVantageService.getCompanyOverview(stock.symbol),
+          alphaVantageService.getIncomeStatement(stock.symbol),
+          alphaVantageService.getBalanceSheet(stock.symbol),
+          alphaVantageService.getEarnings(stock.symbol)
+        ]);
+
+        if (overview && income && balance) {
+          financialData = this.combineAlphaVantageData(overview, income, balance, earnings);
+          result.dataSource = 'alpha_vantage';
         }
       } catch (error) {
-        console.log(`FMP failed for ${stock.symbol}, trying Alpha Vantage`);
-      }
-
-      // Fallback to Alpha Vantage if FMP fails
-      if (!financialData || financialData.length === 0) {
-        try {
-          const alphaData = await alphaVantageService.getCompanyOverview(stock.symbol);
-          if (alphaData) {
-            // Convert Alpha Vantage data to compatible format
-            financialData = this.convertAlphaVantageData(alphaData);
-            result.dataSource = 'alpha_vantage';
-          }
-        } catch (error) {
-          console.log(`Alpha Vantage also failed for ${stock.symbol}`);
-        }
+        console.log(`Alpha Vantage failed for ${stock.symbol}:`, error);
       }
 
       if (!financialData || financialData.length === 0) {
@@ -395,25 +388,26 @@ export class ComprehensiveAnalysisService {
    */
   private async storeCompanyMetrics(symbol: string, analysis: ComprehensiveAnalysisResult) {
     try {
-      // Store in financial_metrics table
+      // Store comprehensive metrics in database
       if (analysis.ruleOneMetrics) {
-        await storage.createFinancialMetrics({
-          symbol,
-          year: new Date().getFullYear().toString(),
-          revenue: null, // Would need actual revenue data
-          netIncome: null,
-          totalAssets: null,
-          totalDebt: null,
-          freeCashFlow: null,
-          eps: null,
-          totalStockholdersEquity: null,
-          // Add Rule One specific metrics
-          salesGrowthRate: analysis.ruleOneMetrics.salesGrowth,
-          epsGrowthRate: analysis.ruleOneMetrics.epsGrowth,
-          equityGrowthRate: analysis.ruleOneMetrics.equityGrowth,
-          fcfGrowthRate: analysis.ruleOneMetrics.fcfGrowth,
-          roic: analysis.ruleOneMetrics.roic
-        });
+        const stock = await storage.getStock(symbol);
+        if (stock) {
+          await storage.createFinancialMetrics({
+            stockId: stock.id,
+            year: new Date().getFullYear().toString(),
+            revenue: null,
+            earnings: null,
+            freeCashFlow: null,
+            bookValue: null,
+            eps: null,
+            roic: analysis.ruleOneMetrics.roic,
+            debt: null,
+            salesGrowthRate: analysis.ruleOneMetrics.salesGrowth,
+            epsGrowthRate: analysis.ruleOneMetrics.epsGrowth,
+            equityGrowthRate: analysis.ruleOneMetrics.equityGrowth,
+            fcfGrowthRate: analysis.ruleOneMetrics.fcfGrowth
+          });
+        }
       }
     } catch (error) {
       console.error(`Failed to store metrics for ${symbol}:`, error);
@@ -421,10 +415,44 @@ export class ComprehensiveAnalysisService {
   }
 
   /**
-   * Convert Alpha Vantage data to compatible format
+   * Combine Alpha Vantage data from multiple sources
+   */
+  private combineAlphaVantageData(overview: any, income: any[], balance: any[], earnings: any[]): any[] {
+    const combinedData: any[] = [];
+    
+    // Take up to 5 years of data
+    const maxYears = Math.min(5, income.length, balance.length);
+    
+    for (let i = 0; i < maxYears; i++) {
+      const incomeData = income[i] || {};
+      const balanceData = balance[i] || {};
+      const earningsData = earnings[i] || {};
+      
+      combinedData.push({
+        year: parseInt(incomeData.fiscalDateEnding?.split('-')[0]) || new Date().getFullYear() - i,
+        revenue: parseFloat(incomeData.totalRevenue) || 0,
+        netIncome: parseFloat(incomeData.netIncome) || 0,
+        eps: parseFloat(earningsData.reportedEPS) || parseFloat(overview.EPS) || 0,
+        totalAssets: parseFloat(balanceData.totalAssets) || 0,
+        totalDebt: parseFloat(balanceData.totalDebt) || 0,
+        totalStockholdersEquity: parseFloat(balanceData.totalShareholderEquity) || 0,
+        freeCashFlow: parseFloat(incomeData.operatingCashflow) || 0,
+        operatingIncome: parseFloat(incomeData.operatingIncome) || 0,
+        totalCurrentAssets: parseFloat(balanceData.totalCurrentAssets) || 0,
+        totalCurrentLiabilities: parseFloat(balanceData.totalCurrentLiabilities) || 0,
+        inventory: parseFloat(balanceData.inventory) || 0,
+        interestExpense: parseFloat(incomeData.interestExpense) || 0,
+        price: parseFloat(overview.Price) || 0
+      });
+    }
+    
+    return combinedData;
+  }
+
+  /**
+   * Convert Alpha Vantage data to compatible format (fallback)
    */
   private convertAlphaVantageData(alphaData: any): any[] {
-    // Convert Alpha Vantage company overview to financial data format
     return [{
       year: new Date().getFullYear(),
       revenue: parseFloat(alphaData.RevenueTTM) || 0,

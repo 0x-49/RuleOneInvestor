@@ -1,4 +1,5 @@
 import { storage } from './storage';
+import { dataGatheringCheckpoint } from './dataGatheringCheckpoint';
 
 interface CompanyFinancialData {
   symbol: string;
@@ -43,6 +44,10 @@ export class AlphaVantageComprehensiveService {
    */
   async startComprehensiveAnalysis(): Promise<{ message: string; total: number }> {
     const allStocks = await storage.getAllStocks();
+    
+    // Initialize checkpoint system
+    await dataGatheringCheckpoint.initializeCheckpoint(allStocks.length);
+    
     this.processingStats = {
       total: allStocks.length,
       processed: 0,
@@ -52,7 +57,7 @@ export class AlphaVantageComprehensiveService {
       currentSymbol: ''
     };
 
-    // Process companies in batches to respect API limits
+    // Process companies with checkpoint recovery
     this.processCompaniesInBatches(allStocks);
 
     return {
@@ -69,7 +74,78 @@ export class AlphaVantageComprehensiveService {
   }
 
   /**
-   * Process companies in batches with rate limiting
+   * Process companies with checkpoint recovery system
+   */
+  private async processCompaniesWithCheckpoints(stocks: any[]) {
+    // Premium API allows 75 calls per minute
+    const delayBetweenCalls = 820; // ~73 calls per minute to stay under limit
+    
+    console.log(`Starting comprehensive analysis of ${stocks.length} companies with Alpha Vantage Premium API`);
+    console.log(`Rate limit: 75 calls/minute. Processing ~70 companies per minute.`);
+    console.log(`Estimated completion time: ${Math.ceil(stocks.length / 70)} minutes`);
+
+    let callCount = 0;
+    let lastMinuteReset = Date.now();
+
+    for (let i = 0; i < stocks.length; i++) {
+      const stock = stocks[i];
+      
+      // Skip if already processed (checkpoint recovery)
+      if (dataGatheringCheckpoint.isProcessed(stock.symbol)) {
+        console.log(`Skipping ${stock.symbol} - already processed`);
+        continue;
+      }
+
+      // Reset call counter every minute
+      const now = Date.now();
+      if (now - lastMinuteReset >= 60000) {
+        callCount = 0;
+        lastMinuteReset = now;
+        console.log(`Minute reset - processed ${i} companies so far`);
+      }
+
+      // If we've hit 70 calls this minute, wait until next minute
+      if (callCount >= 70) {
+        const waitTime = 60000 - (now - lastMinuteReset);
+        console.log(`Rate limit reached, waiting ${Math.ceil(waitTime/1000)} seconds`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        callCount = 0;
+        lastMinuteReset = Date.now();
+      }
+      
+      let success = false;
+      try {
+        this.processingStats.currentSymbol = stock.symbol;
+        
+        await this.analyzeCompanyComprehensively(stock, 0);
+        this.processingStats.successful++;
+        success = true;
+        callCount += 1; // Only overview call now
+        
+      } catch (error) {
+        console.error(`Failed to analyze ${stock.symbol}:`, error);
+        this.processingStats.failed++;
+        callCount += 1; // At least the overview call was made
+      }
+      
+      this.processingStats.processed++;
+      
+      // Update checkpoint
+      dataGatheringCheckpoint.updateCheckpoint(stock.symbol, success, i);
+      
+      // Small delay between companies
+      await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+    }
+
+    console.log(`Comprehensive analysis complete: ${this.processingStats.successful} successful, ${this.processingStats.failed} failed`);
+    console.log(`Total companies with financial data: ${this.processingStats.successful}/${stocks.length} (${Math.round(this.processingStats.successful/stocks.length*100)}%)`);
+    
+    // Save final results
+    await dataGatheringCheckpoint.saveFinalResults();
+  }
+
+  /**
+   * Legacy batch processing method (kept for compatibility)
    */
   private async processCompaniesInBatches(stocks: any[]) {
     // Premium API allows 75 calls per minute

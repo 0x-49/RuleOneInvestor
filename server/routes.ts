@@ -843,6 +843,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process final comprehensive expansion to reach exactly 4000 companies
+  app.post("/api/admin/batch-process-final-comprehensive", async (req, res) => {
+    try {
+      const result = await import('./batchProcessor16').then(m => m.processFinalComprehensiveBatch());
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Final comprehensive expansion complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in final comprehensive expansion:', error);
+      res.status(500).json({ error: 'Failed to process final comprehensive expansion' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

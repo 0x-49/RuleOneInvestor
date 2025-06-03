@@ -38,7 +38,7 @@ export function EnhancedDashboard() {
 
   // Dashboard stats from actual system data
   const stats: DashboardStats = {
-    totalCompanies: 423,
+    totalCompanies: 2955,
     analyzedToday: 87,
     ruleOneQuality: 73,
     averageGrowth: 12.4

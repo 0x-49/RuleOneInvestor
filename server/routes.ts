@@ -719,6 +719,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process comprehensive global markets to reach 4000 companies
+  app.post("/api/admin/batch-process-comprehensive-expansion", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor10').then(m => m.processMiddleEasternAfricanBatch()),
+        import('./batchProcessor10').then(m => m.processNordicBatch()),
+        import('./batchProcessor10').then(m => m.processAdditionalCanadianBatch()),
+        import('./batchProcessor10').then(m => m.processUSMidSmallCapBatch()),
+        import('./batchProcessor11').then(m => m.processRussell1000Batch()),
+        import('./batchProcessor11').then(m => m.processRussell2000Batch()),
+        import('./batchProcessor11').then(m => m.processConsumerStaplesBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `Comprehensive expansion batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in comprehensive expansion batch processing:', error);
+      res.status(500).json({ error: 'Failed to process comprehensive expansion batch' });
+    }
+  });
+
+  // Process final expansion to reach 4000 companies target
+  app.post("/api/admin/batch-process-final-expansion", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor12').then(m => m.processRussell3000Batch()),
+        import('./batchProcessor12').then(m => m.processEmergingMarketsBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `Final expansion batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in final expansion batch processing:', error);
+      res.status(500).json({ error: 'Failed to process final expansion batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

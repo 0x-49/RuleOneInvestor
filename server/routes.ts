@@ -859,6 +859,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process final 648 companies to reach exactly 4000 total
+  app.post("/api/admin/batch-process-final-648", async (req, res) => {
+    try {
+      const result = await import('./batchProcessor17').then(m => m.processFinal648CompaniesBatch());
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Final 648 companies batch complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in final 648 companies batch:', error);
+      res.status(500).json({ error: 'Failed to process final 648 companies batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

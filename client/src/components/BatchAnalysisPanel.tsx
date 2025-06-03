@@ -49,7 +49,7 @@ export function BatchAnalysisPanel() {
       setIsRunning(true);
       toast({
         title: "Batch Analysis Started",
-        description: "Processing 400+ companies for Rule One analysis...",
+        description: "Processing 2,955+ companies for Rule One analysis...",
       });
     },
     onError: (error: Error) => {

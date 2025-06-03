@@ -38,7 +38,7 @@ export function EnhancedDashboard() {
 
   // Dashboard stats from actual system data
   const stats: DashboardStats = {
-    totalCompanies: 3572,
+    totalCompanies: 3739,
     analyzedToday: 87,
     ruleOneQuality: 73,
     averageGrowth: 12.4
@@ -77,7 +77,7 @@ export function EnhancedDashboard() {
             Rule One Investing Assistant
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            AI-powered analysis of 3,572+ global companies using Phil Town's Rule One methodology
+            AI-powered analysis of 3,739+ global companies using Phil Town's Rule One methodology
           </p>
           
           {/* Prominent Stock Search Bar */}

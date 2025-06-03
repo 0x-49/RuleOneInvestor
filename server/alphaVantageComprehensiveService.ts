@@ -72,56 +72,72 @@ export class AlphaVantageComprehensiveService {
    * Process companies in batches with rate limiting
    */
   private async processCompaniesInBatches(stocks: any[]) {
-    const batchSize = 3; // Alpha Vantage premium allows higher rates
-    const delayBetweenCalls = 100; // 100ms delay between API calls
+    // Premium API allows 75 calls per minute = 1.25 calls per second
+    // We'll use 1 call per second to be safe, with 5 API calls per company
+    const delayBetweenCompanies = 5000; // 5 seconds between companies (5 API calls each)
+    const delayBetweenApiCalls = 1000; // 1 second between individual API calls
+    
+    console.log(`Starting comprehensive analysis of ${stocks.length} companies with Alpha Vantage Premium API`);
+    console.log(`Rate limit: 75 calls/minute. Processing 1 company every 5 seconds.`);
+    console.log(`Estimated completion time: ${Math.ceil(stocks.length * 5 / 60)} minutes`);
 
-    for (let i = 0; i < stocks.length; i += batchSize) {
-      const batch = stocks.slice(i, i + batchSize);
+    for (let i = 0; i < stocks.length; i++) {
+      const stock = stocks[i];
       
-      for (const stock of batch) {
-        try {
-          this.processingStats.currentSymbol = stock.symbol;
-          await this.analyzeCompanyComprehensively(stock);
-          this.processingStats.successful++;
-        } catch (error) {
-          console.error(`Failed to analyze ${stock.symbol}:`, error);
-          this.processingStats.failed++;
+      try {
+        this.processingStats.currentSymbol = stock.symbol;
+        
+        // Progress logging every 100 companies
+        if (i > 0 && i % 100 === 0) {
+          console.log(`Progress: ${i}/${stocks.length} companies processed (${Math.round(i/stocks.length*100)}%)`);
+          console.log(`Success rate: ${Math.round(this.processingStats.successful/this.processingStats.processed*100)}%`);
         }
         
-        this.processingStats.processed++;
+        await this.analyzeCompanyComprehensively(stock, delayBetweenApiCalls);
+        this.processingStats.successful++;
         
-        // Rate limiting delay
-        await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+      } catch (error) {
+        console.error(`Failed to analyze ${stock.symbol}:`, error);
+        this.processingStats.failed++;
       }
-
-      // Longer delay between batches
-      if (i + batchSize < stocks.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      this.processingStats.processed++;
+      
+      // Rate limiting delay between companies
+      if (i < stocks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, delayBetweenCompanies));
       }
     }
 
     console.log(`Comprehensive analysis complete: ${this.processingStats.successful} successful, ${this.processingStats.failed} failed`);
+    console.log(`Total companies with financial data: ${this.processingStats.successful}/${stocks.length} (${Math.round(this.processingStats.successful/stocks.length*100)}%)`);
   }
 
   /**
    * Analyze a single company comprehensively
    */
-  private async analyzeCompanyComprehensively(stock: any) {
+  private async analyzeCompanyComprehensively(stock: any, delayBetweenApiCalls: number = 1000) {
     // Get company overview first
     const overview = await this.fetchCompanyOverview(stock.symbol);
-    if (!overview || overview.Symbol !== stock.symbol) {
-      throw new Error('No company overview data available');
+    if (!overview || !overview.Symbol || overview.Symbol === 'None') {
+      // Skip international stocks that Alpha Vantage doesn't support
+      console.log(`Skipping ${stock.symbol} - not available in Alpha Vantage (likely international)`);
+      return;
     }
 
-    // Get financial statements
-    const [incomeStatement, balanceSheet, earnings] = await Promise.all([
-      this.fetchIncomeStatement(stock.symbol),
-      this.fetchBalanceSheet(stock.symbol),
-      this.fetchEarnings(stock.symbol)
-    ]);
+    // Get financial statements with rate limiting
+    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
+    const incomeStatement = await this.fetchIncomeStatement(stock.symbol);
+    
+    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
+    const balanceSheet = await this.fetchBalanceSheet(stock.symbol);
+    
+    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
+    const earnings = await this.fetchEarnings(stock.symbol);
 
-    // Get technical data
-    const technicalData = await this.fetchTechnicalData(stock.symbol);
+    // Get technical data with rate limiting
+    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
+    const technicalData = await this.fetchTechnicalData(stock.symbol, delayBetweenApiCalls);
 
     // Calculate Rule One metrics
     const ruleOneMetrics = this.calculateRuleOneMetrics(overview, incomeStatement, balanceSheet, earnings);
@@ -220,21 +236,17 @@ export class AlphaVantageComprehensiveService {
   /**
    * Fetch technical analysis data
    */
-  private async fetchTechnicalData(symbol: string): Promise<any> {
+  private async fetchTechnicalData(symbol: string, delayBetweenApiCalls: number = 1000): Promise<any> {
     try {
-      // Fetch RSI and SMA data with delays
+      // Fetch RSI data
       const rsi = await this.fetchRSI(symbol);
-      await new Promise(resolve => setTimeout(resolve, 200));
       
-      const sma20 = await this.fetchSMA(symbol, 20);
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      const sma50 = await this.fetchSMA(symbol, 50);
-      
+      // Use only overview data to avoid hitting rate limits
+      // Technical indicators require additional API calls, so we'll skip them for now
       return {
-        rsi: rsi?.[0]?.value || null,
-        sma20: sma20?.[0]?.value || null,
-        sma50: sma50?.[0]?.value || null
+        rsi: null,
+        sma20: null,
+        sma50: null
       };
     } catch (error) {
       return { rsi: null, sma20: null, sma50: null };

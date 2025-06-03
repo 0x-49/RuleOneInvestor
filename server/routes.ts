@@ -429,6 +429,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Batch process remaining companies
+  app.post("/api/admin/batch-process", async (req, res) => {
+    try {
+      const { processBatch } = await import('./batchProcessor');
+      const result = await processBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in batch processing:', error);
+      res.status(500).json({ error: 'Failed to process batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

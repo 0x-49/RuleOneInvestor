@@ -480,6 +480,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process Canadian companies batch
+  app.post("/api/admin/batch-process-canadian", async (req, res) => {
+    try {
+      const { processCanadianBatch } = await import('./batchProcessor3');
+      const result = await processCanadianBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Canadian batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in Canadian batch processing:', error);
+      res.status(500).json({ error: 'Failed to process Canadian batch' });
+    }
+  });
+
+  // Process Hong Kong companies batch
+  app.post("/api/admin/batch-process-hongkong", async (req, res) => {
+    try {
+      const { processHongKongBatch } = await import('./batchProcessor3');
+      const result = await processHongKongBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Hong Kong batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in Hong Kong batch processing:', error);
+      res.status(500).json({ error: 'Failed to process Hong Kong batch' });
+    }
+  });
+
+  // Process global companies batch
+  app.post("/api/admin/batch-process-global", async (req, res) => {
+    try {
+      const { processGlobalBatch } = await import('./batchProcessor3');
+      const result = await processGlobalBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Global batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in Global batch processing:', error);
+      res.status(500).json({ error: 'Failed to process Global batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

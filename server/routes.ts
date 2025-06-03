@@ -667,6 +667,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process all remaining sectors to complete database expansion
+  app.post("/api/admin/batch-process-all-sectors", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor7').then(m => m.processConsumerDiscretionaryBatch()),
+        import('./batchProcessor7').then(m => m.processIndustrialsBatch()),
+        import('./batchProcessor7').then(m => m.processMaterialsBatch()),
+        import('./batchProcessor7').then(m => m.processUtilitiesBatch()),
+        import('./batchProcessor7').then(m => m.processRealEstateBatch()),
+        import('./batchProcessor7').then(m => m.processTelecomBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `All sectors batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in all sectors batch processing:', error);
+      res.status(500).json({ error: 'Failed to process all sectors batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

@@ -693,6 +693,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process major global markets to expand to 4000 companies
+  app.post("/api/admin/batch-process-global-expansion", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor8').then(m => m.processEuropeanBatch()),
+        import('./batchProcessor8').then(m => m.processAsianBatch()),
+        import('./batchProcessor8').then(m => m.processAustralianBatch()),
+        import('./batchProcessor9').then(m => m.processChineseBatch()),
+        import('./batchProcessor9').then(m => m.processAdditionalJapaneseBatch()),
+        import('./batchProcessor9').then(m => m.processLatinAmericanBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `Global expansion batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in global expansion batch processing:', error);
+      res.status(500).json({ error: 'Failed to process global expansion batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

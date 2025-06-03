@@ -818,6 +818,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process remaining expansion to reach 4000 companies target
+  app.post("/api/admin/batch-process-remaining-expansion", async (req, res) => {
+    try {
+      const processors = await Promise.all([
+        import('./batchProcessor15').then(m => m.processNASDAQRemainingBatch()),
+        import('./batchProcessor15').then(m => m.processNYSERemainingBatch()),
+        import('./batchProcessor15').then(m => m.processEuropeanETFsBatch()),
+        import('./batchProcessor15').then(m => m.processAsianTechBatch()),
+        import('./batchProcessor15').then(m => m.processLatinAmericanBatch())
+      ]);
+
+      const totalAdded = processors.reduce((sum, result) => sum + result.added, 0);
+      const totalFailed = processors.reduce((sum, result) => sum + result.failed, 0);
+      
+      res.json({
+        companiesAdded: totalAdded,
+        companiesFailed: totalFailed,
+        message: `Remaining expansion batch processing complete: ${totalAdded} companies added, ${totalFailed} failed`
+      });
+    } catch (error) {
+      console.error('Error in remaining expansion batch processing:', error);
+      res.status(500).json({ error: 'Failed to process remaining expansion batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

@@ -446,6 +446,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process Indian companies batch
+  app.post("/api/admin/batch-process-indian", async (req, res) => {
+    try {
+      const { processIndianBatch } = await import('./batchProcessor2');
+      const result = await processIndianBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Indian batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in Indian batch processing:', error);
+      res.status(500).json({ error: 'Failed to process Indian batch' });
+    }
+  });
+
+  // Process European companies batch
+  app.post("/api/admin/batch-process-european", async (req, res) => {
+    try {
+      const { processEuropeanBatch } = await import('./batchProcessor2');
+      const result = await processEuropeanBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `European batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in European batch processing:', error);
+      res.status(500).json({ error: 'Failed to process European batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

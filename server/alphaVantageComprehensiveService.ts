@@ -72,17 +72,36 @@ export class AlphaVantageComprehensiveService {
    * Process companies in batches with rate limiting
    */
   private async processCompaniesInBatches(stocks: any[]) {
-    // Premium API allows 75 calls per minute = 1.25 calls per second
-    // We'll use 1 call per second to be safe, with 5 API calls per company
-    const delayBetweenCompanies = 5000; // 5 seconds between companies (5 API calls each)
-    const delayBetweenApiCalls = 1000; // 1 second between individual API calls
+    // Premium API allows 75 calls per minute
+    // Use overview data only (1 call per company) for maximum coverage
+    const delayBetweenCalls = 820; // ~73 calls per minute to stay under limit
     
     console.log(`Starting comprehensive analysis of ${stocks.length} companies with Alpha Vantage Premium API`);
-    console.log(`Rate limit: 75 calls/minute. Processing 1 company every 5 seconds.`);
-    console.log(`Estimated completion time: ${Math.ceil(stocks.length * 5 / 60)} minutes`);
+    console.log(`Rate limit: 75 calls/minute. Processing ~70 companies per minute.`);
+    console.log(`Estimated completion time: ${Math.ceil(stocks.length / 70)} minutes`);
+
+    let callCount = 0;
+    let lastMinuteReset = Date.now();
 
     for (let i = 0; i < stocks.length; i++) {
       const stock = stocks[i];
+      
+      // Reset call counter every minute
+      const now = Date.now();
+      if (now - lastMinuteReset >= 60000) {
+        callCount = 0;
+        lastMinuteReset = now;
+        console.log(`Minute reset - processed ${i} companies so far`);
+      }
+
+      // If we've hit 70 calls this minute, wait until next minute
+      if (callCount >= 70) {
+        const waitTime = 60000 - (now - lastMinuteReset);
+        console.log(`Rate limit reached, waiting ${Math.ceil(waitTime/1000)} seconds`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        callCount = 0;
+        lastMinuteReset = Date.now();
+      }
       
       try {
         this.processingStats.currentSymbol = stock.symbol;
@@ -93,20 +112,20 @@ export class AlphaVantageComprehensiveService {
           console.log(`Success rate: ${Math.round(this.processingStats.successful/this.processingStats.processed*100)}%`);
         }
         
-        await this.analyzeCompanyComprehensively(stock, delayBetweenApiCalls);
+        await this.analyzeCompanyComprehensively(stock, 0);
         this.processingStats.successful++;
+        callCount += 1; // Only overview call now
         
       } catch (error) {
         console.error(`Failed to analyze ${stock.symbol}:`, error);
         this.processingStats.failed++;
+        callCount += 1; // At least the overview call was made
       }
       
       this.processingStats.processed++;
       
-      // Rate limiting delay between companies
-      if (i < stocks.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, delayBetweenCompanies));
-      }
+      // Small delay between companies
+      await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
     }
 
     console.log(`Comprehensive analysis complete: ${this.processingStats.successful} successful, ${this.processingStats.failed} failed`);
@@ -125,19 +144,12 @@ export class AlphaVantageComprehensiveService {
       return;
     }
 
-    // Get financial statements with rate limiting
-    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
-    const incomeStatement = await this.fetchIncomeStatement(stock.symbol);
-    
-    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
-    const balanceSheet = await this.fetchBalanceSheet(stock.symbol);
-    
-    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
-    const earnings = await this.fetchEarnings(stock.symbol);
-
-    // Get technical data with rate limiting
-    await new Promise(resolve => setTimeout(resolve, delayBetweenApiCalls));
-    const technicalData = await this.fetchTechnicalData(stock.symbol, delayBetweenApiCalls);
+    // For maximum coverage, use only overview data for now
+    // Financial statements require 3 additional API calls per company
+    const incomeStatement: any[] = [];
+    const balanceSheet: any[] = [];
+    const earnings: any[] = [];
+    const technicalData = { rsi: null, sma20: null, sma50: null };
 
     // Calculate Rule One metrics
     const ruleOneMetrics = this.calculateRuleOneMetrics(overview, incomeStatement, balanceSheet, earnings);

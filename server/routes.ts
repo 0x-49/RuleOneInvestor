@@ -914,6 +914,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Start Alpha Vantage comprehensive analysis
+  app.post("/api/admin/alpha-vantage-analysis/start", async (req, res) => {
+    try {
+      const { alphaVantageComprehensiveService } = await import('./alphaVantageComprehensiveService');
+      const result = await alphaVantageComprehensiveService.startComprehensiveAnalysis();
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error starting Alpha Vantage analysis:', error);
+      res.status(500).json({ error: 'Failed to start Alpha Vantage analysis' });
+    }
+  });
+
+  // Get Alpha Vantage analysis progress
+  app.get("/api/admin/alpha-vantage-analysis/progress", async (req, res) => {
+    try {
+      const { alphaVantageComprehensiveService } = await import('./alphaVantageComprehensiveService');
+      const progress = alphaVantageComprehensiveService.getProgress();
+      
+      res.json(progress);
+    } catch (error) {
+      console.error('Error getting Alpha Vantage progress:', error);
+      res.status(500).json({ error: 'Failed to get Alpha Vantage progress' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

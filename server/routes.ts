@@ -531,6 +531,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process mixed international companies batch
+  app.post("/api/admin/batch-process-mixed", async (req, res) => {
+    try {
+      const { processMixedInternationalBatch } = await import('./batchProcessor4');
+      const result = await processMixedInternationalBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Mixed international batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in mixed international batch processing:', error);
+      res.status(500).json({ error: 'Failed to process mixed international batch' });
+    }
+  });
+
+  // Process additional US companies batch
+  app.post("/api/admin/batch-process-additional-us", async (req, res) => {
+    try {
+      const { processAdditionalUSBatch } = await import('./batchProcessor4');
+      const result = await processAdditionalUSBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Additional US batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in additional US batch processing:', error);
+      res.status(500).json({ error: 'Failed to process additional US batch' });
+    }
+  });
+
+  // Process additional international companies batch
+  app.post("/api/admin/batch-process-additional-international", async (req, res) => {
+    try {
+      const { processAdditionalInternationalBatch } = await import('./batchProcessor5');
+      const result = await processAdditionalInternationalBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Additional international batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in additional international batch processing:', error);
+      res.status(500).json({ error: 'Failed to process additional international batch' });
+    }
+  });
+
+  // Process ETFs batch
+  app.post("/api/admin/batch-process-etfs", async (req, res) => {
+    try {
+      const { processETFsBatch } = await import('./batchProcessor5');
+      const result = await processETFsBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `ETFs batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in ETFs batch processing:', error);
+      res.status(500).json({ error: 'Failed to process ETFs batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

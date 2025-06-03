@@ -199,6 +199,32 @@ export class AlphaVantageService {
   }
 
   /**
+   * Fetch company overview data
+   */
+  async getCompanyOverview(symbol: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}?function=OVERVIEW&symbol=${symbol}&apikey=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data['Error Message']) {
+        throw new Error(data['Error Message']);
+      }
+
+      return data;
+    } catch (error) {
+      console.error(`Alpha Vantage overview error for ${symbol}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Fetch Simple Moving Average
    */
   async getSMA(symbol: string, interval = 'daily', timePeriod = 20): Promise<TechnicalIndicator[]> {

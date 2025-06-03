@@ -875,6 +875,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Start comprehensive financial analysis for all companies
+  app.post("/api/admin/comprehensive-analysis/start", async (req, res) => {
+    try {
+      const { comprehensiveAnalysisService } = await import('./comprehensiveAnalysisService');
+      const result = await comprehensiveAnalysisService.startComprehensiveAnalysis();
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error starting comprehensive analysis:', error);
+      res.status(500).json({ error: 'Failed to start comprehensive analysis' });
+    }
+  });
+
+  // Get comprehensive analysis progress
+  app.get("/api/admin/comprehensive-analysis/progress", async (req, res) => {
+    try {
+      const { comprehensiveAnalysisService } = await import('./comprehensiveAnalysisService');
+      const progress = comprehensiveAnalysisService.getBatchProgress();
+      
+      res.json(progress);
+    } catch (error) {
+      console.error('Error getting analysis progress:', error);
+      res.status(500).json({ error: 'Failed to get analysis progress' });
+    }
+  });
+
+  // Get comprehensive analysis results
+  app.get("/api/admin/comprehensive-analysis/results", async (req, res) => {
+    try {
+      const { comprehensiveAnalysisService } = await import('./comprehensiveAnalysisService');
+      const results = comprehensiveAnalysisService.getBatchResults();
+      
+      res.json(results);
+    } catch (error) {
+      console.error('Error getting analysis results:', error);
+      res.status(500).json({ error: 'Failed to get analysis results' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

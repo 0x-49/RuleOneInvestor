@@ -599,6 +599,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process crypto companies batch
+  app.post("/api/admin/batch-process-crypto", async (req, res) => {
+    try {
+      const { processCryptoBatch } = await import('./batchProcessor6');
+      const result = await processCryptoBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Crypto batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in crypto batch processing:', error);
+      res.status(500).json({ error: 'Failed to process crypto batch' });
+    }
+  });
+
+  // Process fintech companies batch
+  app.post("/api/admin/batch-process-fintech", async (req, res) => {
+    try {
+      const { processFintechBatch } = await import('./batchProcessor6');
+      const result = await processFintechBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Fintech batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in fintech batch processing:', error);
+      res.status(500).json({ error: 'Failed to process fintech batch' });
+    }
+  });
+
+  // Process healthcare companies batch
+  app.post("/api/admin/batch-process-healthcare", async (req, res) => {
+    try {
+      const { processHealthcareBatch } = await import('./batchProcessor6');
+      const result = await processHealthcareBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Healthcare batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in healthcare batch processing:', error);
+      res.status(500).json({ error: 'Failed to process healthcare batch' });
+    }
+  });
+
+  // Process energy companies batch
+  app.post("/api/admin/batch-process-energy", async (req, res) => {
+    try {
+      const { processEnergyBatch } = await import('./batchProcessor6');
+      const result = await processEnergyBatch();
+      
+      res.json({
+        companiesAdded: result.added,
+        companiesFailed: result.failed,
+        message: `Energy batch processing complete: ${result.added} companies added, ${result.failed} failed`
+      });
+    } catch (error) {
+      console.error('Error in energy batch processing:', error);
+      res.status(500).json({ error: 'Failed to process energy batch' });
+    }
+  });
+
   // Company analysis report endpoint
   app.get("/api/admin/company-analysis", async (req, res) => {
     try {

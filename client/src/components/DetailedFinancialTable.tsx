@@ -118,7 +118,7 @@ export default function DetailedFinancialTable({ metrics, metricType, title, uni
                 const isGrowthPositive = (data.yoyGrowth || 0) > 0;
                 
                 return (
-                  <tr key={data.year} className={`border-b hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                  <tr key={`${data.year}-${index}`} className={`border-b hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
                     <td className="p-3 font-medium">{data.year}</td>
                     <td className="text-right p-3 font-mono">{formatValue(data.value)}</td>
                     <td className={`text-right p-3 font-mono ${isGrowthPositive ? 'text-green-600' : 'text-red-600'}`}>

@@ -55,6 +55,14 @@ export const getQueryFn: <T>(options: {
 
     await throwIfResNotOk(res);
     
+    // Check content type before parsing
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await res.text();
+      console.error('Expected JSON but received:', contentType, text.substring(0, 200));
+      throw new Error(`Server returned ${contentType || 'unknown content type'} instead of JSON`);
+    }
+    
     // Check if response has content before parsing JSON
     const text = await res.text();
     if (!text) return null;
@@ -62,7 +70,7 @@ export const getQueryFn: <T>(options: {
     try {
       return JSON.parse(text);
     } catch (error) {
-      console.error('Failed to parse JSON response:', text);
+      console.error('Failed to parse JSON response:', text.substring(0, 200));
       throw new Error('Invalid JSON response from server');
     }
   };

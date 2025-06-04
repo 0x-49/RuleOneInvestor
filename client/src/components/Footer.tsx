@@ -85,10 +85,8 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerLinks.platform.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href}>
-                    <a className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                      {link.label}
-                    </a>
+                  <Link href={link.href} className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    {link.label}
                   </Link>
                 </li>
               ))}

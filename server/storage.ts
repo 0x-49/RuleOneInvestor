@@ -262,6 +262,7 @@ export class MemStorage implements IStorage {
       marginOfSafety: 0,
       qualityScore: 0,
       stickerPrice: 0,
+      marginOfSafetyPrice: 0,
       investmentStory: "Insufficient data for analysis"
     };
 
@@ -433,6 +434,7 @@ export class DatabaseStorage implements IStorage {
       .values({
         ...stock,
         symbol: stock.symbol.toUpperCase(),
+        lastUpdated: new Date(),
       })
       .returning();
     return newStock;

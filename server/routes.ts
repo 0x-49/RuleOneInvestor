@@ -7,6 +7,7 @@ import { alphaVantageService } from "./alphaVantageService";
 import { batchAnalysisService } from "./batchAnalysisService";
 import { companyDataParser } from "./companyDataParser";
 import { companyListProcessor } from "./companyListProcessor";
+import { processAndStoreStockData } from "./populateStockData";
 import { insertStockSchema, insertWatchlistItemSchema, insertValuationInputsSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -99,53 +100,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Force refresh financial data for a stock
-  app.post("/api/stocks/:symbol/refresh", async (req, res) => {
+  // Force refresh financial data for a stock, or add if new
+  app.post("/api/stocks/:symbol/refresh", async (req, res, next) => {
     try {
       const { symbol } = req.params;
+      if (!symbol || typeof symbol !== 'string') {
+        return res.status(400).json({ error: "Stock symbol parameter is required and must be a string." });
+      }
       const upperSymbol = symbol.toUpperCase();
       
-      // Get or create stock
-      let stock = await storage.getStock(upperSymbol);
-      if (!stock) {
-        const stockData = await financialDataService.fetchStockData(upperSymbol);
-        if (stockData) {
-          stock = await storage.createStock(stockData);
+      console.log(`Processing/refreshing data for ${upperSymbol} via API call...`);
+      
+      const success = await processAndStoreStockData(upperSymbol);
+      
+      if (success) {
+        // Fetch the potentially updated/new stock data to return it
+        const stockWithMetrics = await storage.getStockWithMetrics(upperSymbol);
+        if (stockWithMetrics) {
+            res.json({ 
+                message: `Stock data for ${upperSymbol} processed/refreshed successfully.`, 
+                stock: stockWithMetrics 
+            });
+        } else {
+            // This case should ideally not happen if processAndStoreStockData succeeded
+            // and the stock was indeed created/updated.
+            console.warn(`Stock ${upperSymbol} processed but not found immediately after.`) 
+            res.json({ 
+                message: `Stock data for ${upperSymbol} processed/refreshed, but encountered an issue fetching updated details.`, 
+            });
         }
-      }
-      
-      if (!stock) {
-        return res.status(404).json({ error: "Stock not found" });
-      }
-      
-      // Force fetch fresh financial metrics
-      console.log(`Force refreshing financial data for ${upperSymbol}`);
-      
-      // Clear existing metrics first to prevent duplicates
-      await storage.clearFinancialMetrics(stock.id);
-      
-      const freshMetrics = await financialDataService.fetchFinancialMetrics(upperSymbol, stock.id, false);
-      
-      if (freshMetrics.length > 0) {
-        // Store fresh metrics one by one to prevent duplicates
-        const storedMetrics: any[] = [];
-        for (const metric of freshMetrics) {
-          try {
-            const stored = await storage.createFinancialMetrics(metric);
-            storedMetrics.push(stored);
-          } catch (error) {
-            console.warn(`Skipped duplicate metric for ${upperSymbol} year ${metric.year}`);
-          }
-        }
-        
-        console.log(`Successfully refreshed ${storedMetrics.length} years of data for ${upperSymbol}`);
-        res.json({ message: "Financial data refreshed successfully", years: storedMetrics.length });
       } else {
-        res.status(400).json({ error: "No financial data could be retrieved" });
+        res.status(500).json({ error: `Failed to process/refresh stock data for ${upperSymbol}. Check server logs.` });
       }
-    } catch (error) {
-      console.error("Error refreshing stock data:", error);
-      res.status(500).json({ error: "Failed to refresh stock data" });
+    } catch (error) { // error is 'unknown'
+      // Log more informatively
+      if (error instanceof Error) {
+        console.error(`Error in /api/stocks/:symbol/refresh for ${req.params.symbol}: ${error.message}`, error.stack);
+      } else {
+        console.error(`An unknown error occurred in /api/stocks/:symbol/refresh for ${req.params.symbol}:`, error);
+      }
+      // Pass the error to the centralized error handler
+      next(error); 
     }
   });
 
@@ -389,9 +384,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   });
                   addedCount++;
                 }
-              } catch (error) {
-                console.error(`Failed to add company ${symbol}:`, error);
-                failures.push(`${symbol}: ${error.message}`);
+              } catch (error) { // error is 'unknown'
+                let errorMessage = 'Unknown error';
+                if (error instanceof Error) {
+                  console.error(`Failed to add company ${symbol}: ${error.message}`, error.stack);
+                  errorMessage = error.message;
+                } else {
+                  console.error(`Failed to add company ${symbol} (unknown error type):`, error);
+                }
+                failures.push(`${symbol}: ${errorMessage}`);
                 failedCount++;
               }
             }

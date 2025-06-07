@@ -259,7 +259,7 @@ IVSO	INVISIO AB
     return companies;
   }
 
-  /**
+  /** 
    * Determine exchange based on symbol patterns
    */
   private determineExchange(symbol: string): string {

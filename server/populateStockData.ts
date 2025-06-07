@@ -333,10 +333,10 @@ const populateStockData = async () => {
   console.log('\nStock data population script finished.');
 };
 
-populateStockData().catch(error => {
-  console.error('Unhandled error in populateStockData script:', error);
-  process.exit(1);
-});
+// populateStockData().catch(error => {
+//   console.error('Unhandled error in populateStockData script:', error);
+//   process.exit(1);
+// });
 
 // To run this script: npx tsx server/populateStockData.ts
 // Ensure your .env file has ALPHA_VANTAGE_PREMIUM_API_KEY

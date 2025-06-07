@@ -18,10 +18,6 @@
     },
     {
       "src": "/(.*)",
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
       "dest": "dist/index.js"
     }
   ]

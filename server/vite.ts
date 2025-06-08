@@ -23,7 +23,7 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true,
+    allowedHosts: true as const,
   };
 
   const vite = await createViteServer({
@@ -68,18 +68,44 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "dist", "public");
+  // Get the directory of the current module (e.g., /path/to/project/dist when running dist/index.js)
+  const currentModuleDir = path.dirname(new URL(import.meta.url).pathname);
+  // Resolve the path to the 'public' directory containing Vite's build output
+  const distPath = path.resolve(currentModuleDir, "public"); // Should be /path/to/project/dist/public
+
+  log(`Production mode: Attempting to serve static files from: ${distPath}`, "vite-prod-setup");
 
   if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
+    log(`Error: Static assets directory not found: ${distPath}. Ensure client is built and 'dist/public' exists.`, "vite-prod-setup");
+    // This is a critical error if the path is wrong or files are missing.
+    app.use("*", (_req, res) => {
+      res.status(500).send(`Server configuration error: Static assets path not found at ${distPath}. Please check server logs.`);
+    });
+    return; // Stop further middleware setup if base path is wrong
   }
 
+  log(`Serving static content from ${distPath}`, "vite-prod-setup");
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  // Fall through to index.html for SPA routing (handles client-side routes)
+  app.use("*", (req, res) => {
+    // This check is mostly a safeguard; API routes should be handled before this middleware.
+    // Vercel's routing also directs /api/* to dist/index.js, where API routes are registered first.
+    if (req.originalUrl.startsWith('/api/')) {
+      // This should ideally not be hit if API routes are correctly registered before static serving.
+      log(`Warning: SPA fallback received API-like path: ${req.originalUrl}`, "vite-prod-fallback");
+      res.status(404).send('API route not found within SPA fallback.');
+      return;
+    }
+
+    const indexPath = path.resolve(distPath, "index.html");
+    log(`SPA fallback: Attempting to serve ${indexPath} for ${req.originalUrl}`, "vite-prod-fallback");
+
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      log(`Error: index.html not found at ${indexPath} for SPA fallback.`, "vite-prod-fallback");
+      res.status(404).send(`SPA Fallback Error: Main application file (index.html) not found at ${indexPath}.`);
+    }
   });
 }

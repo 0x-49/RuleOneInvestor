@@ -1,15 +1,24 @@
 ---
 // src/components/ui/DropdownMenuTrigger.astro
-import { DropdownMenuTrigger as ReactDropdownMenuTrigger } from '@client/components/ui/dropdown-menu';
+import { cn } from '../../lib/utils';
 
 export interface Props {
-  asChild?: boolean | undefined;
-  children?: any;
-  [key: string]: any;
+  class?: string;
+  disabled?: boolean;
 }
 
-const astroProps = Astro.props;
+const { class: className, disabled = false } = Astro.props;
 ---
-<ReactDropdownMenuTrigger {...astroProps} client:only="react">
+
+<button 
+  type="button" 
+  class={cn(
+    'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50', 
+    className
+  )}
+  data-dropdown-trigger
+  aria-expanded="false"
+  disabled={disabled}
+>
   <slot />
-</ReactDropdownMenuTrigger>
+</button>

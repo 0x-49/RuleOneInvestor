@@ -1,0 +1,15 @@
+---
+export interface Props {
+  class?: string;
+  [key: string]: any;
+}
+
+const { class: className = '', ...rest } = Astro.props;
+
+const baseClasses = 'text-sm text-muted-foreground';
+const classes = [baseClasses, className].filter(Boolean).join(' ');
+---
+
+<p class={classes} {...rest}>
+  <slot />
+</p>

@@ -4,10 +4,12 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import node from '@astrojs/node';
 import mdx from '@astrojs/mdx';
+import remarkToc from 'remark-toc';
+import path from 'path';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',  // Using static output for simpler deployment
+  output: 'server',  // Changed to 'server' for compatibility with Node adapter
   integrations: [
     react(), 
     tailwind({
@@ -16,8 +18,8 @@ export default defineConfig({
     }),
     mdx({
       // MDX options for blog content
-      remarkPlugins: ['remark-toc'],
-      drafts: true, // Allow draft posts during development
+      remarkPlugins: [remarkToc]
+      // Note: The 'drafts' option was removed as it's not a valid MDX option
     })
   ],
   vite: {
@@ -27,7 +29,7 @@ export default defineConfig({
       minify: 'terser',
       // Configure external packages that shouldn't be bundled
       rollupOptions: {
-        external: ['ws']
+        external: ['ws', 'dotenv', 'dotenv/config', 'axios', '@google/generative-ai']
       },
     },
     // Better error messages during development
@@ -39,10 +41,11 @@ export default defineConfig({
     // Resolve paths like @shared and @server
     resolve: {
       alias: {
-        '@shared': '/src/shared',
-        '@server': '/src/server',
-        '@client': '/src/client',
-        '@components': '/src/components',
+        '@server': path.resolve('./src/server'),
+        '@shared': path.resolve('./src/shared'),
+        '@client': path.resolve('./src/client/src'),
+        '@components': path.resolve('./src/components'),
+        '@layouts': path.resolve('./src/layouts'),
       }
     }
   },

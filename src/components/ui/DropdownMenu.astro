@@ -1,17 +1,96 @@
 ---
 // src/components/ui/DropdownMenu.astro
-import { DropdownMenu as ReactDropdownMenu } from '@client/components/ui/dropdown-menu';
+import { cn } from '../../lib/utils';
 
-// Props for DropdownMenu are typically related to its open state, modal behavior, etc.
-// These are often handled by the component itself or through context.
-// For a simple wrapper, we might not need to explicitly define many props here unless overriding defaults.
-export interface Props {
-  children?: any;
-  [key: string]: any;
+interface Props {
+  class?: string;
+  id?: string;
 }
 
-const astroProps = Astro.props;
+const { class: className, id = `dropdown-${Math.random().toString(36).slice(2, 11)}` } = Astro.props;
 ---
-<ReactDropdownMenu {...astroProps} client:only="react">
+
+<div class={cn('dropdown-menu-root relative inline-block text-left', className)} id={id}>
   <slot />
-</ReactDropdownMenu>
+</div>
+
+<script>
+  class DropdownController {
+    root: HTMLElement;
+    trigger: HTMLElement | null;
+    content: HTMLElement | null;
+    isOpen: boolean = false;
+    
+    constructor(root: HTMLElement) {
+      this.root = root;
+      this.trigger = root.querySelector('[data-dropdown-trigger]');
+      this.content = root.querySelector('[data-dropdown-content]');
+      this.isOpen = false;
+      
+      this.init();
+    }
+    
+    init() {
+      if (!this.trigger || !this.content) return;
+      
+      this.trigger.addEventListener('click', () => this.toggle());
+      
+      // Close when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!this.root.contains(e.target as Node) && this.isOpen) {
+          this.close();
+        }
+      });
+      
+      // Close on ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.close();
+        }
+      });
+    }
+    
+    toggle() {
+      this.isOpen ? this.close() : this.open();
+    }
+    
+    open() {
+      if (!this.content) return;
+      this.content.classList.remove('hidden');
+      this.content.setAttribute('data-state', 'open');
+      this.isOpen = true;
+      
+      // Position the dropdown
+      this.position();
+    }
+    
+    close() {
+      if (!this.content) return;
+      this.content.classList.add('hidden');
+      this.content.setAttribute('data-state', 'closed');
+      this.isOpen = false;
+    }
+    
+    position() {
+      if (!this.trigger || !this.content) return;
+      
+      // Simple positioning logic - can be enhanced for more complex scenarios
+      const triggerRect = this.trigger.getBoundingClientRect();
+      
+      // Position below trigger by default
+      this.content.style.position = 'absolute';
+      this.content.style.top = `${triggerRect.height}px`;
+      this.content.style.left = '0';
+      this.content.style.width = 'max-content';
+      this.content.style.zIndex = '50';
+    }
+  }
+  
+  // Initialize all dropdown menus
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropdowns = document.querySelectorAll('.dropdown-menu-root');
+    dropdowns.forEach(dropdown => {
+      new DropdownController(dropdown as HTMLElement);
+    });
+  });
+</script>

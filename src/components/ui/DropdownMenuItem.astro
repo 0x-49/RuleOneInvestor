@@ -1,16 +1,32 @@
 ---
 // src/components/ui/DropdownMenuItem.astro
-import { DropdownMenuItem as ReactDropdownMenuItem } from '@client/components/ui/dropdown-menu';
+import { cn } from '../../lib/utils';
 
 export interface Props {
-  inset?: boolean | undefined;
-  disabled?: boolean | undefined;
-  children?: any;
-  [key: string]: any;
+  class?: string;
+  inset?: boolean;
+  disabled?: boolean;
+  onSelect?: string;
+  href?: string;
 }
 
-const astroProps = Astro.props;
+const { class: className, inset = false, disabled = false, onSelect, href } = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+const hrefAttr = href ? { href } : {};
 ---
-<ReactDropdownMenuItem {...astroProps} client:only="react">
+
+<Tag
+  class={cn(
+    'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+    inset && 'pl-8',
+    className
+  )}
+  role="menuitem"
+  data-dropdown-item
+  {...onSelect ? { 'data-select': onSelect } : {}}
+  {...(disabled ? { 'data-disabled': true } : {})}
+  {...hrefAttr}
+>
   <slot />
-</ReactDropdownMenuItem>
+</Tag>

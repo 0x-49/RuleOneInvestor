@@ -1,0 +1,24 @@
+---
+export interface Props {
+  class?: string;
+  for?: string;
+  [key: string]: any;
+}
+
+const { 
+  class: className = '',
+  for: forAttribute,
+  ...rest 
+} = Astro.props;
+
+const baseClasses = 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
+const classes = [baseClasses, className].filter(Boolean).join(' ');
+---
+
+<label 
+  class={classes}
+  for={forAttribute}
+  {...rest}
+>
+  <slot />
+</label>

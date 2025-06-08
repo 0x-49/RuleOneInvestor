@@ -1,0 +1,112 @@
+---
+export interface Props {
+  class?: string;
+  defaultValue?: string;
+  id?: string;
+  [key: string]: any;
+}
+
+const { 
+  class: className = '',
+  defaultValue,
+  id,
+  ...rest 
+} = Astro.props;
+
+const baseClasses = 'w-full';
+const classes = [baseClasses, className].filter(Boolean).join(' ');
+---
+
+<div 
+  class={classes}
+  data-default-value={defaultValue}
+  id={id}
+  {...rest}
+>
+  <slot />
+</div>
+
+<script>
+  // Client-side tabs functionality
+  class Tabs {
+    container: HTMLElement;
+    defaultTab: string | null;
+    tabListElement: HTMLElement | null;
+    triggerElements: HTMLElement[];
+    contentElements: HTMLElement[];
+    
+    constructor(container: HTMLElement) {
+      this.container = container;
+      this.defaultTab = container.dataset.defaultValue || null;
+      this.tabListElement = container.querySelector('[role="tablist"]');
+      this.triggerElements = Array.from(container.querySelectorAll('[role="tab"]'));
+      this.contentElements = Array.from(container.querySelectorAll('[role="tabpanel"]'));
+      
+      this.init();
+    }
+    
+    init() {
+      // Set initial active tab or first tab if none specified
+      const initialTab = this.defaultTab || (this.triggerElements[0]?.id.replace('tab-', ''));
+      if (initialTab) {
+        this.showTab(initialTab);
+      }
+      
+      // Add click handlers to tab triggers
+      this.triggerElements.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const tabId = trigger.id.replace('tab-', '');
+          this.showTab(tabId);
+        });
+      });
+    }
+    
+    showTab(tabId: string) {
+      // Update trigger states
+      this.triggerElements.forEach(trigger => {
+        const isActive = trigger.id === `tab-${tabId}`;
+        trigger.setAttribute('aria-selected', isActive.toString());
+        trigger.classList.toggle('active-tab', isActive);
+        
+        // Apply active styles
+        if (isActive) {
+          trigger.classList.remove('border-transparent', 'text-slate-500');
+          trigger.classList.add('border-primary', 'text-primary');
+        } else {
+          trigger.classList.add('border-transparent', 'text-slate-500');
+          trigger.classList.remove('border-primary', 'text-primary');
+        }
+      });
+      
+      // Update content visibility
+      this.contentElements.forEach(content => {
+        const isActive = content.id === `content-${tabId}`;
+        content.classList.toggle('hidden', !isActive);
+      });
+    }
+  }
+  
+  // Initialize all tabs on the page
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-default-value]').forEach(container => {
+      if (container instanceof HTMLElement) {
+        new Tabs(container);
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Tabs styling */
+  [role="tab"] {
+    @apply px-4 py-2 font-medium border-b-2 transition-colors duration-200;
+  }
+  
+  [role="tab"][aria-selected="true"] {
+    @apply border-primary text-primary;
+  }
+  
+  [role="tab"][aria-selected="false"] {
+    @apply border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300;
+  }
+</style>

@@ -1,6 +1,9 @@
 ---
-import { Card, CardContent, CardHeader, CardTitle } from '../client/src/components/ui/card'; // Assuming UI components are React
-import { Badge } from '../client/src/components/ui/badge'; // Assuming UI components are React
+import Card from './ui/card.astro';
+import CardContent from './ui/card-content.astro';
+import CardHeader from './ui/card-header.astro';
+import CardTitle from './ui/card-title.astro';
+import Badge from './ui/Badge.astro';
 
 interface FinancialMetrics {
   year: string;
@@ -70,9 +73,9 @@ const formatGrowth = (growth: number | null) => {
 };
 ---
 
-<Card className="mt-4">
+<Card class="mt-4">
   <CardHeader>
-    <CardTitle className="text-lg">{title} - Historical Data & Analysis</CardTitle>
+    <CardTitle class="text-lg">{title} - Historical Data & Analysis</CardTitle>
   </CardHeader>
   <CardContent>
     {/* Summary Statistics */}
@@ -153,7 +156,7 @@ const formatGrowth = (growth: number | null) => {
           </div>
         </div>
         <div class="text-right">
-          <Badge variant={(growthRate || 0) >= 10 ? "default" : "destructive"} className="text-lg px-4 py-2">
+          <Badge variant={(growthRate || 0) >= 10 ? "default" : "destructive"} class="text-lg px-4 py-2">
             {(growthRate || 0) >= 10 ? "PASSES" : "FAILS"}
           </Badge>
         </div>

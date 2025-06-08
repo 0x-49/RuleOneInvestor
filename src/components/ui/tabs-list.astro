@@ -1,0 +1,28 @@
+---
+export interface Props {
+  class?: string;
+  [key: string]: any;
+}
+
+const { 
+  class: className = '',
+  ...rest 
+} = Astro.props;
+
+const baseClasses = 'flex border-b mb-6';
+const classes = [baseClasses, className].filter(Boolean).join(' ');
+---
+
+<div 
+  class={classes}
+  role="tablist"
+  {...rest}
+>
+  <slot />
+</div>
+
+<style>
+  div[role="tablist"] {
+    @apply flex h-10 items-center;
+  }
+</style>

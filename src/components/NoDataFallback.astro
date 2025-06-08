@@ -1,16 +1,14 @@
 ---
-import { Card, CardContent } from '../client/src/components/ui/card'; // Assuming UI components are React
-import { Button } from '../client/src/components/ui/button'; // Assuming UI components are React
-import { AlertCircle, RefreshCw, Play } from 'lucide-react'; // Keep for now, will address later
+import Card from './ui/card.astro';
+import CardContent from './ui/card-content.astro';
+import Button from './ui/button.astro';
 
 interface Props {
   symbol: string;
-  onRefresh: () => void;
-  onQuickAnalysis: () => void;
   isRefreshing?: boolean;
 }
 
-const { symbol, onRefresh, onQuickAnalysis, isRefreshing = false } = Astro.props;
+const { symbol, isRefreshing = false } = Astro.props;
 ---
 
 <div class="text-center py-12">
@@ -18,7 +16,11 @@ const { symbol, onRefresh, onQuickAnalysis, isRefreshing = false } = Astro.props
     <CardContent>
       <div class="flex flex-col items-center space-y-6">
         <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-          <AlertCircle className="h-8 w-8 text-gray-400" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8 text-gray-400">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
         </div>
 
         <div class="space-y-2">
@@ -35,21 +37,18 @@ const { symbol, onRefresh, onQuickAnalysis, isRefreshing = false } = Astro.props
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
-          <Button
-            onClick={onQuickAnalysis}
-            className="flex items-center space-x-2"
-          >
-            <Play className="h-4 w-4" />
+          <Button data-action="quick-analysis" class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
             <span>Quick Analysis</span>
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className="flex items-center space-x-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <Button data-action="refresh" variant="outline" disabled={isRefreshing} class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}">
+              <path d="M23 4v6h-6"></path>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
             <span>{isRefreshing ? 'Refreshing...' : 'Refresh Data'}</span>
           </Button>
         </div>
@@ -61,3 +60,72 @@ const { symbol, onRefresh, onQuickAnalysis, isRefreshing = false } = Astro.props
     </CardContent>
   </Card>
 </div>
+
+<script define:vars={{ symbol }}>
+  // Add client-side interactivity
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    // Quick analysis button functionality
+    const quickAnalysisBtn = document.querySelector('[data-action="quick-analysis"]');
+    if (quickAnalysisBtn) {
+      
+      quickAnalysisBtn.addEventListener('click', async () => {
+        try {
+          const response = await fetch(`/api/stocks/${symbol}/quick-analysis`, {
+            
+            method: 'POST',
+            headers: {
+              
+              'Content-Type': 'application/json'
+            
+            }
+          
+          });
+          
+          if (response.ok) {
+            // Reload the page to show updated data
+            window.location.reload();
+          } else {
+            console.error('Quick analysis failed');
+          }
+        } catch (error) {
+          console.error('Error performing quick analysis:', error);
+        }
+      });
+    }
+    
+    // Refresh data button functionality
+    const refreshBtn = document.querySelector('[data-action="refresh"]');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', async () => {
+        try {
+          refreshBtn.disabled = true;
+          refreshBtn.querySelector('span').textContent = 'Refreshing...';
+          refreshBtn.querySelector('svg').classList.add('animate-spin');
+          
+          const response = await fetch(`/api/stocks/${symbol}/refresh`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            // Reload the page to show updated data
+            window.location.reload();
+          } else {
+            console.error('Data refresh failed');
+            refreshBtn.disabled = false;
+            refreshBtn.querySelector('span').textContent = 'Refresh Data';
+            refreshBtn.querySelector('svg').classList.remove('animate-spin');
+          }
+        } catch (error) {
+          console.error('Error refreshing data:', error);
+          refreshBtn.disabled = false;
+          refreshBtn.querySelector('span').textContent = 'Refresh Data';
+          refreshBtn.querySelector('svg').classList.remove('animate-spin');
+        }
+      });
+    }
+  });
+</script>

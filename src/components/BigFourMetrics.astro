@@ -1,6 +1,9 @@
 ---
-import ReactBigFourMetrics from '../client/src/components/BigFourMetrics'; // Assuming BigFourMetrics is a React component
-import type { StockWithMetrics } from '@shared/schema'; // Import the type
+import type { StockWithMetrics } from '../shared/schema';
+import Card from './ui/card.astro';
+import CardHeader from './ui/card-header.astro';
+import CardTitle from './ui/card-title.astro';
+import CardContent from './ui/card-content.astro';
 
 interface Props {
   stockData?: StockWithMetrics;
@@ -9,6 +12,226 @@ interface Props {
 }
 
 const { stockData, isLoading, symbol } = Astro.props;
+
+// Helper functions for metrics formatting and evaluation
+const formatPercentage = (value: number) => {
+  return `${(value * 100).toFixed(2)}%`;
+};
+
+const formatGrowthRate = (rate: number | null | undefined) => {
+  if (rate === null || rate === undefined) return 'N/A';
+  return formatPercentage(rate);
+};
+
+const getGrowthClass = (rate: number | null | undefined) => {
+  if (rate === null || rate === undefined) return 'text-gray-500';
+  if (rate >= 0.10) return 'text-green-600'; // >= 10%
+  if (rate >= 0.05) return 'text-green-500'; // >= 5%
+  if (rate >= 0) return 'text-amber-500';    // >= 0%
+  return 'text-red-500';                     // < 0%
+};
+
+const getMetricStatus = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return 'unknown';
+  if (value >= 0.10) return 'excellent';
+  if (value >= 0.05) return 'good';
+  if (value >= 0) return 'fair';
+  return 'poor';
+};
+
+// Extract Big Four metrics if data is available
+const salesGrowth = stockData?.financialMetrics?.salesGrowthRate;
+const epsgGrowth = stockData?.financialMetrics?.epsGrowthRate;
+const equityGrowth = stockData?.financialMetrics?.bookValueGrowthRate;
+const fcfGrowth = stockData?.financialMetrics?.freeCashFlowGrowthRate;
+
+// Calculate overall health score (0-100)
+let healthScore = 0;
+let availableMetrics = 0;
+
+if (salesGrowth !== null && salesGrowth !== undefined) {
+  healthScore += salesGrowth >= 0.10 ? 25 : (salesGrowth >= 0.05 ? 15 : (salesGrowth >= 0 ? 10 : 0));
+  availableMetrics++;
+}
+
+if (epsgGrowth !== null && epsgGrowth !== undefined) {
+  healthScore += epsgGrowth >= 0.10 ? 25 : (epsgGrowth >= 0.05 ? 15 : (epsgGrowth >= 0 ? 10 : 0));
+  availableMetrics++;
+}
+
+if (equityGrowth !== null && equityGrowth !== undefined) {
+  healthScore += equityGrowth >= 0.10 ? 25 : (equityGrowth >= 0.05 ? 15 : (equityGrowth >= 0 ? 10 : 0));
+  availableMetrics++;
+}
+
+if (fcfGrowth !== null && fcfGrowth !== undefined) {
+  healthScore += fcfGrowth >= 0.10 ? 25 : (fcfGrowth >= 0.05 ? 15 : (fcfGrowth >= 0 ? 10 : 0));
+  availableMetrics++;
+}
+
+// Normalize the score based on available metrics
+const finalHealthScore = availableMetrics > 0 ? Math.round((healthScore / (availableMetrics * 25)) * 100) : 0;
+
+// Overall evaluation
+let overallStatus = 'Unknown';
+if (availableMetrics > 0) {
+  if (finalHealthScore >= 80) overallStatus = 'Excellent';
+  else if (finalHealthScore >= 60) overallStatus = 'Good';
+  else if (finalHealthScore >= 40) overallStatus = 'Fair';
+  else overallStatus = 'Poor';
+}
+
+// Get color class for overall status
+const getOverallStatusClass = () => {
+  switch(overallStatus.toLowerCase()) {
+    case 'excellent': return 'text-green-600';
+    case 'good': return 'text-green-500';
+    case 'fair': return 'text-amber-500';
+    case 'poor': return 'text-red-500';
+    default: return 'text-gray-500';
+  }
+};
 ---
 
-<ReactBigFourMetrics client:only="react" stockData={stockData} isLoading={isLoading} symbol={symbol} />
+<Card>
+  <CardHeader>
+    <CardTitle>
+      <div class="flex justify-between items-center">
+        <span>Big Four Growth Metrics</span>
+        {!isLoading && stockData && (
+          <span class={`text-lg font-bold ${getOverallStatusClass()}`}>
+            {overallStatus}
+          </span>
+        )}
+      </div>
+    </CardTitle>
+  </CardHeader>
+  
+  <CardContent>
+    {isLoading ? (
+      <div class="flex justify-center items-center h-48">
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+          <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+        </div>
+      </div>
+    ) : symbol && !stockData ? (
+      <div class="flex flex-col items-center justify-center h-48 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium">No data available</h3>
+        <p class="mt-1 text-sm text-gray-500">We couldn't find financial metrics for {symbol}.</p>
+      </div>
+    ) : !symbol ? (
+      <div class="flex flex-col items-center justify-center h-48 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium">Search for a stock</h3>
+        <p class="mt-1 text-sm text-gray-500">Enter a stock symbol to view financial metrics.</p>
+      </div>
+    ) : (
+      <div>
+        <!-- Health Score Gauge -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-600">Overall Health</span>
+            <span class="text-sm font-bold">{finalHealthScore}%</span>
+          </div>
+          <div class="h-3 w-full bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              class={`h-full rounded-full ${finalHealthScore >= 80 ? 'bg-green-600' : 
+                                             finalHealthScore >= 60 ? 'bg-green-500' : 
+                                             finalHealthScore >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
+              style={`width: ${finalHealthScore}%`}
+            ></div>
+          </div>
+        </div>
+        
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Sales Growth -->
+          <div class="border rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-600 mb-1">Sales Growth (CAGR)</h4>
+            <div class="flex justify-between items-center">
+              <span class={`text-xl font-bold ${getGrowthClass(salesGrowth)}`}>
+                {formatGrowthRate(salesGrowth)}
+              </span>
+              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
+                        ${getMetricStatus(salesGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
+                          getMetricStatus(salesGrowth) === 'good' ? 'bg-green-50 text-green-700' :
+                          getMetricStatus(salesGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
+                          getMetricStatus(salesGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
+                          'bg-gray-100 text-gray-700'}"
+              >
+                {getMetricStatus(salesGrowth) !== 'unknown' ? getMetricStatus(salesGrowth) : 'N/A'}
+              </span>
+            </div>
+          </div>
+          
+          <!-- EPS Growth -->
+          <div class="border rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-600 mb-1">EPS Growth (CAGR)</h4>
+            <div class="flex justify-between items-center">
+              <span class={`text-xl font-bold ${getGrowthClass(epsgGrowth)}`}>
+                {formatGrowthRate(epsgGrowth)}
+              </span>
+              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
+                        ${getMetricStatus(epsgGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
+                          getMetricStatus(epsgGrowth) === 'good' ? 'bg-green-50 text-green-700' :
+                          getMetricStatus(epsgGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
+                          getMetricStatus(epsgGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
+                          'bg-gray-100 text-gray-700'}"
+              >
+                {getMetricStatus(epsgGrowth) !== 'unknown' ? getMetricStatus(epsgGrowth) : 'N/A'}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Equity (Book Value) Growth -->
+          <div class="border rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-600 mb-1">Book Value Growth (CAGR)</h4>
+            <div class="flex justify-between items-center">
+              <span class={`text-xl font-bold ${getGrowthClass(equityGrowth)}`}>
+                {formatGrowthRate(equityGrowth)}
+              </span>
+              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
+                        ${getMetricStatus(equityGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
+                          getMetricStatus(equityGrowth) === 'good' ? 'bg-green-50 text-green-700' :
+                          getMetricStatus(equityGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
+                          getMetricStatus(equityGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
+                          'bg-gray-100 text-gray-700'}"
+              >
+                {getMetricStatus(equityGrowth) !== 'unknown' ? getMetricStatus(equityGrowth) : 'N/A'}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Free Cash Flow Growth -->
+          <div class="border rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-600 mb-1">FCF Growth (CAGR)</h4>
+            <div class="flex justify-between items-center">
+              <span class={`text-xl font-bold ${getGrowthClass(fcfGrowth)}`}>
+                {formatGrowthRate(fcfGrowth)}
+              </span>
+              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
+                        ${getMetricStatus(fcfGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
+                          getMetricStatus(fcfGrowth) === 'good' ? 'bg-green-50 text-green-700' :
+                          getMetricStatus(fcfGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
+                          getMetricStatus(fcfGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
+                          'bg-gray-100 text-gray-700'}"
+              >
+                {getMetricStatus(fcfGrowth) !== 'unknown' ? getMetricStatus(fcfGrowth) : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 text-xs text-gray-500 italic">
+          <p>Rule #1 metrics provide insight into the company's long-term growth consistency.</p>
+          <p>* CAGR = Compound Annual Growth Rate over the past 10 years</p>
+        </div>
+      </div>
+    )}
+  </CardContent>
+</Card>

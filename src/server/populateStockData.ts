@@ -1,5 +1,9 @@
 // server/populateStockData.ts
-import 'dotenv/config';
+// Import dotenv directly instead of using the config shorthand
+import * as dotenv from 'dotenv';
+
+// Initialize dotenv
+dotenv.config();
 import { db } from './db'; // Adjusted path: assuming db.ts is in the same server/ directory
 import * as schema from '../shared/schema'; // Adjusted path: schema.ts is in shared/, one level up from server/
 import { eq, and } from 'drizzle-orm';

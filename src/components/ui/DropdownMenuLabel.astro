@@ -1,0 +1,23 @@
+---
+// src/components/ui/DropdownMenuLabel.astro
+import { cn } from '../../lib/utils';
+
+export interface Props {
+  class?: string;
+  inset?: boolean;
+}
+
+const { class: className, inset = false } = Astro.props;
+---
+
+<div
+  class={cn(
+    'px-2 py-1.5 text-sm font-semibold',
+    inset && 'pl-8',
+    className
+  )}
+  role="menuitem"
+  data-dropdown-label
+>
+  <slot />
+</div>

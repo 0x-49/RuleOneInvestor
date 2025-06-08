@@ -15,10 +15,8 @@ export const POST: APIRoute = async ({ params, request }) => {
     // Dynamically import the correct batch processor module
     let batchProcessorModule;
     try {
-      // Assuming batch processor files are named like batchProcessor.ts, batchProcessor2.ts, etc.
-      // and functions are named like processBatch, processIndianBatch, etc.
-      // This mapping might need refinement based on actual function names and file structure.
-      batchProcessorModule = await import(`@server/${processorName}`); // Use path alias
+      // Import with explicit file extension for dynamic imports
+      batchProcessorModule = await import(`../../../../../../src/server/${processorName}.js`); // Use relative path with .js extension
     } catch (importError) {
       console.error(`Failed to import batch processor module ${processorName}:`, importError);
       return new Response(JSON.stringify({ error: `Batch processor module "${processorName}" not found.` }), {

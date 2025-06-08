@@ -1,18 +1,61 @@
 ---
 // src/components/ui/Button.astro
-import { Button as ReactButton } from '@client/components/ui/button';
-
-// Define the props for the Astro component. These should match the React component's props.
 export interface Props {
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | null | undefined;
-  size?: 'default' | 'sm' | 'lg' | 'icon' | null | undefined;
-  asChild?: boolean | undefined;
-  children?: any; // To allow content projection
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  class?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
   [key: string]: any; // Allow any other props to be passed through
 }
 
-const astroProps = Astro.props;
+const { 
+  variant = 'default', 
+  size = 'default', 
+  class: className = '',
+  type = 'button',
+  disabled = false,
+  ...rest 
+} = Astro.props;
+
+// Build the class string based on variants
+const getVariantClasses = () => {
+  const variants = {
+    default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+    ghost: 'hover:bg-accent hover:text-accent-foreground',
+    link: 'text-primary underline-offset-4 hover:underline',
+  } as const;
+  
+  const safeVariant = variant ? (variants[variant as keyof typeof variants] || variants.default) : variants.default;
+  return safeVariant;
+};
+
+const getSizeClasses = () => {
+  const sizes = {
+    default: 'h-10 px-4 py-2',
+    sm: 'h-9 rounded-md px-3',
+    lg: 'h-11 rounded-md px-8',
+    icon: 'h-10 w-10',
+  } as const;
+  
+  const safeSize = size ? (sizes[size as keyof typeof sizes] || sizes.default) : sizes.default;
+  return safeSize;
+};
+
+const classes = [
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md',
+  'text-sm font-medium ring-offset-background transition-colors',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+  'disabled:pointer-events-none disabled:opacity-50',
+  getVariantClasses(),
+  getSizeClasses(),
+  className
+].filter(Boolean).join(' ');
 ---
-<ReactButton {...astroProps} client:only="react">
+
+<button class={classes} type={type} disabled={disabled} {...rest}>
   <slot />
-</ReactButton>
+</button>

@@ -1,0 +1,18 @@
+---
+export interface Props {
+  class?: string;
+  tag?: string;
+  [key: string]: any;
+}
+
+const { class: className = '', tag = 'h3', ...rest } = Astro.props;
+
+const baseClasses = 'text-2xl font-semibold leading-none tracking-tight';
+const classes = [baseClasses, className].filter(Boolean).join(' ');
+
+const Tag = tag;
+---
+
+<Tag class={classes} {...rest}>
+  <slot />
+</Tag>

@@ -1,6 +1,11 @@
 ---
-import ReactRuleOneAnalysis from '../client/src/components/RuleOneAnalysis'; // Assuming RuleOneAnalysis is a React component
-import type { StockWithMetrics } from '@shared/schema'; // Import the type
+import Card from './ui/card.astro';
+import CardContent from './ui/card-content.astro';
+import CardHeader from './ui/card-header.astro';
+import CardTitle from './ui/card-title.astro';
+import Badge from './ui/Badge.astro';
+import Progress from './ui/progress.astro';
+import NoDataFallback from './NoDataFallback.astro';
 
 interface RuleOneData {
   salesGrowth: number | null;
@@ -23,6 +28,206 @@ interface Props {
 }
 
 const { ruleOneData, currentPrice, symbol } = Astro.props;
+
+const {
+  salesGrowth,
+  epsGrowth,
+  equityGrowth,
+  fcfGrowth,
+  roic,
+  debtPayoffYears,
+  stickerPrice,
+  marginOfSafetyPrice,
+  isExcellent,
+  qualityScore,
+  investmentStory
+} = ruleOneData;
+
+// Check if we have no meaningful data
+const hasData = salesGrowth !== null || epsGrowth !== null || equityGrowth !== null || fcfGrowth !== null;
+
+// Helper functions
+const formatPercentage = (value: number | null) => {
+  if (value === null) return "N/A";
+  return `${value.toFixed(1)}%`;
+};
+
+const formatPrice = (value: number | null) => {
+  if (value === null) return "N/A";
+  return `$${value.toFixed(2)}`;
+};
+
+const getGrowthStatus = (value: number | null, target: number = 10) => {
+  if (value === null) return "neutral";
+  return value >= target ? "excellent" : value >= 5 ? "fair" : "poor";
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "excellent": return "text-green-600 bg-green-50";
+    case "fair": return "text-yellow-600 bg-yellow-50";
+    case "poor": return "text-red-600 bg-red-50";
+    default: return "text-gray-600 bg-gray-50";
+  }
+};
+
+const getValuationSignal = () => {
+  if (!stickerPrice || !marginOfSafetyPrice) return null;
+  
+  if (currentPrice <= marginOfSafetyPrice) {
+    return { signal: "BUY", color: "text-green-600 bg-green-50" };
+  } else if (currentPrice <= stickerPrice) {
+    return { signal: "HOLD", color: "text-yellow-600 bg-yellow-50" };
+  } else {
+    return { signal: "AVOID", color: "text-red-600 bg-red-50" };
+  }
+};
+
+const valuationSignal = getValuationSignal();
+
+const bigFourMetrics = [
+  { name: "Sales Growth", value: salesGrowth, icon: "TrendingUp", target: 10 },
+  { name: "EPS Growth", value: epsGrowth, icon: "DollarSign", target: 10 },
+  { name: "Equity Growth", value: equityGrowth, icon: "BarChart3", target: 10 },
+  { name: "FCF Growth", value: fcfGrowth, icon: "TrendingUp", target: 10 }
+];
 ---
 
-<ReactRuleOneAnalysis client:only="react" ruleOneData={ruleOneData} currentPrice={currentPrice} symbol={symbol} />
+{!hasData && qualityScore === 0 ? (
+  <NoDataFallback symbol={symbol} />
+) : (
+  <div class="space-y-6">
+    {/* Rule One Quality Overview */}
+    <Card>
+      <CardHeader>
+        <CardTitle class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+          </svg>
+          Rule One Quality Assessment
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="text-center">
+            <div class={`text-2xl font-bold ${isExcellent ? 'text-green-600' : 'text-red-600'}`}>
+              {isExcellent ? "EXCELLENT" : "CAUTION"}
+            </div>
+            <div class="text-sm text-gray-600">Overall Quality</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-blue-600">{qualityScore}/100</div>
+            <div class="text-sm text-gray-600">Quality Score</div>
+            <Progress value={qualityScore} />
+          </div>
+          <div class="text-center">
+            {valuationSignal && (
+              <>
+                <Badge class={valuationSignal.color}>
+                  {valuationSignal.signal === "BUY" ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                    </svg>
+                  ) : valuationSignal.signal === "HOLD" ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <circle cx="12" cy="12" r="6"></circle>
+                      <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1">
+                      <line x1="3" x2="21" y1="6" y2="18"></line>
+                      <line x1="3" x2="21" y1="18" y2="6"></line>
+                    </svg>
+                  )}
+                  {valuationSignal.signal}
+                </Badge>
+                <div class="text-sm text-gray-600 mt-1">Investment Signal</div>
+              </>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Big Four Growth Metrics */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Phil Town's "Big Four" Growth Analysis</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {bigFourMetrics.map((metric) => {
+            const status = getGrowthStatus(metric.value, metric.target);
+            
+            return (
+              <div class={`p-4 rounded-lg border ${getStatusColor(status)}`}>
+                <div class="flex items-center justify-between mb-2">
+                  {metric.icon === "TrendingUp" ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                      <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                  ) : metric.icon === "DollarSign" ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+                      <path d="M3 3v18h18"></path>
+                      <path d="M18 17V9"></path>
+                      <path d="M13 17V5"></path>
+                      <path d="M8 17v-3"></path>
+                    </svg>
+                  )}
+                  <span class="text-xs font-medium">10Y CAGR</span>
+                </div>
+                <div class="text-2xl font-bold mb-1">
+                  {formatPercentage(metric.value)}
+                </div>
+                <div class="text-sm font-medium">{metric.name}</div>
+                <div class="text-xs mt-1">
+                  Target: ≥{metric.target}%
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Financial Quality Metrics */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Financial Quality Indicators</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium">Return on Invested Capital (ROIC)</span>
+                <span class={`text-lg font-bold ${(roic ?? 0) >= 10 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatPercentage(roic)}
+                </span>
+              </div>
+              <div class="text-xs text-gray-600">Rule One Target: ≥10%</div>
+              {roic && <Progress value={Math.min(roic, 50)} class="mt-2" />}
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium">Debt Payoff Time</span>
+                <span class={`text-lg font-bold ${(debtPayoffYears ?? 0) <= 3 ? 'text-green-600' : 'text-red-600'}`}>
+                  {debtPayoffYears ? `${debtPayoffYears.toFixed(1)} years` : "No debt"}
+                </span>
+              </div>
+              <div class="text-xs text-gray-600">Rule One Target: ≤3 years</div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>

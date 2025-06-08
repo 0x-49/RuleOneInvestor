@@ -1,0 +1,32 @@
+---
+export interface Props {
+  class?: string;
+  value: string;
+  [key: string]: any;
+}
+
+const { 
+  class: className = '',
+  value,
+  ...rest 
+} = Astro.props;
+
+const baseClasses = 'px-4 py-2 font-medium border-b-2 border-transparent text-slate-500';
+const classes = [baseClasses, className].filter(Boolean).join(' ');
+---
+
+<button 
+  class={classes}
+  role="tab"
+  id={`tab-${value}`}
+  aria-selected="false"
+  {...rest}
+>
+  <slot />
+</button>
+
+<style>
+  button[role="tab"] {
+    @apply inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+</style>

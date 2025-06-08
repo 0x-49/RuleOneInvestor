@@ -1,0 +1,95 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Privacy Policy">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-6 text-gray-800 dark:text-white">Privacy Policy</h1>
+    
+    <div class="prose dark:prose-invert max-w-none">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Last Updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      
+      <p>
+        Welcome to the Rule One Assistant (referred to as "we", "us", or "our"). We are committed to protecting your personal information 
+        and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your 
+        personal information, please contact us at [Your Contact Email Address Here].
+      </p>
+      
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Information We Collect</h2>
+      <p>
+        As of the current version, the Rule One Assistant is designed to be a client-side application or to operate with minimal server interaction 
+        that does not require user accounts or the storage of personal investment data on our servers. The data you input for stock analysis 
+        and valuation is processed in your browser or handled via secure, authenticated API calls to third-party financial data providers (e.g., Financial Modeling Prep).
+      </p>
+      <p>
+        We may collect non-personal information such as usage statistics and error reports to help us improve the application. This data is anonymized 
+        and cannot be used to identify you personally.
+      </p>
+      <p>
+        If and when we introduce features that require user accounts or data storage (e.g., saving watchlists, portfolios), this policy will be updated 
+        to reflect the types of personal information collected, such as:
+      </p>
+      <ul>
+        <li>Name and contact data (e.g., email address)</li>
+        <li>Account credentials (e.g., username, password)</li>
+        <li>User-generated content (e.g., watchlists, notes, portfolio data)</li>
+      </ul>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">How We Use Your Information</h2>
+      <p>
+        Currently, any non-personal information collected is used solely for the purpose of improving the application's functionality, performance, and user experience.
+      </p>
+      <p>
+        Should we collect personal information in the future, it would be used to:
+      </p>
+      <ul>
+        <li>Create and manage your account.</li>
+        <li>Provide, operate, and maintain our services.</li>
+        <li>Personalize and improve your experience.</li>
+        <li>Communicate with you, including for customer service and support.</li>
+      </ul>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Sharing Your Information</h2>
+      <p>
+        We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties, except as described in this policy 
+        or with your consent. This does not include trusted third parties who assist us in operating our application, conducting our business, or servicing you, 
+        so long as those parties agree to keep this information confidential (e.g., financial data providers, authentication services).
+      </p>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Data Security</h2>
+      <p>
+        We implement a variety of security measures to maintain the safety of your personal information when you enter, submit, or access your personal information. 
+        However, no electronic storage or transmission over the Internet can be guaranteed to be 100% secure.
+      </p>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Third-Party Links</h2>
+      <p>
+        Occasionally, at our discretion, we may include or offer third-party products or services on our application. These third-party sites have 
+        separate and independent privacy policies. We therefore have no responsibility or liability for the content and activities of these linked sites.
+      </p>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Your Data Rights</h2>
+      <p>
+        Depending on your location, you may have certain rights regarding your personal information, such as the right to access, correct, or delete your data. 
+        If such features become applicable, we will provide tools and processes to exercise these rights.
+      </p>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Changes to This Privacy Policy</h2>
+      <p>
+        We may update this privacy policy from time to time. The updated version will be indicated by an updated "Last Updated" date and the updated version 
+        will be effective as soon as it is accessible. We encourage you to review this privacy policy frequently to be informed of how we are protecting your information.
+      </p>
+
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Contact Us</h2>
+      <p>
+        If you have questions or comments about this policy, you may email us at [Your Contact Email Address Here] or by post to:
+      </p>
+      <p>
+        [Your Company Name/Your Name]<br>
+        [Your Address]<br>
+        [City, State, Zip Code]<br>
+        [Country]
+      </p>
+    </div>
+  </div>
+</Layout>

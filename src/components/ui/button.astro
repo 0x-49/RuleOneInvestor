@@ -1,0 +1,18 @@
+---
+// src/components/ui/Button.astro
+import { Button as ReactButton } from '@client/components/ui/button';
+
+// Define the props for the Astro component. These should match the React component's props.
+export interface Props {
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | null | undefined;
+  size?: 'default' | 'sm' | 'lg' | 'icon' | null | undefined;
+  asChild?: boolean | undefined;
+  children?: any; // To allow content projection
+  [key: string]: any; // Allow any other props to be passed through
+}
+
+const astroProps = Astro.props;
+---
+<ReactButton {...astroProps} client:only="react">
+  <slot />
+</ReactButton>

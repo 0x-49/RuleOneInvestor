@@ -1,0 +1,11 @@
+---
+import ReactWatchlist from '../client/src/components/Watchlist'; // Assuming Watchlist is a React component
+
+interface Props {
+  onStockSelect: (symbol: string) => void;
+}
+
+const { onStockSelect } = Astro.props;
+---
+
+<ReactWatchlist client:only="react" onStockSelect={onStockSelect} />

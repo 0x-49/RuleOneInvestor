@@ -1,0 +1,15 @@
+---
+// src/components/ui/SheetTrigger.astro
+import { SheetTrigger as ReactSheetTrigger } from '@client/components/ui/sheet';
+
+export interface Props {
+  asChild?: boolean | undefined;
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactSheetTrigger {...astroProps} client:only="react">
+  <slot />
+</ReactSheetTrigger>

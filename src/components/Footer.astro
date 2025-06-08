@@ -1,0 +1,174 @@
+---
+import { TrendingUp, Github, Twitter, Mail, ExternalLink } from 'lucide-react'; // Keep for now, will address later
+
+const currentYear = new Date().getFullYear();
+
+const footerLinks = {
+  platform: [
+    { label: "Dashboard", href: "/" },
+    { label: "Stock Search", href: "/search" },
+    { label: "Watchlist", href: "/watchlist" },
+    { label: "Batch Analysis", href: "/batch-analysis" },
+    { label: "Valuation Tool", href: "/valuation" }
+  ],
+  resources: [
+    { label: "Rule One Guide", href: "/guide" },
+    { label: "Investment Methodology", href: "/methodology" },
+    { label: "Financial Metrics", href: "/metrics" },
+    { label: "API Documentation", href: "/api-docs" },
+    { label: "Help Center", href: "/help" }
+  ],
+  company: [
+    { label: "About", href: "/about" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Contact", href: "/contact" },
+    { label: "Feedback", href: "/feedback" }
+  ]
+};
+---
+
+<footer class="border-t bg-background">
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      {/* Brand Section */}
+      <div class="lg:col-span-2">
+        <a href="/" class="flex items-center space-x-2 mb-4 hover:opacity-80 transition-opacity">
+          <div class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
+            <TrendingUp className="h-5 w-5 text-white" client:only="react" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+              Rule One Assistant
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Democratizing Phil Town's Rule One investing methodology through comprehensive
+              stock analysis tools, automated metrics calculation, and data-driven investment decisions.
+            </p>
+          </div>
+        </a>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 max-w-md">
+          Democratizing Phil Town's Rule One investing methodology through comprehensive
+          stock analysis tools, automated metrics calculation, and data-driven investment decisions.
+        </p>
+        <div class="flex space-x-4">
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            <Github className="h-5 w-5" client:only="react" />
+          </a>
+          <a
+            href="https://twitter.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            <Twitter className="h-5 w-5" client:only="react" />
+          </a>
+          <a
+            href="mailto:support@example.com"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            <Mail className="h-5 w-5" client:only="react" />
+          </a>
+        </div>
+      </div>
+
+      {/* Platform Links */}
+      <div>
+        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+          Platform
+        </h4>
+        <ul class="space-y-3">
+          {footerLinks.platform.map((link) => (
+            <li>
+              <a href={link.href} class="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Resources Links */}
+      <div>
+        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+          Resources
+        </h4>
+        <ul class="space-y-3">
+          {footerLinks.resources.map((link) => (
+            <li>
+              <a href={link.href} class="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Company Links */}
+      <div>
+        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+          Company
+        </h4>
+        <ul class="space-y-3">
+          {footerLinks.company.map((link) => (
+            <li>
+              <a href={link.href} class="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    {/* Bottom Section */}
+    <div class="border-t mt-12 pt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          {currentYear} Rule One Assistant. All rights reserved.
+        </div>
+
+        {/* Phil Town Attribution */}
+        <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+          <span>Based on</span>
+          <a
+            href="https://www.ruleoneinvesting.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center space-x-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+          >
+            <span>Phil Town's Rule One</span>
+            <ExternalLink className="h-3 w-3" client:only="react" />
+          </a>
+        </div>
+
+        {/* Data Sources */}
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          Data provided by Financial Modeling Prep
+          <a 
+            href="https://site.financialmodelingprep.com/developer/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+          >
+            (FMP) <ExternalLink className="h-3 w-3 inline-block" client:only="react" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {/* Disclaimer */}
+    <div class="mt-6 pt-6 border-t">
+      <p class="text-xs text-gray-400 dark:text-gray-500 text-center max-w-4xl mx-auto">
+        <strong>Disclaimer:</strong> This platform is for educational purposes only and should not be considered
+        as financial advice. All investment decisions should be made after conducting your own research and
+        consulting with qualified financial advisors. Past performance does not guarantee future results.
+      </p>
+    </div>
+  </div>
+</footer>

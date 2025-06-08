@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ReactDashboard from '../client/src/pages/Dashboard'; // Assuming Dashboard is a React component
+---
+
+<Layout title="Dashboard - Rule One Investor">
+  <ReactDashboard client:only="react" />
+</Layout>

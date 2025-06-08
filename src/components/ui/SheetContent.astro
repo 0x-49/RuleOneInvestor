@@ -1,0 +1,15 @@
+---
+// src/components/ui/SheetContent.astro
+import { SheetContent as ReactSheetContent } from '@client/components/ui/sheet';
+
+export interface Props {
+  side?: 'top' | 'bottom' | 'left' | 'right' | null | undefined;
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactSheetContent {...astroProps} client:only="react">
+  <slot />
+</ReactSheetContent>

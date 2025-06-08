@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ReactScreening from '../client/src/pages/Screening'; // Assuming Screening is a React component
+---
+
+<Layout title="Screening - Rule One Investor">
+  <ReactScreening client:only="react" />
+</Layout>

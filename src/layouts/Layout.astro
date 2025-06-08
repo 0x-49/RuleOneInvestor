@@ -1,0 +1,53 @@
+---
+import AppHeader from '../components/Header.astro'; // Updated import alias
+import Footer from '../components/Footer.astro';
+import type { UserData } from '../components/Header.astro'; // Import UserData type for clarity
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+
+let isAuthenticated: boolean = false;
+let user: UserData | undefined = undefined;
+
+try {
+  const response = await fetch(Astro.url.origin + '/api/auth/status');
+  if (response.ok) {
+    const authData = await response.json();
+    isAuthenticated = authData.isAuthenticated;
+    user = authData.user;
+  } else {
+    // Handle cases where the auth status endpoint fails or returns an error
+    console.error('Failed to fetch authentication status:', response.status);
+    // Defaults to not authenticated
+  }
+} catch (error) {
+  console.error('Error fetching authentication status:', error);
+  // Defaults to not authenticated
+} 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Rule One Investor Dashboard" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | Rule One Assistant</title>
+		{/* The global.css is likely where Tailwind directives are, or should be if not already handled by astro.config.mjs integration */}
+	</head>
+	<body class="min-h-screen bg-background font-sans antialiased">
+		<div class="relative flex min-h-screen flex-col">
+			<AppHeader isAuthenticated={isAuthenticated} user={user} />
+			<main class="flex-1">
+				<slot />
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>
+

@@ -1,0 +1,204 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Layout from '../../layouts/MainLayout.astro';
+import { format } from 'date-fns';
+// Import regular img tag instead of Image component since we're using static paths for images
+import TableOfContents from '../../components/blog/TableOfContents.astro';
+import ShareButtons from '../../components/blog/ShareButtons.astro';
+import RelatedPosts from '../../components/blog/RelatedPosts.astro';
+import AuthorBio from '../../components/blog/AuthorBio.astro';
+import NewsletterSignup from '../../components/blog/NewsletterSignup.astro';
+
+// Generate static paths for all blog posts
+export async function getStaticPaths() {
+  const blogPosts = await getCollection('blog', ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+  
+  return blogPosts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+// Get the post data
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+
+// Get related posts if specified
+let relatedPosts = [];
+if (post.data.relatedPosts && post.data.relatedPosts.length > 0) {
+  relatedPosts = await Promise.all(
+    post.data.relatedPosts.map(slug => getEntry('blog', slug))
+  );
+} else {
+  // If no related posts specified, get 3 posts from the same category
+  const allPosts = await getCollection('blog', ({ data }) => {
+    return !data.draft && data.category === post.data.category && data.title !== post.data.title;
+  });
+  relatedPosts = allPosts.slice(0, 3);
+}
+
+// Format the date
+const formattedDate = format(post.data.pubDate, 'MMMM d, yyyy');
+
+// Calculate reading time if not provided
+const readingTime = post.data.readingTime || Math.ceil(post.body.split(/\s+/).length / 250);
+---
+
+<Layout 
+  title={`${post.data.title} | Rule One Investor Blog`}
+  description={post.data.excerpt}
+  image={post.data.image}
+  article={true}
+>
+  <article class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Article Header -->
+    <header class="mb-8 text-center">
+      <div class="mb-3 flex items-center justify-center space-x-3 text-sm">
+        <span class="rounded-full bg-blue-100 px-3 py-1 text-blue-800 font-medium">
+          {post.data.category}
+        </span>
+        <span class="text-gray-500">
+          {formattedDate} · {readingTime} min read
+        </span>
+      </div>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gray-900">{post.data.title}</h1>
+      <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6">
+        {post.data.excerpt}
+      </p>
+      
+      <!-- Author info -->
+      <div class="flex items-center justify-center">
+        {post.data.author.image && (
+          <img 
+            src={post.data.author.image}
+            alt={post.data.author.name}
+            class="h-10 w-10 rounded-full object-cover mr-3"
+          />
+        )}
+        <div class="text-left">
+          <div class="font-medium text-gray-900">{post.data.author.name}</div>
+          {post.data.author.title && <div class="text-sm text-gray-500">{post.data.author.title}</div>}
+        </div>
+      </div>
+    </header>
+
+    <!-- Featured Image -->
+    <div class="mb-12 rounded-lg overflow-hidden shadow-lg">
+      <img 
+        src={post.data.image} 
+        alt={post.data.title}
+        class="w-full h-auto object-cover"
+      />
+    </div>
+    
+    <!-- Article Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Table of Contents (desktop) -->
+      <aside class="hidden lg:block lg:col-span-1 self-start sticky top-24">
+        <div class="border-l-2 border-gray-200 pl-4">
+          <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Contents</h4>
+          <TableOfContents headings={headings} />
+          
+          <div class="mt-8">
+            <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Share</h4>
+            <ShareButtons title={post.data.title} />
+          </div>
+        </div>
+      </aside>
+      
+      <!-- Main Content -->
+      <div class="lg:col-span-3 prose prose-blue prose-lg max-w-none">
+        <Content />
+        
+        <!-- Tags -->
+        {post.data.tags && post.data.tags.length > 0 && (
+          <div class="mt-8 flex flex-wrap gap-2 not-prose">
+            {post.data.tags.map(tag => (
+              <a 
+                href={`/blog/tag/${tag.toLowerCase().replace(/\s+/g, '-')}`}
+                class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200"
+              >
+                #{tag}
+              </a>
+            ))}
+          </div>
+        )}
+        
+        <!-- Author Bio -->
+        <div class="mt-12 not-prose">
+          <AuthorBio author={post.data.author} />
+        </div>
+      </div>
+    </div>
+  </article>
+  
+  <!-- Mobile share buttons -->
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 px-4 flex justify-center space-x-6 z-10">
+    <ShareButtons title={post.data.title} />
+  </div>
+  
+  <!-- Related Posts section -->
+  {relatedPosts.length > 0 && (
+    <section class="bg-gray-50 py-12">
+      <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">Related Articles</h2>
+        <RelatedPosts posts={relatedPosts} />
+      </div>
+    </section>
+  )}
+  
+  <!-- Newsletter signup -->
+  <section class="bg-blue-900 text-white py-16">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <NewsletterSignup />
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    article {
+      padding-top: 2rem;
+      padding-bottom: 5rem; /* Make space for the mobile share buttons */
+    }
+    
+    .prose {
+      font-size: 1.05rem;
+    }
+    
+    .prose h2 {
+      font-size: 1.5rem;
+      margin-top: 1.75rem;
+    }
+    
+    .prose h3 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  /* Tablet optimizations */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    article {
+      padding-top: 3rem;
+    }
+  }
+  
+  /* Enhancement for code blocks and quotes */
+  :global(.prose pre) {
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    background-color: #1e293b;
+    color: #e2e8f0;
+    overflow-x: auto;
+  }
+  
+  :global(.prose blockquote) {
+    border-left-color: #3b82f6;
+    background-color: #f0f9ff;
+    padding: 1rem;
+    border-radius: 0.25rem;
+  }
+</style>

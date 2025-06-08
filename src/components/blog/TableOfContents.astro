@@ -1,0 +1,104 @@
+---
+// TableOfContents.astro - Smart navigation for blog posts
+// Shows a hierarchical table of contents based on headings in the blog post
+
+export interface Props {
+  headings: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+}
+
+const { headings } = Astro.props;
+
+// Filter out h1 (title) and only include h2, h3, h4
+const filteredHeadings = headings.filter(
+  heading => heading.depth >= 2 && heading.depth <= 4
+);
+
+// Group headings to create proper hierarchy
+const hierarchy = filteredHeadings.reduce((acc, heading) => {
+  const { depth, slug, text } = heading;
+  
+  if (depth === 2) {
+    acc.push({ ...heading, children: [] });
+  } else if (depth === 3 && acc.length > 0) {
+    acc[acc.length - 1].children.push({ ...heading, children: [] });
+  } else if (depth === 4 && acc.length > 0) {
+    const lastH2 = acc[acc.length - 1];
+    if (lastH2.children.length > 0) {
+      lastH2.children[lastH2.children.length - 1].children.push(heading);
+    }
+  }
+  
+  return acc;
+}, []);
+---
+
+<nav class="toc text-sm" aria-label="Table of contents">
+  {filteredHeadings.length === 0 ? (
+    <p class="text-gray-500 italic">No table of contents available</p>
+  ) : (
+    <ul class="space-y-2">
+      {hierarchy.map(h2 => (
+        <li>
+          <a 
+            href={`#${h2.slug}`} 
+            class="text-gray-700 hover:text-blue-600 font-medium flex items-center"
+          >
+            {h2.text}
+          </a>
+          
+          {h2.children.length > 0 && (
+            <ul class="pl-4 mt-2 space-y-2 border-l border-gray-200">
+              {h2.children.map(h3 => (
+                <li>
+                  <a 
+                    href={`#${h3.slug}`}
+                    class="text-gray-600 hover:text-blue-600 font-normal text-sm block"
+                  >
+                    {h3.text}
+                  </a>
+                  
+                  {h3.children.length > 0 && (
+                    <ul class="pl-3 mt-1 space-y-1">
+                      {h3.children.map(h4 => (
+                        <li>
+                          <a 
+                            href={`#${h4.slug}`}
+                            class="text-gray-500 hover:text-blue-600 font-light text-xs block"
+                          >
+                            {h4.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+</nav>
+
+<style>
+  .toc {
+    position: sticky;
+    top: 2rem;
+  }
+  
+  .toc a {
+    display: block;
+    padding: 0.25rem 0;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+  
+  .toc a:hover {
+    transform: translateX(2px);
+  }
+</style>

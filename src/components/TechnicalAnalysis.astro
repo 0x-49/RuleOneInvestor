@@ -1,0 +1,14 @@
+---
+import ReactTechnicalAnalysis from '../client/src/components/TechnicalAnalysis'; // Assuming TechnicalAnalysis is a React component
+
+interface Props {
+  symbol: string;
+  currentPrice: number;
+  priceChange: number;
+  priceChangePercent: number;
+}
+
+const { symbol, currentPrice, priceChange, priceChangePercent } = Astro.props;
+---
+
+<ReactTechnicalAnalysis client:only="react" symbol={symbol} currentPrice={currentPrice} priceChange={priceChange} priceChangePercent={priceChangePercent} />

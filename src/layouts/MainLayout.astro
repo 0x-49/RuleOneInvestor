@@ -1,0 +1,193 @@
+---
+// MainLayout.astro - Main layout component with responsive design for all pages
+// Features navigation, footer, and responsive container
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: string;
+}
+
+const { 
+  title, 
+  description = "Rule One Investor - Intelligent value investing tools and insights", 
+  image = "/social-card.jpg",
+  type = "website" 
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content={Astro.generator}>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    
+    <title>{title}</title>
+    <meta name="description" content={description}>
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL}>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type}>
+    <meta property="og:url" content={canonicalURL}>
+    <meta property="og:title" content={title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={new URL(image, Astro.url)}>
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content={canonicalURL}>
+    <meta property="twitter:title" content={title}>
+    <meta property="twitter:description" content={description}>
+    <meta property="twitter:image" content={new URL(image, Astro.url)}>
+    
+    <!-- Preload critical assets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Use this slot for any custom head content -->
+    <slot name="head"/>
+  </head>
+  <body class="min-h-screen flex flex-col bg-background text-foreground">
+    <header class="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div class="container-outer flex h-16 items-center justify-between">
+        <div class="flex items-center gap-6">
+          <a href="/" class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 20h.01"></path>
+              <path d="M7 20v-4"></path>
+              <path d="M12 20v-8"></path>
+              <path d="M17 20V8"></path>
+              <path d="M22 4v16"></path>
+            </svg>
+            <span class="font-bold text-xl">Rule One Investor</span>
+          </a>
+          
+          <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <a href="/" class="transition-colors hover:text-primary">Home</a>
+            <a href="/dashboard" class="transition-colors hover:text-primary">Dashboard</a>
+            <a href="/watchlist" class="transition-colors hover:text-primary">Watchlist</a>
+            <a href="/stock-analysis" class="transition-colors hover:text-primary">Stock Analysis</a>
+            <a href="/screener" class="transition-colors hover:text-primary">Screener</a>
+            <a href="/blog" class="transition-colors hover:text-primary">Blog</a>
+          </nav>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+          <button type="button" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2">
+            Sign In
+          </button>
+          
+          <button type="button" class="lg:hidden" aria-label="Toggle Menu" id="menu-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="mobile-menu hidden lg:hidden border-t" id="mobile-menu">
+        <div class="container-outer py-4">
+          <nav class="flex flex-col space-y-1">
+            <a href="/" class="mobile-nav-item">Home</a>
+            <a href="/dashboard" class="mobile-nav-item">Dashboard</a>
+            <a href="/watchlist" class="mobile-nav-item">Watchlist</a>
+            <a href="/stock-analysis" class="mobile-nav-item">Stock Analysis</a>
+            <a href="/screener" class="mobile-nav-item">Screener</a>
+            <a href="/blog" class="mobile-nav-item">Blog</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+    
+    <main class="flex-grow">
+      <slot />
+    </main>
+    
+    <footer class="border-t bg-muted">
+      <div class="container-outer py-10 md:py-16">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+          <div>
+            <div class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 20h.01"></path>
+                <path d="M7 20v-4"></path>
+                <path d="M12 20v-8"></path>
+                <path d="M17 20V8"></path>
+                <path d="M22 4v16"></path>
+              </svg>
+              <span class="font-bold text-lg">Rule One Investor</span>
+            </div>
+            <p class="mt-4 text-sm text-muted-foreground">
+              Intelligent tools and insights for value investors following the principles of Rule One investing.
+            </p>
+          </div>
+          
+          <div>
+            <h4 class="font-semibold text-sm mb-4">Features</h4>
+            <ul class="space-y-2 text-sm">
+              <li><a href="/dashboard" class="text-muted-foreground hover:text-foreground">Dashboard</a></li>
+              <li><a href="/watchlist" class="text-muted-foreground hover:text-foreground">Watchlist</a></li>
+              <li><a href="/stock-analysis" class="text-muted-foreground hover:text-foreground">Stock Analysis</a></li>
+              <li><a href="/screener" class="text-muted-foreground hover:text-foreground">Screener</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="font-semibold text-sm mb-4">Resources</h4>
+            <ul class="space-y-2 text-sm">
+              <li><a href="/blog" class="text-muted-foreground hover:text-foreground">Blog</a></li>
+              <li><a href="/learning" class="text-muted-foreground hover:text-foreground">Learning Center</a></li>
+              <li><a href="/faq" class="text-muted-foreground hover:text-foreground">FAQ</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="font-semibold text-sm mb-4">Stay Updated</h4>
+            <p class="text-sm text-muted-foreground mb-4">
+              Subscribe to our newsletter for investing insights.
+            </p>
+            <form class="relative">
+              <input 
+                type="email" 
+                placeholder="Email address" 
+                class="w-full py-2 px-3 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button 
+                type="submit"
+                class="absolute right-1 top-1 rounded-md px-3 py-1 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+          <div class="flex space-x-6 mb-4 md:mb-0">
+            <a href="/privacy-policy" class="hover:text-foreground">Privacy Policy</a>
+            <a href="/terms-of-service" class="hover:text-foreground">Terms of Service</a>
+            <a href="/contact" class="hover:text-foreground">Contact</a>
+          </div>
+          
+          <p>&copy; {new Date().getFullYear()} Rule One Investor. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    
+    <script>
+      // Mobile menu toggle functionality
+      document.getElementById('menu-toggle')?.addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenu?.classList.toggle('hidden');
+      });
+    </script>
+  </body>
+</html>

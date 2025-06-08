@@ -1,0 +1,15 @@
+---
+// src/components/ui/DropdownMenuTrigger.astro
+import { DropdownMenuTrigger as ReactDropdownMenuTrigger } from '@client/components/ui/dropdown-menu';
+
+export interface Props {
+  asChild?: boolean | undefined;
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactDropdownMenuTrigger {...astroProps} client:only="react">
+  <slot />
+</ReactDropdownMenuTrigger>

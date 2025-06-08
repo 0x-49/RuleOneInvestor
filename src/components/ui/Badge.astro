@@ -1,0 +1,16 @@
+---
+// src/components/ui/Badge.astro
+import { Badge as ReactBadge } from '@client/components/ui/badge';
+
+// Define the props for the Astro component. These should match the React component's props.
+export interface Props {
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined;
+  children?: any; // To allow content projection
+  [key: string]: any; // Allow any other props to be passed through
+}
+
+const astroProps = Astro.props;
+---
+<ReactBadge {...astroProps} client:only="react">
+  <slot />
+</ReactBadge>

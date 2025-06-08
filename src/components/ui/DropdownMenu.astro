@@ -1,0 +1,17 @@
+---
+// src/components/ui/DropdownMenu.astro
+import { DropdownMenu as ReactDropdownMenu } from '@client/components/ui/dropdown-menu';
+
+// Props for DropdownMenu are typically related to its open state, modal behavior, etc.
+// These are often handled by the component itself or through context.
+// For a simple wrapper, we might not need to explicitly define many props here unless overriding defaults.
+export interface Props {
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactDropdownMenu {...astroProps} client:only="react">
+  <slot />
+</ReactDropdownMenu>

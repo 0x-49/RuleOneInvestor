@@ -1,0 +1,13 @@
+---
+import ReactFinancialTrends from '../client/src/components/FinancialTrends'; // Assuming FinancialTrends is a React component
+import type { StockWithMetrics } from '@shared/schema'; // Import the type
+
+interface Props {
+  stockData?: StockWithMetrics;
+  isLoading: boolean;
+}
+
+const { stockData, isLoading } = Astro.props;
+---
+
+<ReactFinancialTrends client:only="react" stockData={stockData} isLoading={isLoading} />

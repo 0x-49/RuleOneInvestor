@@ -1,0 +1,14 @@
+---
+import ReactStockSelector from '../client/src/components/StockSelector'; // Assuming StockSelector is a React component
+import type { StockWithMetrics } from '@shared/schema'; // Import the type
+
+interface Props {
+  stockData?: StockWithMetrics;
+  isLoading: boolean;
+  onStockSelect: (symbol: string) => void;
+}
+
+const { stockData, isLoading, onStockSelect } = Astro.props;
+---
+
+<ReactStockSelector client:only="react" stockData={stockData} isLoading={isLoading} onStockSelect={onStockSelect} />

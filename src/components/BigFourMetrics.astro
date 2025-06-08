@@ -1,0 +1,14 @@
+---
+import ReactBigFourMetrics from '../client/src/components/BigFourMetrics'; // Assuming BigFourMetrics is a React component
+import type { StockWithMetrics } from '@shared/schema'; // Import the type
+
+interface Props {
+  stockData?: StockWithMetrics;
+  isLoading: boolean;
+  symbol?: string;
+}
+
+const { stockData, isLoading, symbol } = Astro.props;
+---
+
+<ReactBigFourMetrics client:only="react" stockData={stockData} isLoading={isLoading} symbol={symbol} />

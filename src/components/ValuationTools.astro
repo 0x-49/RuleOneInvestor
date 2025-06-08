@@ -1,0 +1,14 @@
+---
+import ReactValuationTools from '../client/src/components/ValuationTools'; // Assuming ValuationTools is a React component
+import type { StockWithMetrics } from '@shared/schema'; // Import the type
+
+interface Props {
+  stockData?: StockWithMetrics;
+  isLoading: boolean;
+  symbol: string;
+}
+
+const { stockData, isLoading, symbol } = Astro.props;
+---
+
+<ReactValuationTools client:only="react" stockData={stockData} isLoading={isLoading} symbol={symbol} />

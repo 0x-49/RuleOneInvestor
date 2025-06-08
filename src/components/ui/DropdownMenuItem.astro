@@ -1,0 +1,16 @@
+---
+// src/components/ui/DropdownMenuItem.astro
+import { DropdownMenuItem as ReactDropdownMenuItem } from '@client/components/ui/dropdown-menu';
+
+export interface Props {
+  inset?: boolean | undefined;
+  disabled?: boolean | undefined;
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactDropdownMenuItem {...astroProps} client:only="react">
+  <slot />
+</ReactDropdownMenuItem>

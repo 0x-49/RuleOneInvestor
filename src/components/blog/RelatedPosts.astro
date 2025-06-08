@@ -1,0 +1,59 @@
+---
+// RelatedPosts.astro - Shows related articles to keep readers engaged
+// Displays a grid of related posts with responsive design for all devices
+
+import { format } from 'date-fns';
+
+export interface Props {
+  posts: any[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  {posts.map(post => (
+    <a 
+      href={`/blog/${post.slug}`}
+      class="group flex flex-col overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-all bg-white"
+    >
+      <div class="aspect-video w-full overflow-hidden">
+        <img 
+          src={post.data.image} 
+          alt={post.data.title}
+          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <div class="flex flex-1 flex-col justify-between p-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-x-2 text-xs mb-2">
+            <span class="text-blue-600 font-medium">
+              {post.data.category}
+            </span>
+            <span class="text-gray-500">
+              {format(post.data.pubDate, 'MMM d, yyyy')}
+            </span>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2">
+            {post.data.title}
+          </h3>
+        </div>
+      </div>
+    </a>
+  ))}
+</div>
+
+<style>
+  /* Enhance mobile responsiveness */
+  @media (max-width: 640px) {
+    div[class^="grid"] {
+      gap: 1rem;
+    }
+  }
+  
+  /* Add subtle hover effect */
+  a:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+  }
+</style>

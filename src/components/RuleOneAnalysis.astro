@@ -1,0 +1,28 @@
+---
+import ReactRuleOneAnalysis from '../client/src/components/RuleOneAnalysis'; // Assuming RuleOneAnalysis is a React component
+import type { StockWithMetrics } from '@shared/schema'; // Import the type
+
+interface RuleOneData {
+  salesGrowth: number | null;
+  epsGrowth: number | null;
+  equityGrowth: number | null;
+  fcfGrowth: number | null;
+  roic: number | null;
+  debtPayoffYears: number | null;
+  stickerPrice: number | null;
+  marginOfSafetyPrice: number | null;
+  isExcellent: boolean;
+  qualityScore: number;
+  investmentStory: string;
+}
+
+interface Props {
+  ruleOneData: RuleOneData;
+  currentPrice: number;
+  symbol: string;
+}
+
+const { ruleOneData, currentPrice, symbol } = Astro.props;
+---
+
+<ReactRuleOneAnalysis client:only="react" ruleOneData={ruleOneData} currentPrice={currentPrice} symbol={symbol} />

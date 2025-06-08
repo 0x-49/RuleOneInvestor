@@ -1,0 +1,63 @@
+---
+import { Card, CardContent } from '../client/src/components/ui/card'; // Assuming UI components are React
+import { Button } from '../client/src/components/ui/button'; // Assuming UI components are React
+import { AlertCircle, RefreshCw, Play } from 'lucide-react'; // Keep for now, will address later
+
+interface Props {
+  symbol: string;
+  onRefresh: () => void;
+  onQuickAnalysis: () => void;
+  isRefreshing?: boolean;
+}
+
+const { symbol, onRefresh, onQuickAnalysis, isRefreshing = false } = Astro.props;
+---
+
+<div class="text-center py-12">
+  <Card>
+    <CardContent>
+      <div class="flex flex-col items-center space-y-6">
+        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+          <AlertCircle className="h-8 w-8 text-gray-400" />
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            No Financial Data Available
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 max-w-md">
+            This stock isn't covered by our financial data providers.
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-500">
+            This commonly happens with smaller international stocks, recent IPOs,
+            or companies from emerging markets.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <Button
+            onClick={onQuickAnalysis}
+            className="flex items-center space-x-2"
+          >
+            <Play className="h-4 w-4" />
+            <span>Quick Analysis</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="flex items-center space-x-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Refreshing...' : 'Refresh Data'}</span>
+          </Button>
+        </div>
+
+        <div class="text-xs text-gray-400 mt-4">
+          <p>Try refreshing to fetch the latest data from our providers</p>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</div>

@@ -1,0 +1,11 @@
+---
+import ReactStockSearch from '../client/src/components/StockSearch'; // Assuming StockSearch is a React component
+
+interface Props {
+  onStockSelect: (symbol: string) => void;
+}
+
+const { onStockSelect } = Astro.props;
+---
+
+<ReactStockSearch client:only="react" onStockSelect={onStockSelect} />

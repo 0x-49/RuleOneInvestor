@@ -1,0 +1,16 @@
+---
+// src/components/ui/Sheet.astro
+import { Sheet as ReactSheet } from '@client/components/ui/sheet';
+
+export interface Props {
+  open?: boolean | undefined;
+  onOpenChange?: (open: boolean) => void;
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactSheet {...astroProps} client:only="react">
+  <slot />
+</ReactSheet>

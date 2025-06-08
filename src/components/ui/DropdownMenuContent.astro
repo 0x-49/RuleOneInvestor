@@ -1,0 +1,16 @@
+---
+// src/components/ui/DropdownMenuContent.astro
+import { DropdownMenuContent as ReactDropdownMenuContent } from '@client/components/ui/dropdown-menu';
+
+export interface Props {
+  align?: 'start' | 'center' | 'end' | undefined;
+  sideOffset?: number | undefined;
+  children?: any;
+  [key: string]: any;
+}
+
+const astroProps = Astro.props;
+---
+<ReactDropdownMenuContent {...astroProps} client:only="react">
+  <slot />
+</ReactDropdownMenuContent>

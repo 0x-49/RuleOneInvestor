@@ -1,25 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "builds": [
-    {
-      "src": "dist/index.js",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/public/**"] } 
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "dist/index.js"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "dist/public/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/index.js"
-    }
-  ]
-}
+    "buildCommand": "npm install && npm run build",
+    "outputDirectory": "dist",
+    "framework": "astro"
+  }

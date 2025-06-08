@@ -80,7 +80,7 @@ RuleOneInvestor conducts a variety of analyses to provide a holistic view of a c
 
 ## Screenshots
 
-*(This section would ideally include screenshots of the application's key interfaces. You can add them as the UI develops.)*
+(This section would ideally include screenshots of the application's key interfaces. You can add them as the UI develops.)
 
 Example:
 `![Dashboard View](path/to/your/dashboard_screenshot.png)`
@@ -166,9 +166,10 @@ Follow these instructions to set up and run the RuleOneInvestor project locally.
     *Obtain API keys from [Alpha Vantage](https://www.alphavantage.co/support/#api-key) and other respective services.*
 
 2. **Database Setup:** (If using a local database like PostgreSQL)
-  - Ensure your database server is running.
-  - Create the database if it doesn't exist.
-  - Run database migrations using Drizzle ORM (commands depend on your Drizzle setup, e.g., `npm run db:migrate`).
+
+- Ensure your database server is running.
+- Create the database if it doesn't exist.
+- Run database migrations using Drizzle ORM (commands depend on your Drizzle setup, e.g., `npm run db:migrate`).
 
 ### Running the App
 
@@ -251,3 +252,55 @@ This project is licensed under the [MIT License](LICENSE.txt). (Create a LICENSE
 - Data provided by Alpha Vantage (and other sources as listed).
 
 If you have questions, feedback, or want to get involved, please [open an issue](link_to_your_github_issues_page) or contact [Your Name/Email (Optional)].
+
+--------------------------------
+
+## Astro Starter Kit: Basics
+
+```sh
+npm create astro@latest -- --template basics
+```
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
+[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+
+![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+
+## 🚀 Project Structure
+
+Inside of your Astro project, you'll see the following folders and files:
+
+```text
+/
+├── public/
+│   └── favicon.svg
+├── src/
+│   ├── layouts/
+│   │   └── Layout.astro
+│   └── pages/
+│       └── index.astro
+└── package.json
+```
+
+To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+
+## 🧞 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+

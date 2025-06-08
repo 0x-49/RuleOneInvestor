@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import StockDetail from '../../client/src/pages/StockDetail'; // Assuming StockDetail is a React component
+
+const { symbol } = Astro.params;
+---
+
+<Layout title={`Stock Detail for ${symbol} - Rule One Investor`}>
+  <StockDetail client:only="react" />
+</Layout>

@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Landing from '../client/src/pages/Landing'; // Assuming Landing is a React component
+---
+
+<Layout title="Rule One Investor">
+  <Landing client:only="react" />
+</Layout>

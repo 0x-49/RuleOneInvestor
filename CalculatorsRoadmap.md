@@ -15844,4 +15844,12886 @@ We've barely scratched the surface of Fundamental Analysis, but this is a good s
 
 ----------
 
+Right, let's continue with the utmost rigor and dive even deeper into **Fundamental Analysis in Investing**. This batch will add another **50 calculators**, significantly expanding our coverage of profitability, efficiency, solvency, and various valuation methodologies.
+
+---
+
+## XII. Fundamental Analysis in Investing Calculators (Continued)
+
+380.  **Residual Income Model (RIM) Valuation**
+    * **Purpose:** Value a company's stock by adding the present value of its expected future residual income (income above the cost of equity capital) to its current book value.
+    * **Inputs:**
+        * `Current_Book_Value_Per_Share` (Currency)
+        * `Cost_of_Equity_Required_Return` (Percentage)
+        * `Projected_Net_Income_Years` (List of Currency, one per year for projection period)
+        * `Projected_Book_Value_Years` (List of Currency, one per year for projection period)
+        * `Terminal_Growth_Rate_Residual_Income` (Percentage - for residual income beyond projection)
+        * `Projection_Years` (Years)
+    * **Calculations:**
+        * `Intrinsic_Value = Current_Book_Value_Per_Share`
+        * `FOR i FROM 1 TO Projection_Years:`
+            * `Equity_Charge_This_Year = Projected_Book_Value_Years[i-1] * (Cost_of_Equity_Required_Return / 100)`
+            * `Residual_Income_This_Year = Projected_Net_Income_Years[i-1] - Equity_Charge_This_Year`
+            * `Intrinsic_Value = Intrinsic_Value + (Residual_Income_This_Year / (1 + Cost_of_Equity_Required_Return / 100)^i)`
+        * `Terminal_Residual_Income = (Projected_Net_Income_Years[Projection_Years-1] - (Projected_Book_Value_Years[Projection_Years-1] * (Cost_of_Equity_Required_Return / 100))) * (1 + Terminal_Growth_Rate_Residual_Income / 100)`
+        * `Terminal_Value_Residual_Income = Terminal_Residual_Income / (Cost_of_Equity_Required_Return / 100 - Terminal_Growth_Rate_Residual_Income / 100)`
+        * `Intrinsic_Value = Intrinsic_Value + (Terminal_Value_Residual_Income / (1 + Cost_of_Equity_Required_Return / 100)^Projection_Years)`
+    * **Outputs:**
+        * `Calculated_Intrinsic_Value_Per_Share` (Currency)
+        * `Projected_Residual_Income_Table` (Table: Year, Net Income, Equity Charge, Residual Income, PV of RI)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateRIMValuation():
+            Current_Book_Value_Per_Share = GET_INPUT("Current_Book_Value_Per_Share")
+            Cost_of_Equity_Required_Return = GET_INPUT("Cost_of_Equity_Required_Return") / 100
+            Projected_Net_Income_Years = GET_INPUT("Projected_Net_Income_Years") // List
+            Projected_Book_Value_Years = GET_INPUT("Projected_Book_Value_Years") // List
+            Terminal_Growth_Rate_Residual_Income = GET_INPUT("Terminal_Growth_Rate_Residual_Income") / 100
+            Projection_Years = LENGTH(Projected_Net_Income_Years)
+
+            Intrinsic_Value = Current_Book_Value_Per_Share
+            Projected_Residual_Income_Table = []
+
+            IF Cost_of_Equity_Required_Return <= Terminal_Growth_Rate_Residual_Income THEN
+                DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", "Error: Cost of Equity must be greater than Terminal Growth Rate.")
+                RETURN
+            END IF
+
+            FOR i FROM 0 TO Projection_Years - 1:
+                Equity_Charge_This_Year = Projected_Book_Value_Years[i] * Cost_of_Equity_Required_Return
+                Residual_Income_This_Year = Projected_Net_Income_Years[i] - Equity_Charge_This_Year
+                PV_of_RI_This_Year = Residual_Income_This_Year / POWER((1 + Cost_of_Equity_Required_Return), (i + 1))
+                Intrinsic_Value = Intrinsic_Value + PV_of_RI_This_Year
+                Projected_Residual_Income_Table.ADD({Year: i+1, Net_Income: Projected_Net_Income_Years[i], Equity_Charge: Equity_Charge_This_Year, Residual_Income: Residual_Income_This_Year, PV_of_RI: PV_of_RI_This_Year})
+            END FOR
+
+            Terminal_Residual_Income_Year_N = Projected_Net_Income_Years[Projection_Years-1] - (Projected_Book_Value_Years[Projection_Years-1] * Cost_of_Equity_Required_Return)
+            Terminal_Residual_Income_Year_N_Plus_1 = Terminal_Residual_Income_Year_N * (1 + Terminal_Growth_Rate_Residual_Income)
+
+            Terminal_Value_Residual_Income = Terminal_Residual_Income_Year_N_Plus_1 / (Cost_of_Equity_Required_Return - Terminal_Growth_Rate_Residual_Income)
+            PV_of_Terminal_Value_RI = Terminal_Value_Residual_Income / POWER((1 + Cost_of_Equity_Required_Return), Projection_Years)
+            Intrinsic_Value = Intrinsic_Value + PV_of_Terminal_Value_RI
+
+            DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", Intrinsic_Value)
+            DISPLAY_OUTPUT("Projected_Residual_Income_Table", Projected_Residual_Income_Table)
+        END FUNCTION
+        ```
+
+381.  **Abnormal Earnings Growth (AEG) Model Valuation (Basic)**
+    * **Purpose:** Value a company by capitalizing its abnormal earnings growth (earnings growth above the cost of equity).
+    * **Inputs:**
+        * `Current_EPS` (Currency)
+        * `Expected_EPS_Next_Year` (Currency)
+        * `Cost_of_Equity` (Percentage)
+        * `Long_Term_Growth_Rate_AEG` (Percentage - for abnormal earnings growth)
+    * **Calculations:**
+        * `Capitalized_Current_Earnings = Current_EPS / (Cost_of_Equity / 100)`
+        * `Abnormal_Earnings_Growth_Year_1 = Expected_EPS_Next_Year - Current_EPS - (Current_EPS * (Cost_of_Equity / 100))`
+        * `PV_of_AEG = Abnormal_Earnings_Growth_Year_1 / (Cost_of_Equity / 100 - Long_Term_Growth_Rate_AEG / 100)`
+        * `Intrinsic_Value = Capitalized_Current_Earnings + PV_of_AEG`
+    * **Outputs:**
+        * `Calculated_Intrinsic_Value_Per_Share` (Currency)
+        * `Abnormal_Earnings_Growth_Year_1` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAEGValuation():
+            Current_EPS = GET_INPUT("Current_EPS")
+            Expected_EPS_Next_Year = GET_INPUT("Expected_EPS_Next_Year")
+            Cost_of_Equity = GET_INPUT("Cost_of_Equity") / 100
+            Long_Term_Growth_Rate_AEG = GET_INPUT("Long_Term_Growth_Rate_AEG") / 100
+
+            IF Cost_of_Equity <= Long_Term_Growth_Rate_AEG THEN
+                DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", "Error: Cost of Equity must be greater than Long-Term Growth Rate.")
+                RETURN
+            END IF
+            IF Cost_of_Equity = 0 THEN
+                 DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", "Error: Cost of Equity cannot be zero.")
+                 RETURN
+            END IF
+
+            Capitalized_Current_Earnings = Current_EPS / Cost_of_Equity
+            Abnormal_Earnings_Growth_Year_1 = Expected_EPS_Next_Year - Current_EPS - (Current_EPS * Cost_of_Equity)
+            
+            PV_of_AEG = Abnormal_Earnings_Growth_Year_1 / (Cost_of_Equity - Long_Term_Growth_Rate_AEG)
+            
+            Intrinsic_Value = Capitalized_Current_Earnings + PV_of_AEG
+
+            DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", Intrinsic_Value)
+            DISPLAY_OUTPUT("Abnormal_Earnings_Growth_Year_1", Abnormal_Earnings_Growth_Year_1)
+        END FUNCTION
+        ```
+
+382.  **Economic Value Added (EVA) - Valuation Link**
+    * **Purpose:** Calculate a company's EVA and link it to market value by showing how sustained EVA contributes to shareholder wealth.
+    * **Inputs:**
+        * `NOPAT_Net_Operating_Profit_After_Tax` (Currency)
+        * `Invested_Capital` (Currency)
+        * `WACC_Weighted_Average_Cost_of_Capital` (Percentage)
+        * `Market_Value_of_Equity` (Currency)
+        * `Average_EVA_Growth_Rate` (Percentage - expected future EVA growth)
+        * `Projection_Years` (Years)
+    * **Calculations:**
+        * `Current_EVA = NOPAT - (Invested_Capital * (WACC / 100))`
+        * `PV_of_Future_EVAs = 0`
+        * `Projected_EVA = Current_EVA`
+        * `FOR i FROM 1 TO Projection_Years:`
+            * `Projected_EVA = Projected_EVA * (1 + Average_EVA_Growth_Rate / 100)`
+            * `PV_of_Future_EVAs = PV_of_Future_EVAs + (Projected_EVA / (1 + WACC / 100)^i)`
+        * `Firm_Value_Based_on_EVA = Invested_Capital + PV_of_Future_EVAs` (Simplified, more complex models exist)
+        * `Shareholder_Value_Created = Firm_Value_Based_on_EVA - Market_Value_of_Equity`
+    * **Outputs:**
+        * `Calculated_Current_EVA` (Currency)
+        * `Estimated_Firm_Value_Based_on_EVA` (Currency)
+        * `Estimated_Shareholder_Value_Created_or_Destroyed` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEVAValluationLink():
+            NOPAT = GET_INPUT("NOPAT_Net_Operating_Profit_After_Tax")
+            Invested_Capital = GET_INPUT("Invested_Capital")
+            WACC = GET_INPUT("WACC_Weighted_Average_Cost_of_Capital") / 100
+            Market_Value_of_Equity = GET_INPUT("Market_Value_of_Equity")
+            Average_EVA_Growth_Rate = GET_INPUT("Average_EVA_Growth_Rate") / 100
+            Projection_Years = GET_INPUT("Projection_Years")
+
+            Current_EVA = NOPAT - (Invested_Capital * WACC)
+
+            PV_of_Future_EVAs = 0
+            Projected_EVA_Loop = Current_EVA
+
+            FOR i FROM 1 TO Projection_Years:
+                Projected_EVA_Loop = Projected_EVA_Loop * (1 + Average_EVA_Growth_Rate)
+                PV_of_Future_EVAs = PV_of_Future_EVAs + (Projected_EVA_Loop / POWER((1 + WACC), i))
+            END FOR
+
+            Firm_Value_Based_on_EVA = Invested_Capital + PV_of_Future_EVAs
+            Shareholder_Value_Created = Firm_Value_Based_on_EVA - Market_Value_of_Equity
+
+            DISPLAY_OUTPUT("Calculated_Current_EVA", Current_EVA)
+            DISPLAY_OUTPUT("Estimated_Firm_Value_Based_on_EVA", Firm_Value_Based_on_EVA)
+            DISPLAY_OUTPUT("Estimated_Shareholder_Value_Created_or_Destroyed", Shareholder_Value_Created)
+        END FUNCTION
+        ```
+
+383.  **PEG Ratio (Multi-Year Growth Consideration)**
+    * **Purpose:** Calculate PEG considering a more stable, multi-year earnings growth rate, which can be more reliable for long-term investors.
+    * **Inputs:**
+        * `Price_to_Earnings_Ratio_PE` (Number)
+        * `Average_Earnings_Growth_Rate_5_Years` (Percentage)
+        * `Average_Earnings_Growth_Rate_10_Years` (Percentage)
+        * `Desired_Growth_Period` (Text: "5 Years", "10 Years")
+    * **Calculations:**
+        * `Growth_Rate_Used = 0`
+        * `IF Desired_Growth_Period = "5 Years" THEN Growth_Rate_Used = Average_Earnings_Growth_Rate_5_Years`
+        * `ELSE IF Desired_Growth_Period = "10 Years" THEN Growth_Rate_Used = Average_Earnings_Growth_Rate_10_Years`
+        * `PEG_Ratio = PE / Growth_Rate_Used`
+    * **Outputs:**
+        * `Calculated_PEG_Ratio` (Number)
+        * `Growth_Period_Used` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePEGMultiYear():
+            Price_to_Earnings_Ratio_PE = GET_INPUT("Price_to_Earnings_Ratio_PE")
+            Average_Earnings_Growth_Rate_5_Years = GET_INPUT("Average_Earnings_Growth_Rate_5_Years")
+            Average_Earnings_Growth_Rate_10_Years = GET_INPUT("Average_Earnings_Growth_Rate_10_Years")
+            Desired_Growth_Period = GET_INPUT("Desired_Growth_Period")
+
+            Growth_Rate_Used = 0
+            IF Desired_Growth_Period = "5 Years" THEN
+                Growth_Rate_Used = Average_Earnings_Growth_Rate_5_Years
+            ELSE IF Desired_Growth_Period = "10 Years" THEN
+                Growth_Rate_Used = Average_Earnings_Growth_Rate_10_Years
+            END IF
+
+            IF Growth_Rate_Used <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_PEG_Ratio", "N/A")
+                DISPLAY_OUTPUT("Error", "Selected growth rate must be positive.")
+                RETURN
+            END IF
+
+            PEG_Ratio = Price_to_Earnings_Ratio_PE / Growth_Rate_Used
+
+            DISPLAY_OUTPUT("Calculated_PEG_Ratio", PEG_Ratio)
+            DISPLAY_OUTPUT("Growth_Period_Used", Desired_Growth_Period)
+        END FUNCTION
+        ```
+
+384.  **Price-to-Book (P/B) Ratio with ROE Consideration**
+    * **Purpose:** Provide context to the P/B ratio by also considering the company's Return on Equity, which indicates profitability of its book value.
+    * **Inputs:**
+        * `Current_Share_Price` (Currency)
+        * `Book_Value_Per_Share` (Currency)
+        * `Return_on_Equity_ROE` (Percentage)
+    * **Calculations:**
+        * `P_B_Ratio = Current_Share_Price / Book_Value_Per_Share`
+        * `ROE_Adjusted_P_B = P_B_Ratio / (ROE / 100)`
+    * **Outputs:**
+        * `Calculated_P_B_Ratio` (Number)
+        * `P_B_Ratio_Adjusted_for_ROE` (Number)
+        * `Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePBWithROE():
+            Current_Share_Price = GET_INPUT("Current_Share_Price")
+            Book_Value_Per_Share = GET_INPUT("Book_Value_Per_Share")
+            Return_on_Equity_ROE = GET_INPUT("Return_on_Equity_ROE")
+
+            IF Book_Value_Per_Share <= 0 OR Return_on_Equity_ROE <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_P_B_Ratio", "N/A")
+                DISPLAY_OUTPUT("Interpretation", "Book Value and ROE must be positive.")
+                RETURN
+            END IF
+
+            P_B_Ratio = Current_Share_Price / Book_Value_Per_Share
+            ROE_Adjusted_P_B = P_B_Ratio / (Return_on_Equity_ROE / 100)
+
+            Interpretation = ""
+            IF P_B_Ratio < 1 AND Return_on_Equity_ROE > 10 THEN // Arbitrary ROE threshold
+                Interpretation = "Potential Value Play (Trading below book with good profitability)"
+            ELSE IF P_B_Ratio > 3 AND Return_on_Equity_ROE < 10 THEN
+                Interpretation = "Potentially Overvalued (High P/B with low profitability)"
+            ELSE
+                Interpretation = "Requires deeper analysis."
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_P_B_Ratio", P_B_Ratio)
+            DISPLAY_OUTPUT("P_B_Ratio_Adjusted_for_ROE", ROE_Adjusted_P_B)
+            DISPLAY_OUTPUT("Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+385.  **Dividend Yield Plus Growth Rate (Gordon Growth variant)**
+    * **Purpose:** Estimate total shareholder return by summing current dividend yield and a projected long-term dividend growth rate.
+    * **Inputs:**
+        * `Current_Dividend_Yield` (Percentage)
+        * `Expected_Long_Term_Dividend_Growth_Rate` (Percentage)
+    * **Calculations:**
+        * `Estimated_Total_Shareholder_Return = Current_Dividend_Yield + Expected_Long_Term_Dividend_Growth_Rate`
+    * **Outputs:**
+        * `Estimated_Total_Shareholder_Return` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDividendYieldPlusGrowth():
+            Current_Dividend_Yield = GET_INPUT("Current_Dividend_Yield")
+            Expected_Long_Term_Dividend_Growth_Rate = GET_INPUT("Expected_Long_Term_Dividend_Growth_Rate")
+
+            Estimated_Total_Shareholder_Return = Current_Dividend_Yield + Expected_Long_Term_Dividend_Growth_Rate
+
+            DISPLAY_OUTPUT("Estimated_Total_Shareholder_Return", Estimated_Total_Shareholder_Return)
+        END FUNCTION
+        ```
+
+386.  **Graham Formula (Intrinsic Value for Growth Stocks)**
+    * **Purpose:** Calculate the intrinsic value of a common stock using Benjamin Graham's simplified formula for growth companies.
+    * **Inputs:**
+        * `Earnings_Per_Share_Last_Twelve_Months` (Currency)
+        * `Expected_Earnings_Growth_Rate` (Percentage - over 7 years)
+        * `Current_Yield_on_AAA_Corporate_Bonds` (Percentage)
+    * **Calculations:**
+        * `Intrinsic_Value = EPS_LTM * (8.5 + 2 * Expected_Earnings_Growth_Rate) * (4.4 / Current_Yield_on_AAA_Corporate_Bonds)`
+    * **Outputs:**
+        * `Calculated_Graham_Intrinsic_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateGrahamIntrinsicValue():
+            EPS_LTM = GET_INPUT("Earnings_Per_Share_Last_Twelve_Months")
+            Expected_Earnings_Growth_Rate = GET_INPUT("Expected_Earnings_Growth_Rate")
+            Current_Yield_on_AAA_Corporate_Bonds = GET_INPUT("Current_Yield_on_AAA_Corporate_Bonds")
+
+            IF Expected_Earnings_Growth_Rate < 0.01 THEN // Graham suggested using growth > 0
+                DISPLAY_OUTPUT("Calculated_Graham_Intrinsic_Value", "N/A - Growth rate should be positive.")
+                RETURN
+            END IF
+            IF Current_Yield_on_AAA_Corporate_Bonds <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Graham_Intrinsic_Value", "N/A - AAA bond yield must be positive.")
+                RETURN
+            END IF
+
+            Intrinsic_Value = EPS_LTM * (8.5 + 2 * Expected_Earnings_Growth_Rate) * (4.4 / Current_Yield_on_AAA_Corporate_Bonds)
+
+            DISPLAY_OUTPUT("Calculated_Graham_Intrinsic_Value", Intrinsic_Value)
+        END FUNCTION
+        ```
+
+387.  **Kelly Criterion (Optimal Position Sizing - Investing)**
+    * **Purpose:** Calculate the optimal percentage of a portfolio to allocate to an investment, maximizing long-term wealth under specific win/loss probabilities.
+    * **Inputs:**
+        * `Probability_of_Win` (Percentage)
+        * `Average_Win_Ratio` (Number - Average Win Size / Average Loss Size)
+    * **Calculations:**
+        * `Fraction_to_Bet = (Probability_of_Win * Average_Win_Ratio - (1 - Probability_of_Win)) / Average_Win_Ratio`
+        * `Optimal_Percentage = Fraction_to_Bet * 100`
+        * *Caution: Highly theoretical and aggressive for real-world investing.*
+    * **Outputs:**
+        * `Optimal_Portfolio_Allocation_Percentage` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateKellyCriterionInvesting():
+            Probability_of_Win = GET_INPUT("Probability_of_Win") / 100
+            Average_Win_Ratio = GET_INPUT("Average_Win_Ratio") // Win amount / Loss amount
+
+            IF Average_Win_Ratio <= 0 THEN
+                DISPLAY_OUTPUT("Optimal_Portfolio_Allocation_Percentage", "N/A - Win/Loss ratio must be positive.")
+                RETURN
+            END IF
+
+            Fraction_to_Bet = (Probability_of_Win * Average_Win_Ratio - (1 - Probability_of_Win)) / Average_Win_Ratio
+            Optimal_Percentage = Fraction_to_Bet * 100
+
+            DISPLAY_OUTPUT("Optimal_Portfolio_Allocation_Percentage", Optimal_Percentage)
+        END FUNCTION
+        ```
+
+388.  **Discounted Dividends Model (DDM) - Multi-Stage (Advanced)**
+    * **Purpose:** Value a stock by discounting dividends through multiple distinct growth phases.
+    * **Inputs:**
+        * `Current_Dividend_D0` (Currency)
+        * `High_Growth_Rate` (Percentage)
+        * `High_Growth_Years` (Years)
+        * `Declining_Growth_Rate_Start` (Percentage)
+        * `Declining_Growth_Years` (Years)
+        * `Perpetual_Growth_Rate` (Percentage)
+        * `Required_Rate_of_Return` (Percentage)
+    * **Calculations:**
+        * *Calculate and sum PV of dividends for each phase.*
+        * `PV_Dividends_Phase_1 = 0`
+        * `PV_Dividends_Phase_2 = 0`
+        * `Last_Dividend_Phase_1 = D0`
+        * `FOR i FROM 1 TO High_Growth_Years:`
+            * `Dividend_Year_i = Last_Dividend_Phase_1 * (1 + High_Growth_Rate / 100)`
+            * `PV_Dividends_Phase_1 = PV_Dividends_Phase_1 + (Dividend_Year_i / (1 + Required_Rate_of_Return / 100)^i)`
+            * `Last_Dividend_Phase_1 = Dividend_Year_i`
+        * `Annual_Growth_Decline = (High_Growth_Rate - Declining_Growth_Rate_Start) / Declining_Growth_Years`
+        * `Last_Dividend_Phase_2 = Last_Dividend_Phase_1`
+        * `FOR i FROM High_Growth_Years + 1 TO High_Growth_Years + Declining_Growth_Years:`
+            * `Current_Phase2_Growth = High_Growth_Rate - (Annual_Growth_Decline * (i - High_Growth_Years))`
+            * `Dividend_Year_i = Last_Dividend_Phase_2 * (1 + Current_Phase2_Growth / 100)`
+            * `PV_Dividends_Phase_2 = PV_Dividends_Phase_2 + (Dividend_Year_i / (1 + Required_Rate_of_Return / 100)^i)`
+            * `Last_Dividend_Phase_2 = Dividend_Year_i`
+        * `Terminal_Value_Dividend = Last_Dividend_Phase_2 * (1 + Perpetual_Growth_Rate / 100) / (Required_Rate_of_Return / 100 - Perpetual_Growth_Rate / 100)`
+        * `PV_Terminal_Value = Terminal_Value_Dividend / (1 + Required_Rate_of_Return / 100)^(High_Growth_Years + Declining_Growth_Years)`
+        * `Intrinsic_Value = PV_Dividends_Phase_1 + PV_Dividends_Phase_2 + PV_Terminal_Value`
+    * **Outputs:**
+        * `Calculated_Intrinsic_Value_Per_Share` (Currency)
+        * `Detailed_Dividend_Projections_Table` (Table: Year, Dividend, PV of Dividend)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDDMMultiStageAdvanced():
+            Current_Dividend_D0 = GET_INPUT("Current_Dividend_D0")
+            High_Growth_Rate = GET_INPUT("High_Growth_Rate") / 100
+            High_Growth_Years = GET_INPUT("High_Growth_Years")
+            Declining_Growth_Rate_Start = GET_INPUT("Declining_Growth_Rate_Start") / 100 // This is the rate at start of decline
+            Declining_Growth_Years = GET_INPUT("Declining_Growth_Years")
+            Perpetual_Growth_Rate = GET_INPUT("Perpetual_Growth_Rate") / 100
+            Required_Rate_of_Return = GET_INPUT("Required_Rate_of_Return") / 100
+
+            IF Required_Rate_of_Return <= Perpetual_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", "Error: Required Return must be greater than Perpetual Growth Rate.")
+                RETURN
+            END IF
+
+            PV_Dividends_Phase_1 = 0
+            PV_Dividends_Phase_2 = 0
+            Detailed_Dividend_Projections_Table = []
+            
+            Last_Dividend_Calc = Current_Dividend_D0
+            Current_Year_Count = 0
+
+            // Phase 1: High Growth
+            FOR i FROM 1 TO High_Growth_Years:
+                Last_Dividend_Calc = Last_Dividend_Calc * (1 + High_Growth_Rate)
+                Current_Year_Count = Current_Year_Count + 1
+                PV_Dividend = Last_Dividend_Calc / POWER((1 + Required_Rate_of_Return), Current_Year_Count)
+                PV_Dividends_Phase_1 = PV_Dividends_Phase_1 + PV_Dividend
+                Detailed_Dividend_Projections_Table.ADD({Year: Current_Year_Count, Dividend: Last_Dividend_Calc, PV_Dividend: PV_Dividend})
+            END FOR
+
+            // Phase 2: Declining Growth (Linear interpolation of growth rate)
+            Growth_Decline_Per_Year = (High_Growth_Rate - Declining_Growth_Rate_Start) / Declining_Growth_Years
+            FOR i FROM 1 TO Declining_Growth_Years:
+                Current_Growth_Rate_In_Phase2 = High_Growth_Rate - (Growth_Decline_Per_Year * (i - 1))
+                Last_Dividend_Calc = Last_Dividend_Calc * (1 + Current_Growth_Rate_In_Phase2)
+                Current_Year_Count = Current_Year_Count + 1
+                PV_Dividend = Last_Dividend_Calc / POWER((1 + Required_Rate_of_Return), Current_Year_Count)
+                PV_Dividends_Phase_2 = PV_Dividends_Phase_2 + PV_Dividend
+                Detailed_Dividend_Projections_Table.ADD({Year: Current_Year_Count, Dividend: Last_Dividend_Calc, PV_Dividend: PV_Dividend})
+            END FOR
+
+            // Terminal Value
+            Terminal_Dividend = Last_Dividend_Calc * (1 + Perpetual_Growth_Rate)
+            Terminal_Value_Dividend = Terminal_Dividend / (Required_Rate_of_Return - Perpetual_Growth_Rate)
+            PV_Terminal_Value = Terminal_Value_Dividend / POWER((1 + Required_Rate_of_Return), Current_Year_Count)
+            
+            Intrinsic_Value = PV_Dividends_Phase_1 + PV_Dividends_Phase_2 + PV_Terminal_Value
+
+            DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", Intrinsic_Value)
+            DISPLAY_OUTPUT("Detailed_Dividend_Projections_Table", Detailed_Dividend_Projections_Table)
+        END FUNCTION
+        ```
+
+389.  **Free Cash Flow (FCF) Valuation - Multi-Stage (Advanced)**
+    * **Purpose:** Value a company by discounting Free Cash Flow through multiple distinct growth phases, similar to the multi-stage DDM.
+    * **Inputs:**
+        * `Current_FCF` (Currency)
+        * `High_Growth_Rate` (Percentage)
+        * `High_Growth_Years` (Years)
+        * `Declining_Growth_Rate_Start` (Percentage)
+        * `Declining_Growth_Years` (Years)
+        * `Perpetual_Growth_Rate` (Percentage)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * *Identical logic to Multi-Stage DDM (388), but use FCF and WACC instead of Dividends and Cost of Equity.*
+    * **Outputs:**
+        * `Calculated_Intrinsic_Value_of_Firm` (Currency)
+        * `Detailed_FCF_Projections_Table` (Table: Year, FCF, PV of FCF)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFValuationMultiStageAdvanced():
+            Current_FCF = GET_INPUT("Current_FCF")
+            High_Growth_Rate = GET_INPUT("High_Growth_Rate") / 100
+            High_Growth_Years = GET_INPUT("High_Growth_Years")
+            Declining_Growth_Rate_Start = GET_INPUT("Declining_Growth_Rate_Start") / 100
+            Declining_Growth_Years = GET_INPUT("Declining_Growth_Years")
+            Perpetual_Growth_Rate = GET_INPUT("Perpetual_Growth_Rate") / 100
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC") / 100
+
+            IF WACC <= Perpetual_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Intrinsic_Value_of_Firm", "Error: WACC must be greater than Perpetual Growth Rate.")
+                RETURN
+            END IF
+
+            PV_FCFs_Phase_1 = 0
+            PV_FCFs_Phase_2 = 0
+            Detailed_FCF_Projections_Table = []
+            
+            Last_FCF_Calc = Current_FCF
+            Current_Year_Count = 0
+
+            // Phase 1: High Growth
+            FOR i FROM 1 TO High_Growth_Years:
+                Last_FCF_Calc = Last_FCF_Calc * (1 + High_Growth_Rate)
+                Current_Year_Count = Current_Year_Count + 1
+                PV_FCF = Last_FCF_Calc / POWER((1 + WACC), Current_Year_Count)
+                PV_FCFs_Phase_1 = PV_FCFs_Phase_1 + PV_FCF
+                Detailed_FCF_Projections_Table.ADD({Year: Current_Year_Count, FCF: Last_FCF_Calc, PV_FCF: PV_FCF})
+            END FOR
+
+            // Phase 2: Declining Growth (Linear interpolation of growth rate)
+            Growth_Decline_Per_Year = (High_Growth_Rate - Declining_Growth_Rate_Start) / Declining_Growth_Years
+            FOR i FROM 1 TO Declining_Growth_Years:
+                Current_Growth_Rate_In_Phase2 = High_Growth_Rate - (Growth_Decline_Per_Year * (i - 1))
+                Last_FCF_Calc = Last_FCF_Calc * (1 + Current_Growth_Rate_In_Phase2)
+                Current_Year_Count = Current_Year_Count + 1
+                PV_FCF = Last_FCF_Calc / POWER((1 + WACC), Current_Year_Count)
+                PV_FCFs_Phase_2 = PV_FCFs_Phase_2 + PV_FCF
+                Detailed_FCF_Projections_Table.ADD({Year: Current_Year_Count, FCF: Last_FCF_Calc, PV_FCF: PV_FCF})
+            END FOR
+
+            // Terminal Value
+            Terminal_FCF = Last_FCF_Calc * (1 + Perpetual_Growth_Rate)
+            Terminal_Value_FCF = Terminal_FCF / (WACC - Perpetual_Growth_Rate)
+            PV_Terminal_Value = Terminal_Value_FCF / POWER((1 + WACC), Current_Year_Count)
+            
+            Intrinsic_Value = PV_FCFs_Phase_1 + PV_FCFs_Phase_2 + PV_Terminal_Value
+
+            DISPLAY_OUTPUT("Calculated_Intrinsic_Value_of_Firm", Intrinsic_Value)
+            DISPLAY_OUTPUT("Detailed_FCF_Projections_Table", Detailed_FCF_Projections_Table)
+        END FUNCTION
+        ```
+
+390. **Adjusted Present Value (APV) Model Valuation**
+    * **Purpose:** Value a company or project by first valuing it as if it were all-equity financed (unlevered), and then adding the present value of the financing side effects (like the tax shield of debt).
+    * **Inputs:**
+        * `Initial_Investment_Outlay` (Currency - for a project, 0 for valuing existing firm)
+        * `Unlevered_Free_Cash_Flows_Years` (List of Currency, one per year)
+        * `Unlevered_Cost_of_Equity` (Percentage)
+        * `Debt_Amount_Each_Year` (List of Currency, outstanding debt)
+        * `Cost_of_Debt_Each_Year` (List of Percentage)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Projection_Years` (Years)
+        * `Terminal_Value_Growth_Rate` (Percentage - for unlevered FCFs)
+    * **Calculations:**
+        * `PV_of_Unlevered_FCFs = 0`
+        * `FOR i FROM 0 TO Projection_Years - 1:`
+            * `PV_of_Unlevered_FCFs = PV_of_Unlevered_FCFs + (Unlevered_Free_Cash_Flows_Years[i] / (1 + Unlevered_Cost_of_Equity / 100)^(i+1))`
+        * `Unlevered_Terminal_Value = Unlevered_Free_Cash_Flows_Years[Projection_Years-1] * (1 + Terminal_Value_Growth_Rate / 100) / (Unlevered_Cost_of_Equity / 100 - Terminal_Value_Growth_Rate / 100)`
+        * `PV_Unlevered_Terminal_Value = Unlevered_Terminal_Value / (1 + Unlevered_Cost_of_Equity / 100)^Projection_Years`
+        * `Unlevered_Firm_Value = -Initial_Investment_Outlay + PV_of_Unlevered_FCFs + PV_Unlevered_Terminal_Value`
+        * `PV_of_Tax_Shields = 0`
+        * `FOR i FROM 0 TO Projection_Years - 1:`
+            * `Interest_Expense = Debt_Amount_Each_Year[i] * (Cost_of_Debt_Each_Year[i] / 100)`
+            * `Tax_Shield = Interest_Expense * (Corporate_Tax_Rate / 100)`
+            * `PV_of_Tax_Shields = PV_of_Tax_Shields + (Tax_Shield / (1 + Cost_of_Debt_Each_Year[i] / 100)^(i+1))`
+        * `APV = Unlevered_Firm_Value + PV_of_Tax_Shields`
+    * **Outputs:**
+        * `Calculated_Unlevered_Firm_Value` (Currency)
+        * `Calculated_PV_of_Debt_Tax_Shields` (Currency)
+        * `Calculated_Adjusted_Present_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAPVValuation():
+            Initial_Investment_Outlay = GET_INPUT("Initial_Investment_Outlay")
+            Unlevered_Free_Cash_Flows_Years = GET_INPUT("Unlevered_Free_Cash_Flows_Years") // List of FCFs
+            Unlevered_Cost_of_Equity = GET_INPUT("Unlevered_Cost_of_Equity") / 100
+            Debt_Amount_Each_Year = GET_INPUT("Debt_Amount_Each_Year") // List of debt balances
+            Cost_of_Debt_Each_Year = GET_INPUT("Cost_of_Debt_Each_Year") / 100 // List of debt costs
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Projection_Years = LENGTH(Unlevered_Free_Cash_Flows_Years) // Assume matching length
+            Terminal_Value_Growth_Rate = GET_INPUT("Terminal_Value_Growth_Rate") / 100
+
+            // Calculate Unlevered Firm Value
+            PV_of_Unlevered_FCFs = 0
+            FOR i FROM 0 TO Projection_Years - 1:
+                PV_of_Unlevered_FCFs = PV_of_Unlevered_FCFs + (Unlevered_Free_Cash_Flows_Years[i] / POWER((1 + Unlevered_Cost_of_Equity), (i + 1)))
+            END FOR
+
+            IF Unlevered_Cost_of_Equity <= Terminal_Value_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Adjusted_Present_Value", "Error: Unlevered Cost of Equity must be greater than Terminal Growth Rate.")
+                RETURN
+            END IF
+
+            Unlevered_Terminal_Value = Unlevered_Free_Cash_Flows_Years[Projection_Years-1] * (1 + Terminal_Value_Growth_Rate) / \
+                                      (Unlevered_Cost_of_Equity - Terminal_Value_Growth_Rate)
+            PV_Unlevered_Terminal_Value = Unlevered_Terminal_Value / POWER((1 + Unlevered_Cost_of_Equity), Projection_Years)
+
+            Unlevered_Firm_Value = -Initial_Investment_Outlay + PV_of_Unlevered_FCFs + PV_Unlevered_Terminal_Value
+
+            // Calculate Present Value of Tax Shields
+            PV_of_Tax_Shields = 0
+            FOR i FROM 0 TO Projection_Years - 1:
+                Interest_Expense_This_Year = Debt_Amount_Each_Year[i] * Cost_of_Debt_Each_Year[i]
+                Tax_Shield_This_Year = Interest_Expense_This_Year * Corporate_Tax_Rate
+                // Discount at cost of debt (Myers' method)
+                PV_of_Tax_Shields = PV_of_Tax_Shields + (Tax_Shield_This_Year / POWER((1 + Cost_of_Debt_Each_Year[i]), (i + 1)))
+            END FOR
+
+            APV = Unlevered_Firm_Value + PV_of_Tax_Shields
+
+            DISPLAY_OUTPUT("Calculated_Unlevered_Firm_Value", Unlevered_Firm_Value)
+            DISPLAY_OUTPUT("Calculated_PV_of_Debt_Tax_Shields", PV_of_Tax_Shields)
+            DISPLAY_OUTPUT("Calculated_Adjusted_Present_Value", APV)
+        END FUNCTION
+        ```
+
+391. **Sum-of-the-Parts (SOTP) Valuation**
+    * **Purpose:** Value a diversified company by valuing each of its individual business segments separately and then summing them up.
+    * **Inputs:**
+        * `Segment_1_EBITDA` (Currency)
+        * `Segment_1_Industry_EV_EBITDA_Multiple` (Number)
+        * `Segment_2_Revenue` (Currency)
+        * `Segment_2_Industry_EV_Sales_Multiple` (Number)
+        * `Other_Segments_Value` (Currency - sum of other, simpler segments)
+        * `Total_Company_Cash` (Currency)
+        * `Total_Company_Debt` (Currency)
+        * `Non_Operating_Assets_Value` (Currency - e.g., real estate, investments)
+        * `Shares_Outstanding` (Number)
+    * **Calculations:**
+        * `Segment_1_Value = Segment_1_EBITDA * Segment_1_Industry_EV_EBITDA_Multiple`
+        * `Segment_2_Value = Segment_2_Revenue * Segment_2_Industry_EV_Sales_Multiple`
+        * `Total_Enterprise_Value = Segment_1_Value + Segment_2_Value + Other_Segments_Value + Non_Operating_Assets_Value`
+        * `Total_Equity_Value = Total_Enterprise_Value - Total_Company_Debt + Total_Company_Cash`
+        * `SOTP_Value_Per_Share = Total_Equity_Value / Shares_Outstanding`
+    * **Outputs:**
+        * `Calculated_SOTP_Value_Per_Share` (Currency)
+        * `Segment_Valuations_Table` (Table: Segment, Valuation Method, Value)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSOTPValuation():
+            Segment_1_EBITDA = GET_INPUT("Segment_1_EBITDA")
+            Segment_1_Industry_EV_EBITDA_Multiple = GET_INPUT("Segment_1_Industry_EV_EBITDA_Multiple")
+            Segment_2_Revenue = GET_INPUT("Segment_2_Revenue")
+            Segment_2_Industry_EV_Sales_Multiple = GET_INPUT("Segment_2_Industry_EV_Sales_Multiple")
+            Other_Segments_Value = GET_INPUT("Other_Segments_Value")
+            Total_Company_Cash = GET_INPUT("Total_Company_Cash")
+            Total_Company_Debt = GET_INPUT("Total_Company_Debt")
+            Non_Operating_Assets_Value = GET_INPUT("Non_Operating_Assets_Value")
+            Shares_Outstanding = GET_INPUT("Shares_Outstanding")
+
+            Segment_1_Value = Segment_1_EBITDA * Segment_1_Industry_EV_EBITDA_Multiple
+            Segment_2_Value = Segment_2_Revenue * Segment_2_Industry_EV_Sales_Multiple
+            
+            Total_Enterprise_Value = Segment_1_Value + Segment_2_Value + Other_Segments_Value + Non_Operating_Assets_Value
+            Total_Equity_Value = Total_Enterprise_Value - Total_Company_Debt + Total_Company_Cash
+
+            IF Shares_Outstanding <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_SOTP_Value_Per_Share", "N/A - Shares Outstanding must be positive.")
+                RETURN
+            END IF
+            SOTP_Value_Per_Share = Total_Equity_Value / Shares_Outstanding
+
+            Segment_Valuations_Table = [
+                {Segment: "Segment 1", Method: "EV/EBITDA", Value: Segment_1_Value},
+                {Segment: "Segment 2", Method: "EV/Sales", Value: Segment_2_Value},
+                {Segment: "Other Segments", Method: "Direct Input", Value: Other_Segments_Value},
+                {Segment: "Non-Operating Assets", Method: "Direct Input", Value: Non_Operating_Assets_Value}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_SOTP_Value_Per_Share", SOTP_Value_Per_Share)
+            DISPLAY_OUTPUT("Segment_Valuations_Table", Segment_Valuations_Table)
+        END FUNCTION
+        ```
+
+392. **Return on Assets Employed (ROAE) Calculator**
+    * **Purpose:** Measure a company's efficiency in generating profits from the assets directly used in its operations.
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Total_Assets` (Currency)
+        * `Current_Liabilities` (Currency - excluding interest-bearing debt)
+    * **Calculations:**
+        * `Assets_Employed = Total_Assets - Cash_and_Cash_Equivalents - Non_Interest_Bearing_Current_Liabilities` (More precise definition of assets employed)
+        * `ROAE = (EBIT / Assets_Employed) * 100`
+    * **Outputs:**
+        * `Calculated_ROAE` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateROAE():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Total_Assets = GET_INPUT("Total_Assets")
+            Current_Liabilities = GET_INPUT("Current_Liabilities") // Should ideally be non-interest bearing current liabilities for precision
+
+            Assets_Employed = Total_Assets - Current_Liabilities // Simplified to Capital Employed as in 322
+
+            IF Assets_Employed <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROAE", "N/A - Assets Employed must be positive.")
+                RETURN
+            END IF
+
+            ROAE = (EBIT / Assets_Employed) * 100
+
+            DISPLAY_OUTPUT("Calculated_ROAE", ROAE)
+        END FUNCTION
+        ```
+
+393. **Net Income Per Employee Calculator**
+    * **Purpose:** Measure the profitability contribution of each employee to the company's net income.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Number_of_Employees` (Number)
+    * **Calculations:**
+        * `Net_Income_Per_Employee = Net_Income / Number_of_Employees`
+    * **Outputs:**
+        * `Calculated_Net_Income_Per_Employee` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateNetIncomePerEmployee():
+            Net_Income = GET_INPUT("Net_Income")
+            Number_of_Employees = GET_INPUT("Number_of_Employees")
+
+            IF Number_of_Employees <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Net_Income_Per_Employee", "N/A - Number of employees must be positive.")
+                RETURN
+            END IF
+
+            Net_Income_Per_Employee = Net_Income / Number_of_Employees
+
+            DISPLAY_OUTPUT("Calculated_Net_Income_Per_Employee", Net_Income_Per_Employee)
+        END FUNCTION
+        ```
+
+394. **Inventory to Sales Ratio**
+    * **Purpose:** Measure the proportion of inventory a company holds relative to its sales, indicating inventory management efficiency or potential overstocking.
+    * **Inputs:**
+        * `Total_Inventory` (Currency)
+        * `Net_Sales` (Currency)
+    * **Calculations:**
+        * `Inventory_to_Sales_Ratio = (Total_Inventory / Net_Sales) * 100`
+    * **Outputs:**
+        * `Calculated_Inventory_to_Sales_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInventoryToSalesRatio():
+            Total_Inventory = GET_INPUT("Total_Inventory")
+            Net_Sales = GET_INPUT("Net_Sales")
+
+            IF Net_Sales <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Inventory_to_Sales_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Inventory_to_Sales_Ratio = (Total_Inventory / Net_Sales) * 100
+
+            DISPLAY_OUTPUT("Calculated_Inventory_to_Sales_Ratio", Inventory_to_Sales_Ratio)
+        END FUNCTION
+        ```
+
+395. **Days Working Capital (DWC) Calculator**
+    * **Purpose:** Measure the average number of days that a company's working capital is tied up in its sales cycle.
+    * **Inputs:**
+        * `Average_Working_Capital` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+        * `Number_of_Days_in_Period` (Number - e.g., 365)
+    * **Calculations:**
+        * `DWC = (Average_Working_Capital / COGS) * Number_of_Days_in_Period`
+    * **Outputs:**
+        * `Calculated_Days_Working_Capital` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDaysWorkingCapital():
+            Average_Working_Capital = GET_INPUT("Average_Working_Capital")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+            Number_of_Days_in_Period = GET_INPUT("Number_of_Days_in_Period")
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Days_Working_Capital", "N/A")
+                RETURN
+            END IF
+
+            DWC = (Average_Working_Capital / COGS) * Number_of_Days_in_Period
+
+            DISPLAY_OUTPUT("Calculated_Days_Working_Capital", DWC)
+        END FUNCTION
+        ```
+
+396. **PP&E to Sales Ratio**
+    * **Purpose:** Measure the capital intensity of a company by comparing its fixed assets to its revenue.
+    * **Inputs:**
+        * `Net_Property_Plant_and_Equipment_PP_E` (Currency)
+        * `Total_Revenue` (Currency)
+    * **Calculations:**
+        * `PP_E_to_Sales_Ratio = (Net_PP_E / Total_Revenue) * 100`
+    * **Outputs:**
+        * `Calculated_PP_E_to_Sales_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePPEToSalesRatio():
+            Net_PP_E = GET_INPUT("Net_Property_Plant_and_Equipment_PP_E")
+            Total_Revenue = GET_INPUT("Total_Revenue")
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_PP_E_to_Sales_Ratio", "N/A")
+                RETURN
+            END IF
+
+            PP_E_to_Sales_Ratio = (Net_PP_E / Total_Revenue) * 100
+
+            DISPLAY_OUTPUT("Calculated_PP_E_to_Sales_Ratio", PP_E_to_Sales_Ratio)
+        END FUNCTION
+        ```
+
+397. **SG&A as % of Gross Profit**
+    * **Purpose:** Analyze how much of a company's gross profit is consumed by its operating overhead, indicating efficiency in managing non-production costs.
+    * **Inputs:**
+        * `Selling_General_and_Administrative_Expense_SG_A` (Currency)
+        * `Gross_Profit` (Currency)
+    * **Calculations:**
+        * `SG_A_to_Gross_Profit_Ratio = (SG_A / Gross_Profit) * 100`
+    * **Outputs:**
+        * `Calculated_SG_A_to_Gross_Profit_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSGAToGrossProfitRatio():
+            SG_A = GET_INPUT("Selling_General_and_Administrative_Expense_SG_A")
+            Gross_Profit = GET_INPUT("Gross_Profit")
+
+            IF Gross_Profit <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_SG_A_to_Gross_Profit_Ratio", "N/A")
+                RETURN
+            END IF
+
+            SG_A_to_Gross_Profit_Ratio = (SG_A / Gross_Profit) * 100
+
+            DISPLAY_OUTPUT("Calculated_SG_A_to_Gross_Profit_Ratio", SG_A_to_Gross_Profit_Ratio)
+        END FUNCTION
+        ```
+
+398. **EBITDA Margin Calculator (Advanced - with Normalized Earnings)**
+    * **Purpose:** Calculate EBITDA margin using a potentially normalized EBITDA to provide a clearer view of core operational profitability.
+    * **Inputs:**
+        * `Total_Revenue` (Currency)
+        * `Net_Income` (Currency)
+        * `Interest_Expense` (Currency)
+        * `Taxes` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Non_Recurring_Items` (Currency - e.g., one-time gains/losses)
+    * **Calculations:**
+        * `Adjusted_Net_Income = Net_Income - Non_Recurring_Items`
+        * `Adjusted_EBITDA = Adjusted_Net_Income + Interest_Expense + Taxes + Depreciation_Amortization`
+        * `EBITDA_Margin = (Adjusted_EBITDA / Total_Revenue) * 100`
+    * **Outputs:**
+        * `Calculated_Adjusted_EBITDA` (Currency)
+        * `Calculated_EBITDA_Margin` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEBITDAMarginAdvanced():
+            Total_Revenue = GET_INPUT("Total_Revenue")
+            Net_Income = GET_INPUT("Net_Income")
+            Interest_Expense = GET_INPUT("Interest_Expense")
+            Taxes = GET_INPUT("Taxes")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Non_Recurring_Items = GET_INPUT("Non_Recurring_Items")
+
+            Adjusted_Net_Income = Net_Income - Non_Recurring_Items
+            Adjusted_EBITDA = Adjusted_Net_Income + Interest_Expense + Taxes + Depreciation_Amortization
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EBITDA_Margin", "N/A")
+                RETURN
+            END IF
+
+            EBITDA_Margin = (Adjusted_EBITDA / Total_Revenue) * 100
+
+            DISPLAY_OUTPUT("Calculated_Adjusted_EBITDA", Adjusted_EBITDA)
+            DISPLAY_OUTPUT("Calculated_EBITDA_Margin", EBITDA_Margin)
+        END FUNCTION
+        ```
+
+399. **Effective Tax Rate (Company) Calculator**
+    * **Purpose:** Calculate the actual percentage of pre-tax income a company pays in taxes, after accounting for deductions, credits, and special treatments.
+    * **Inputs:**
+        * `Income_Tax_Expense` (Currency)
+        * `Earnings_Before_Tax_EBT` (Currency)
+    * **Calculations:**
+        * `Effective_Tax_Rate = (Income_Tax_Expense / EBT) * 100`
+    * **Outputs:**
+        * `Calculated_Effective_Tax_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCompanyEffectiveTaxRate():
+            Income_Tax_Expense = GET_INPUT("Income_Tax_Expense")
+            EBT = GET_INPUT("Earnings_Before_Tax_EBT")
+
+            IF EBT <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Effective_Tax_Rate", "N/A")
+                RETURN
+            END IF
+
+            Effective_Tax_Rate = (Income_Tax_Expense / EBT) * 100
+
+            DISPLAY_OUTPUT("Calculated_Effective_Tax_Rate", Effective_Tax_Rate)
+        END FUNCTION
+        ```
+
+400. **Return on Research & Development (ROR&D) (Simplified)**
+    * **Purpose:** A simplified attempt to quantify the return generated from a company's investment in R&D.
+    * **Inputs:**
+        * `Increase_in_Revenue_from_Innovation` (Currency - estimated increase directly from R&D)
+        * `R_D_Expense_Prior_Period` (Currency - R&D spending from a few years ago)
+    * **Calculations:**
+        * `ROR_D = (Increase_in_Revenue_from_Innovation / R_D_Expense_Prior_Period) * 100`
+        * *Highly simplified, R&D returns are complex to directly attribute.*
+    * **Outputs:**
+        * `Estimated_Return_on_R_D` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateROR_D():
+            Increase_in_Revenue_from_Innovation = GET_INPUT("Increase_in_Revenue_from_Innovation")
+            R_D_Expense_Prior_Period = GET_INPUT("R_D_Expense_Prior_Period")
+
+            IF R_D_Expense_Prior_Period <= 0 THEN
+                DISPLAY_OUTPUT("Estimated_Return_on_R_D", "N/A - R&D expense must be positive.")
+                RETURN
+            END IF
+
+            ROR_D = (Increase_in_Revenue_from_Innovation / R_D_Expense_Prior_Period) * 100
+
+            DISPLAY_OUTPUT("Estimated_Return_on_R_D", ROR_D)
+        END FUNCTION
+        ```
+
+401. **Receivables Turnover Ratio**
+    * **Purpose:** Measure how efficiently a company collects its accounts receivables from customers.
+    * **Inputs:**
+        * `Net_Credit_Sales` (Currency)
+        * `Average_Accounts_Receivable` (Currency - (Beginning AR + Ending AR) / 2)
+    * **Calculations:**
+        * `Receivables_Turnover = Net_Credit_Sales / Average_Accounts_Receivable`
+    * **Outputs:**
+        * `Calculated_Receivables_Turnover_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateReceivablesTurnoverRatio():
+            Net_Credit_Sales = GET_INPUT("Net_Credit_Sales")
+            Average_Accounts_Receivable = GET_INPUT("Average_Accounts_Receivable")
+
+            IF Average_Accounts_Receivable <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Receivables_Turnover_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Receivables_Turnover = Net_Credit_Sales / Average_Accounts_Receivable
+
+            DISPLAY_OUTPUT("Calculated_Receivables_Turnover_Ratio", Receivables_Turnover)
+        END FUNCTION
+        ```
+
+402. **Payables Turnover Ratio**
+    * **Purpose:** Measure how quickly a company pays its suppliers (accounts payable).
+    * **Inputs:**
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+        * `Average_Accounts_Payable` (Currency - (Beginning AP + Ending AP) / 2)
+    * **Calculations:**
+        * `Payables_Turnover = COGS / Average_Accounts_Payable`
+    * **Outputs:**
+        * `Calculated_Payables_Turnover_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePayablesTurnoverRatio():
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+            Average_Accounts_Payable = GET_INPUT("Average_Accounts_Payable")
+
+            IF Average_Accounts_Payable <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Payables_Turnover_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Payables_Turnover = COGS / Average_Accounts_Payable
+
+            DISPLAY_OUTPUT("Calculated_Payables_Turnover_Ratio", Payables_Turnover)
+        END FUNCTION
+        ```
+
+403. **Earnings Quality Ratio (Cash from Operations to Net Income)**
+    * **Purpose:** A direct comparison to indicate how much of a company's reported net income is backed by actual cash flow.
+    * **Inputs:**
+        * `Cash_Flow_from_Operating_Activities` (Currency)
+        * `Net_Income` (Currency)
+    * **Calculations:**
+        * `Earnings_Quality_Ratio = Cash_Flow_from_Operating_Activities / Net_Income`
+        * `Interpretation = IF Earnings_Quality_Ratio >= 1 THEN "High Quality" ELSE "Lower Quality"`
+    * **Outputs:**
+        * `Calculated_Earnings_Quality_Ratio` (Number)
+        * `Quality_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEarningsQualityRatio():
+            Cash_Flow_from_Operating_Activities = GET_INPUT("Cash_Flow_from_Operating_Activities")
+            Net_Income = GET_INPUT("Net_Income")
+
+            IF Net_Income <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Earnings_Quality_Ratio", "N/A")
+                DISPLAY_OUTPUT("Quality_Interpretation", "Net Income must be positive for calculation.")
+                RETURN
+            END IF
+
+            Earnings_Quality_Ratio = Cash_Flow_from_Operating_Activities / Net_Income
+
+            Interpretation = ""
+            IF Earnings_Quality_Ratio >= 1 THEN
+                Interpretation = "High Quality (Strong cash backing of earnings)"
+            ELSE
+                Interpretation = "Lower Quality (Earnings may rely more on non-cash items)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Earnings_Quality_Ratio", Earnings_Quality_Ratio)
+            DISPLAY_OUTPUT("Quality_Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+404. **Operating Leverage Ratio (Degree of Operating Leverage - DOL)**
+    * **Purpose:** Measure how sensitive a company's operating income is to changes in sales volume, indicating the proportion of fixed costs.
+    * **Inputs:**
+        * `Percentage_Change_in_EBIT` (Percentage)
+        * `Percentage_Change_in_Sales` (Percentage)
+        * `Fixed_Costs` (Currency)
+        * `Variable_Costs_Per_Unit` (Currency)
+        * `Sales_Price_Per_Unit` (Currency)
+        * `Number_of_Units_Sold` (Number)
+    * **Calculations:**
+        * `Contribution_Margin = (Sales_Price_Per_Unit - Variable_Costs_Per_Unit) * Number_of_Units_Sold`
+        * `EBIT = Contribution_Margin - Fixed_Costs`
+        * `DOL_from_Formula = Contribution_Margin / EBIT` (if EBIT > 0)
+        * `DOL_from_Percentage = Percentage_Change_in_EBIT / Percentage_Change_in_Sales` (if Percentage_Change_in_Sales > 0)
+    * **Outputs:**
+        * `Calculated_DOL_Ratio` (Number)
+        * `Sensitivity_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateOperatingLeverageRatio():
+            // Option 1: Using percentage changes
+            Percentage_Change_in_EBIT = GET_INPUT("Percentage_Change_in_EBIT")
+            Percentage_Change_in_Sales = GET_INPUT("Percentage_Change_in_Sales")
+
+            // Option 2: Using cost structure
+            Fixed_Costs = GET_INPUT("Fixed_Costs")
+            Variable_Costs_Per_Unit = GET_INPUT("Variable_Costs_Per_Unit")
+            Sales_Price_Per_Unit = GET_INPUT("Sales_Price_Per_Unit")
+            Number_of_Units_Sold = GET_INPUT("Number_of_Units_Sold")
+
+            DOL = 0
+            Sensitivity_Note = ""
+
+            // Prefer calculation from cost structure if available
+            IF Sales_Price_Per_Unit IS NOT NULL AND Variable_Costs_Per_Unit IS NOT NULL AND Number_of_Units_Sold IS NOT NULL AND Fixed_Costs IS NOT NULL THEN
+                Contribution_Margin_Total = (Sales_Price_Per_Unit - Variable_Costs_Per_Unit) * Number_of_Units_Sold
+                EBIT_Calculated = Contribution_Margin_Total - Fixed_Costs
+                IF EBIT_Calculated != 0 THEN
+                    DOL = Contribution_Margin_Total / EBIT_Calculated
+                    Sensitivity_Note = "Calculated from cost structure. A higher DOL means EBIT is more sensitive to changes in sales."
+                ELSE
+                    Sensitivity_Note = "EBIT is zero, DOL calculation is undefined from cost structure."
+                END IF
+            ELSE IF Percentage_Change_in_Sales != 0 THEN
+                DOL = Percentage_Change_in_EBIT / Percentage_Change_in_Sales
+                Sensitivity_Note = "Calculated from percentage changes. A higher DOL means EBIT is more sensitive to changes in sales."
+            ELSE
+                Sensitivity_Note = "Insufficient input for calculation."
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_DOL_Ratio", DOL)
+            DISPLAY_OUTPUT("Sensitivity_Note", Sensitivity_Note)
+        END FUNCTION
+        ```
+
+405. **Combined Leverage Ratio (Degree of Combined Leverage - DCL)**
+    * **Purpose:** Measure the sensitivity of a company's earnings per share (EPS) to changes in sales volume, combining both operating and financial leverage.
+    * **Inputs:**
+        * `Percentage_Change_in_EPS` (Percentage)
+        * `Percentage_Change_in_Sales` (Percentage)
+        * `Sales_Price_Per_Unit` (Currency)
+        * `Variable_Costs_Per_Unit` (Currency)
+        * `Fixed_Costs` (Currency)
+        * `Interest_Expense` (Currency)
+        * `Number_of_Units_Sold` (Number)
+    * **Calculations:**
+        * `Contribution_Margin_Total = (Sales_Price_Per_Unit - Variable_Costs_Per_Unit) * Number_of_Units_Sold`
+        * `DCL_from_Formula = Contribution_Margin_Total / (Contribution_Margin_Total - Fixed_Costs - Interest_Expense)` (If denominator > 0)
+        * `DCL_from_Percentage = Percentage_Change_in_EPS / Percentage_Change_in_Sales` (If Percentage_Change_in_Sales > 0)
+    * **Outputs:**
+        * `Calculated_DCL_Ratio` (Number)
+        * `Overall_Sensitivity_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCombinedLeverageRatio():
+            // Option 1: Using percentage changes
+            Percentage_Change_in_EPS = GET_INPUT("Percentage_Change_in_EPS")
+            Percentage_Change_in_Sales = GET_INPUT("Percentage_Change_in_Sales")
+
+            // Option 2: Using cost structure
+            Sales_Price_Per_Unit = GET_INPUT("Sales_Price_Per_Unit")
+            Variable_Costs_Per_Unit = GET_INPUT("Variable_Costs_Per_Unit")
+            Fixed_Costs = GET_INPUT("Fixed_Costs")
+            Interest_Expense = GET_INPUT("Interest_Expense")
+            Number_of_Units_Sold = GET_INPUT("Number_of_Units_Sold")
+
+            DCL = 0
+            Overall_Sensitivity_Note = ""
+
+            IF Sales_Price_Per_Unit IS NOT NULL AND Variable_Costs_Per_Unit IS NOT NULL AND Number_of_Units_Sold IS NOT NULL AND Fixed_Costs IS NOT NULL AND Interest_Expense IS NOT NULL THEN
+                Contribution_Margin_Total = (Sales_Price_Per_Unit - Variable_Costs_Per_Unit) * Number_of_Units_Sold
+                Denominator = Contribution_Margin_Total - Fixed_Costs - Interest_Expense
+                IF Denominator != 0 THEN
+                    DCL = Contribution_Margin_Total / Denominator
+                    Overall_Sensitivity_Note = "Calculated from cost structure. A higher DCL means EPS is highly sensitive to changes in sales."
+                ELSE
+                    Overall_Sensitivity_Note = "Denominator is zero, DCL calculation is undefined from cost structure."
+                END IF
+            ELSE IF Percentage_Change_in_Sales != 0 THEN
+                DCL = Percentage_Change_in_EPS / Percentage_Change_in_Sales
+                Overall_Sensitivity_Note = "Calculated from percentage changes. A higher DCL means EPS is highly sensitive to changes in sales."
+            ELSE
+                Overall_Sensitivity_Note = "Insufficient input for calculation."
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_DCL_Ratio", DCL)
+            DISPLAY_OUTPUT("Overall_Sensitivity_Note", Overall_Sensitivity_Note)
+        END FUNCTION
+        ```
+
+406. **Shareholder Yield Calculator**
+    * **Purpose:** A broader measure of direct shareholder returns, combining dividend yield, buyback yield, and sometimes debt reduction yield.
+    * **Inputs:**
+        * `Current_Share_Price` (Currency)
+        * `Annual_Dividend_Per_Share` (Currency)
+        * `Net_Share_Buybacks_Per_Share` (Currency - total value of buybacks minus new shares issued, divided by current shares)
+        * `Net_Debt_Repayment_Per_Share` (Currency - total debt paid down minus new debt issued, divided by current shares)
+    * **Calculations:**
+        * `Dividend_Yield = (Annual_Dividend_Per_Share / Current_Share_Price) * 100`
+        * `Buyback_Yield = (Net_Share_Buybacks_Per_Share / Current_Share_Price) * 100`
+        * `Debt_Paydown_Yield = (Net_Debt_Repayment_Per_Share / Current_Share_Price) * 100`
+        * `Shareholder_Yield = Dividend_Yield + Buyback_Yield + Debt_Paydown_Yield`
+    * **Outputs:**
+        * `Calculated_Shareholder_Yield` (Percentage)
+        * `Breakdown_of_Yield_Components` (Table)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateShareholderYield():
+            Current_Share_Price = GET_INPUT("Current_Share_Price")
+            Annual_Dividend_Per_Share = GET_INPUT("Annual_Dividend_Per_Share")
+            Net_Share_Buybacks_Per_Share = GET_INPUT("Net_Share_Buybacks_Per_Share")
+            Net_Debt_Repayment_Per_Share = GET_INPUT("Net_Debt_Repayment_Per_Share")
+
+            IF Current_Share_Price <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Shareholder_Yield", "N/A")
+                RETURN
+            END IF
+
+            Dividend_Yield = (Annual_Dividend_Per_Share / Current_Share_Price) * 100
+            Buyback_Yield = (Net_Share_Buybacks_Per_Share / Current_Share_Price) * 100
+            Debt_Paydown_Yield = (Net_Debt_Repayment_Per_Share / Current_Share_Price) * 100
+
+            Shareholder_Yield = Dividend_Yield + Buyback_Yield + Debt_Paydown_Yield
+
+            Breakdown_of_Yield_Components = [
+                {Component: "Dividend Yield", Value: Dividend_Yield},
+                {Component: "Buyback Yield", Value: Buyback_Yield},
+                {Component: "Debt Paydown Yield", Value: Debt_Paydown_Yield}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_Shareholder_Yield", Shareholder_Yield)
+            DISPLAY_OUTPUT("Breakdown_of_Yield_Components", Breakdown_of_Yield_Components)
+        END FUNCTION
+        ```
+
+407. **Earnings Retention Rate Calculator**
+    * **Purpose:** Calculate the percentage of net income that a company retains for reinvestment, rather than paying out as dividends.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Dividends_Paid` (Currency)
+    * **Calculations:**
+        * `Retained_Earnings_Amount = Net_Income - Dividends_Paid`
+        * `Earnings_Retention_Rate = (Retained_Earnings_Amount / Net_Income) * 100` (If Net_Income > 0)
+    * **Outputs:**
+        * `Calculated_Earnings_Retention_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEarningsRetentionRate():
+            Net_Income = GET_INPUT("Net_Income")
+            Dividends_Paid = GET_INPUT("Dividends_Paid")
+
+            IF Net_Income <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Earnings_Retention_Rate", "N/A")
+                RETURN
+            END IF
+
+            Retained_Earnings_Amount = Net_Income - Dividends_Paid
+            Earnings_Retention_Rate = (Retained_Earnings_Amount / Net_Income) * 100
+
+            DISPLAY_OUTPUT("Calculated_Earnings_Retention_Rate", Earnings_Retention_Rate)
+        END FUNCTION
+        ```
+
+408. **Diluted EPS Calculator (Complex Capital Structure)**
+    * **Purpose:** Calculate diluted EPS, accounting for all potential shares that could be created from convertible securities, stock options, etc.
+    * **Inputs:**
+        * `Net_Income_Available_to_Common_Shareholders` (Currency)
+        * `Weighted_Average_Basic_Shares_Outstanding` (Number)
+        * `Convertible_Bonds_Value` (Currency)
+        * `Convertible_Bonds_Conversion_Ratio` (Number - shares per bond)
+        * `Stock_Options_In_The_Money_Shares` (Number - from treasury stock method, if applicable)
+        * `Convertible_Preferred_Stock_Shares` (Number - if converted)
+        * `Preferred_Dividends` (Currency - if not already subtracted from Net Income)
+    * **Calculations:**
+        * `Adjusted_Net_Income = Net_Income_Available_to_Common_Shareholders + Preferred_Dividends` (If not already subtracted)
+        * `Shares_from_Convertible_Bonds = (Convertible_Bonds_Value / Face_Value_Per_Bond) * Convertible_Bonds_Conversion_Ratio` (Need Face Value per bond)
+        * `Total_Diluted_Shares = Weighted_Average_Basic_Shares_Outstanding + Shares_from_Convertible_Bonds + Stock_Options_In_The_Money_Shares + Convertible_Preferred_Stock_Shares`
+        * `Diluted_EPS = Adjusted_Net_Income / Total_Diluted_Shares`
+    * **Outputs:**
+        * `Calculated_Diluted_EPS` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDilutedEPSComplex():
+            Net_Income_Available_to_Common_Shareholders = GET_INPUT("Net_Income_Available_to_Common_Shareholders")
+            Weighted_Average_Basic_Shares_Outstanding = GET_INPUT("Weighted_Average_Basic_Shares_Outstanding")
+            Convertible_Bonds_Value = GET_INPUT("Convertible_Bonds_Value")
+            Convertible_Bonds_Conversion_Ratio = GET_INPUT("Convertible_Bonds_Conversion_Ratio") // Shares per bond
+            Face_Value_Per_Convertible_Bond = GET_INPUT("Face_Value_Per_Convertible_Bond") // Added required input
+            Stock_Options_In_The_Money_Shares = GET_INPUT("Stock_Options_In_The_Money_Shares") // From treasury stock method calculation
+            Convertible_Preferred_Stock_Shares = GET_INPUT("Convertible_Preferred_Stock_Shares")
+            Preferred_Dividends_To_Add_Back = GET_INPUT("Preferred_Dividends_To_Add_Back") // If not already in Net Income
+
+            Adjusted_Net_Income_For_Dilution = Net_Income_Available_to_Common_Shareholders + Preferred_Dividends_To_Add_Back
+
+            Shares_from_Convertible_Bonds = 0
+            IF Face_Value_Per_Convertible_Bond > 0 THEN
+                Shares_from_Convertible_Bonds = (Convertible_Bonds_Value / Face_Value_Per_Convertible_Bond) * Convertible_Bonds_Conversion_Ratio
+            END IF
+
+            Total_Diluted_Shares = Weighted_Average_Basic_Shares_Outstanding + Shares_from_Convertible_Bonds + \
+                                  Stock_Options_In_The_Money_Shares + Convertible_Preferred_Stock_Shares
+
+            IF Total_Diluted_Shares <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Diluted_EPS", "N/A - Total diluted shares must be positive.")
+                RETURN
+            END IF
+
+            Diluted_EPS = Adjusted_Net_Income_For_Dilution / Total_Diluted_Shares
+
+            DISPLAY_OUTPUT("Calculated_Diluted_EPS", Diluted_EPS)
+        END FUNCTION
+        ```
+
+409. **Customer Acquisition Cost (CAC) Calculator (SaaS/Subscription)**
+    * **Purpose:** Calculate the average cost to acquire a new customer, critical for growth companies.
+    * **Inputs:**
+        * `Total_Sales_Marketing_Spend` (Currency)
+        * `Number_of_New_Customers_Acquired` (Number)
+    * **Calculations:**
+        * `CAC = Total_Sales_Marketing_Spend / Number_of_New_Customers_Acquired`
+    * **Outputs:**
+        * `Calculated_Customer_Acquisition_Cost` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCAC():
+            Total_Sales_Marketing_Spend = GET_INPUT("Total_Sales_Marketing_Spend")
+            Number_of_New_Customers_Acquired = GET_INPUT("Number_of_New_Customers_Acquired")
+
+            IF Number_of_New_Customers_Acquired <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Customer_Acquisition_Cost", "N/A - Number of new customers must be positive.")
+                RETURN
+            END IF
+
+            CAC = Total_Sales_Marketing_Spend / Number_of_New_Customers_Acquired
+
+            DISPLAY_OUTPUT("Calculated_Customer_Acquisition_Cost", CAC)
+        END FUNCTION
+        ```
+
+410. **Customer Lifetime Value (CLTV) Calculator (Basic)**
+    * **Purpose:** Estimate the total revenue a company can expect from a single customer over their lifetime.
+    * **Inputs:**
+        * `Average_Customer_Value_Per_Period` (Currency - e.g., average monthly revenue per customer)
+        * `Average_Customer_Lifespan_Periods` (Number - e.g., months)
+    * **Calculations:**
+        * `CLTV = Average_Customer_Value_Per_Period * Average_Customer_Lifespan_Periods`
+    * **Outputs:**
+        * `Calculated_Customer_Lifetime_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCLTVBasic():
+            Average_Customer_Value_Per_Period = GET_INPUT("Average_Customer_Value_Per_Period")
+            Average_Customer_Lifespan_Periods = GET_INPUT("Average_Customer_Lifespan_Periods")
+
+            CLTV = Average_Customer_Value_Per_Period * Average_Customer_Lifespan_Periods
+
+            DISPLAY_OUTPUT("Calculated_Customer_Lifetime_Value", CLTV)
+        END FUNCTION
+        ```
+
+411. **CLTV to CAC Ratio**
+    * **Purpose:** Compare the value a customer brings to the cost of acquiring them, indicating the efficiency of sales and marketing efforts.
+    * **Inputs:**
+        * `Calculated_CLTV` (Currency)
+        * `Calculated_CAC` (Currency)
+    * **Calculations:**
+        * `CLTV_to_CAC_Ratio = Calculated_CLTV / Calculated_CAC`
+        * `Interpretation = IF CLTV_to_CAC_Ratio >= 3 THEN "Healthy" ELSE "Needs Improvement"`
+    * **Outputs:**
+        * `Calculated_CLTV_to_CAC_Ratio` (Number)
+        * `Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCLTVToCACRatio():
+            Calculated_CLTV = GET_INPUT("Calculated_CLTV")
+            Calculated_CAC = GET_INPUT("Calculated_CAC")
+
+            IF Calculated_CAC <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_CLTV_to_CAC_Ratio", "N/A")
+                DISPLAY_OUTPUT("Interpretation", "CAC must be positive for calculation.")
+                RETURN
+            END IF
+
+            CLTV_to_CAC_Ratio = Calculated_CLTV / Calculated_CAC
+
+            Interpretation = ""
+            IF CLTV_to_CAC_Ratio >= 3 THEN
+                Interpretation = "Healthy (Customer lifetime value significantly exceeds acquisition cost)"
+            ELSE IF CLTV_to_CAC_Ratio >= 1 THEN
+                Interpretation = "Needs Improvement (Customer value barely covers acquisition cost)"
+            ELSE
+                Interpretation = "Unhealthy (Acquisition cost exceeds customer lifetime value)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_CLTV_to_CAC_Ratio", CLTV_to_CAC_Ratio)
+            DISPLAY_OUTPUT("Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+412. **Burn Rate Calculator (Startup Finance)**
+    * **Purpose:** Calculate the rate at which a startup is spending its cash reserves.
+    * **Inputs:**
+        * `Beginning_Cash_Balance` (Currency)
+        * `Ending_Cash_Balance` (Currency)
+        * `Period_Months` (Months)
+    * **Calculations:**
+        * `Net_Burn = Beginning_Cash_Balance - Ending_Cash_Balance`
+        * `Monthly_Burn_Rate = Net_Burn / Period_Months`
+    * **Outputs:**
+        * `Calculated_Monthly_Burn_Rate` (Currency)
+        * `Calculated_Net_Burn_Over_Period` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBurnRate():
+            Beginning_Cash_Balance = GET_INPUT("Beginning_Cash_Balance")
+            Ending_Cash_Balance = GET_INPUT("Ending_Cash_Balance")
+            Period_Months = GET_INPUT("Period_Months")
+
+            IF Period_Months <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Monthly_Burn_Rate", "N/A")
+                RETURN
+            END IF
+
+            Net_Burn = Beginning_Cash_Balance - Ending_Cash_Balance
+            Monthly_Burn_Rate = Net_Burn / Period_Months
+
+            DISPLAY_OUTPUT("Calculated_Monthly_Burn_Rate", Monthly_Burn_Rate)
+            DISPLAY_OUTPUT("Calculated_Net_Burn_Over_Period", Net_Burn)
+        END FUNCTION
+        ```
+
+413. **Runway Calculator (Startup Finance)**
+    * **Purpose:** Estimate how many months a startup can continue operating given its current cash and burn rate.
+    * **Inputs:**
+        * `Current_Cash_Balance` (Currency)
+        * `Monthly_Burn_Rate` (Currency - from calculator 412)
+    * **Calculations:**
+        * `Runway_Months = Current_Cash_Balance / Monthly_Burn_Rate` (If burn rate > 0)
+    * **Outputs:**
+        * `Estimated_Runway_Months` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateRunway():
+            Current_Cash_Balance = GET_INPUT("Current_Cash_Balance")
+            Monthly_Burn_Rate = GET_INPUT("Monthly_Burn_Rate")
+
+            IF Monthly_Burn_Rate <= 0 THEN // Positive burn means losing money. If negative, gaining.
+                DISPLAY_OUTPUT("Estimated_Runway_Months", "N/A (Positive cash flow or zero burn)")
+                RETURN
+            END IF
+
+            Runway_Months = Current_Cash_Balance / Monthly_Burn_Rate
+
+            DISPLAY_OUTPUT("Estimated_Runway_Months", Runway_Months)
+        END FUNCTION
+        ```
+
+414. **Monthly Recurring Revenue (MRR) / Annual Recurring Revenue (ARR) Calculator**
+    * **Purpose:** Calculate the normalized recurring revenue for subscription-based businesses.
+    * **Inputs:**
+        * `Number_of_Subscribers` (Number)
+        * `Average_Revenue_Per_User_ARPU_Monthly` (Currency)
+        * `Total_Subscription_Revenue_Annual` (Currency)
+        * `Calculation_Type` (Text: "MRR", "ARR")
+    * **Calculations:**
+        * `MRR = Number_of_Subscribers * Average_Revenue_Per_User_ARPU_Monthly`
+        * `ARR = Total_Subscription_Revenue_Annual`
+        * `ARR_from_MRR = MRR * 12`
+    * **Outputs:**
+        * `Calculated_MRR` (Currency)
+        * `Calculated_ARR` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMRR_ARR():
+            Number_of_Subscribers = GET_INPUT("Number_of_Subscribers")
+            Average_Revenue_Per_User_ARPU_Monthly = GET_INPUT("Average_Revenue_Per_User_ARPU_Monthly")
+            Total_Subscription_Revenue_Annual = GET_INPUT("Total_Subscription_Revenue_Annual")
+            Calculation_Type = GET_INPUT("Calculation_Type")
+
+            Calculated_MRR_Val = Number_of_Subscribers * Average_Revenue_Per_User_ARPU_Monthly
+            Calculated_ARR_Val = Total_Subscription_Revenue_Annual
+
+            IF Calculation_Type = "MRR" THEN
+                DISPLAY_OUTPUT("Calculated_MRR", Calculated_MRR_Val)
+                DISPLAY_OUTPUT("Corresponding_ARR", Calculated_MRR_Val * 12)
+            ELSE IF Calculation_Type = "ARR" THEN
+                DISPLAY_OUTPUT("Calculated_ARR", Calculated_ARR_Val)
+                DISPLAY_OUTPUT("Corresponding_MRR", Calculated_ARR_Val / 12)
+            END IF
+        END FUNCTION
+        ```
+
+415. **Customer Churn Rate Calculator**
+    * **Purpose:** Calculate the percentage of customers (or revenue) that a business loses over a given period.
+    * **Inputs:**
+        * `Customers_at_Beginning_of_Period` (Number)
+        * `Customers_Lost_During_Period` (Number)
+        * `Revenue_at_Beginning_of_Period` (Currency)
+        * `Revenue_Lost_During_Period` (Currency)
+        * `Metric_Type` (Text: "Customer", "Revenue")
+    * **Calculations:**
+        * `Customer_Churn_Rate = (Customers_Lost_During_Period / Customers_at_Beginning_of_Period) * 100` (If Customers_at_Beginning_of_Period > 0)
+        * `Revenue_Churn_Rate = (Revenue_Lost_During_Period / Revenue_at_Beginning_of_Period) * 100` (If Revenue_at_Beginning_of_Period > 0)
+    * **Outputs:**
+        * `Calculated_Customer_Churn_Rate` (Percentage)
+        * `Calculated_Revenue_Churn_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCustomerChurnRate():
+            Customers_at_Beginning_of_Period = GET_INPUT("Customers_at_Beginning_of_Period")
+            Customers_Lost_During_Period = GET_INPUT("Customers_Lost_During_Period")
+            Revenue_at_Beginning_of_Period = GET_INPUT("Revenue_at_Beginning_of_Period")
+            Revenue_Lost_During_Period = GET_INPUT("Revenue_Lost_During_Period")
+
+            Customer_Churn_Rate = 0
+            IF Customers_at_Beginning_of_Period > 0 THEN
+                Customer_Churn_Rate = (Customers_Lost_During_Period / Customers_at_Beginning_of_Period) * 100
+            END IF
+
+            Revenue_Churn_Rate = 0
+            IF Revenue_at_Beginning_of_Period > 0 THEN
+                Revenue_Churn_Rate = (Revenue_Lost_During_Period / Revenue_at_Beginning_of_Period) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Customer_Churn_Rate", Customer_Churn_Rate)
+            DISPLAY_OUTPUT("Calculated_Revenue_Churn_Rate", Revenue_Churn_Rate)
+        END FUNCTION
+        ```
+
+416. **Net Revenue Retention (NRR) / Net Dollar Retention (NDR) Calculator**
+    * **Purpose:** Measure the revenue retained from existing customers over a period, accounting for upgrades, downgrades, and churn.
+    * **Inputs:**
+        * `Beginning_of_Period_Recurring_Revenue` (Currency)
+        * `Upgrades_Revenue` (Currency)
+        * `Downgrades_Revenue` (Currency)
+        * `Churned_Revenue` (Currency)
+    * **Calculations:**
+        * `Ending_Recurring_Revenue = Beginning_of_Period_Recurring_Revenue + Upgrades_Revenue - Downgrades_Revenue - Churned_Revenue`
+        * `NRR = (Ending_Recurring_Revenue / Beginning_of_Period_Recurring_Revenue) * 100` (If beginning revenue > 0)
+    * **Outputs:**
+        * `Calculated_NRR_NDR` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateNRR_NDR():
+            Beginning_of_Period_Recurring_Revenue = GET_INPUT("Beginning_of_Period_Recurring_Revenue")
+            Upgrades_Revenue = GET_INPUT("Upgrades_Revenue")
+            Downgrades_Revenue = GET_INPUT("Downgrades_Revenue")
+            Churned_Revenue = GET_INPUT("Churned_Revenue")
+
+            IF Beginning_of_Period_Recurring_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_NRR_NDR", "N/A")
+                RETURN
+            END IF
+
+            Ending_Recurring_Revenue = Beginning_of_Period_Recurring_Revenue + Upgrades_Revenue - Downgrades_Revenue - Churned_Revenue
+            NRR = (Ending_Recurring_Revenue / Beginning_of_Period_Recurring_Revenue) * 100
+
+            DISPLAY_OUTPUT("Calculated_NRR_NDR", NRR)
+        END FUNCTION
+        ```
+
+417. **Rule of 40 (SaaS/Subscription Business Health)**
+    * **Purpose:** A quick metric for SaaS companies that sums revenue growth rate and EBITDA margin, aiming for a total of 40% or higher.
+    * **Inputs:**
+        * `Annual_Revenue_Growth_Rate` (Percentage)
+        * `EBITDA_Margin` (Percentage)
+    * **Calculations:**
+        * `Rule_of_40_Score = Annual_Revenue_Growth_Rate + EBITDA_Margin`
+        * `Health_Indicator = IF Rule_of_40_Score >= 40 THEN "Healthy (Balanced Growth & Profitability)" ELSE "Needs Improvement"`
+    * **Outputs:**
+        * `Calculated_Rule_of_40_Score` (Percentage)
+        * `Business_Health_Indicator` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateRuleOf40SaaS():
+            Annual_Revenue_Growth_Rate = GET_INPUT("Annual_Revenue_Growth_Rate")
+            EBITDA_Margin = GET_INPUT("EBITDA_Margin")
+
+            Rule_of_40_Score = Annual_Revenue_Growth_Rate + EBITDA_Margin
+
+            Health_Indicator = ""
+            IF Rule_of_40_Score >= 40 THEN
+                Health_Indicator = "Healthy (Balanced Growth & Profitability)"
+            ELSE
+                Health_Indicator = "Needs Improvement (Growth or profitability needs attention)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Rule_of_40_Score", Rule_of_40_Score)
+            DISPLAY_OUTPUT("Business_Health_Indicator", Health_Indicator)
+        END FUNCTION
+        ```
+
+418. **Average Revenue Per User (ARPU) / Average Revenue Per Account (ARPA)**
+    * **Purpose:** Calculate the average revenue generated from each user or account over a specific period.
+    * **Inputs:**
+        * `Total_Revenue_for_Period` (Currency)
+        * `Number_of_Users_or_Accounts` (Number)
+    * **Calculations:**
+        * `ARPU_ARPA = Total_Revenue_for_Period / Number_of_Users_or_Accounts`
+    * **Outputs:**
+        * `Calculated_ARPU_ARPA` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateARPU_ARPA():
+            Total_Revenue_for_Period = GET_INPUT("Total_Revenue_for_Period")
+            Number_of_Users_or_Accounts = GET_INPUT("Number_of_Users_or_Accounts")
+
+            IF Number_of_Users_or_Accounts <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ARPU_ARPA", "N/A")
+                RETURN
+            END IF
+
+            ARPU_ARPA = Total_Revenue_for_Period / Number_of_Users_or_Accounts
+
+            DISPLAY_OUTPUT("Calculated_ARPU_ARPA", ARPU_ARPA)
+        END FUNCTION
+        ```
+
+419. **Customer Acquisition Cost (CAC) Payback Period**
+    * **Purpose:** Determine how many months it takes for a company to recoup the cost of acquiring a new customer from the revenue they generate.
+    * **Inputs:**
+        * `Calculated_CAC` (Currency)
+        * `Average_Revenue_Per_User_ARPU_Monthly` (Currency)
+        * `Gross_Margin_Percentage` (Percentage)
+    * **Calculations:**
+        * `Average_Monthly_Gross_Profit_Per_User = ARPU_Monthly * (Gross_Margin_Percentage / 100)`
+        * `CAC_Payback_Months = Calculated_CAC / Average_Monthly_Gross_Profit_Per_User` (If Avg Monthly Gross Profit > 0)
+    * **Outputs:**
+        * `Calculated_CAC_Payback_Months` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCACPaybackPeriod():
+            Calculated_CAC = GET_INPUT("Calculated_CAC")
+            Average_Revenue_Per_User_ARPU_Monthly = GET_INPUT("Average_Revenue_Per_User_ARPU_Monthly")
+            Gross_Margin_Percentage = GET_INPUT("Gross_Margin_Percentage") / 100
+
+            Average_Monthly_Gross_Profit_Per_User = Average_Revenue_Per_User_ARPU_Monthly * Gross_Margin_Percentage
+
+            IF Average_Monthly_Gross_Profit_Per_User <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_CAC_Payback_Months", "N/A - Positive gross profit per user required.")
+                RETURN
+            END IF
+
+            CAC_Payback_Months = Calculated_CAC / Average_Monthly_Gross_Profit_Per_User
+
+            DISPLAY_OUTPUT("Calculated_CAC_Payback_Months", CAC_Payback_Months)
+        END FUNCTION
+        ```
+
+420. **Capital Intensity Ratio (PP&E to Revenue)**
+    * **Purpose:** Measure the amount of capital (fixed assets) required to generate one dollar of revenue, indicating how capital-intensive a business is.
+    * **Inputs:**
+        * `Net_Property_Plant_and_Equipment_PP_E` (Currency)
+        * `Total_Revenue` (Currency)
+    * **Calculations:**
+        * `Capital_Intensity_Ratio = Net_PP_E / Total_Revenue`
+    * **Outputs:**
+        * `Calculated_Capital_Intensity_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCapitalIntensityRatio():
+            Net_PP_E = GET_INPUT("Net_Property_Plant_and_Equipment_PP_E")
+            Total_Revenue = GET_INPUT("Total_Revenue")
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Capital_Intensity_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Capital_Intensity_Ratio = Net_PP_E / Total_Revenue
+
+            DISPLAY_OUTPUT("Calculated_Capital_Intensity_Ratio", Capital_Intensity_Ratio)
+        END FUNCTION
+        ```
+
+421. **Average Collection Period (ACP) Calculator**
+    * **Purpose:** Measure the average number of days it takes for a company to collect its accounts receivables.
+    * **Inputs:**
+        * `Accounts_Receivable` (Currency)
+        * `Annual_Credit_Sales` (Currency)
+        * `Number_of_Days_in_Period` (Number - e.g., 365)
+    * **Calculations:**
+        * `Average_Daily_Credit_Sales = Annual_Credit_Sales / Number_of_Days_in_Period`
+        * `ACP = Accounts_Receivable / Average_Daily_Credit_Sales`
+    * **Outputs:**
+        * `Calculated_Average_Collection_Period_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAverageCollectionPeriod():
+            Accounts_Receivable = GET_INPUT("Accounts_Receivable")
+            Annual_Credit_Sales = GET_INPUT("Annual_Credit_Sales")
+            Number_of_Days_in_Period = GET_INPUT("Number_of_Days_in_Period")
+
+            IF Annual_Credit_Sales <= 0 OR Number_of_Days_in_Period <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Average_Collection_Period_Days", "N/A")
+                RETURN
+            END IF
+
+            Average_Daily_Credit_Sales = Annual_Credit_Sales / Number_of_Days_in_Period
+            ACP = Accounts_Receivable / Average_Daily_Credit_Sales
+
+            DISPLAY_OUTPUT("Calculated_Average_Collection_Period_Days", ACP)
+        END FUNCTION
+        ```
+
+422. **Inventory Conversion Period (ICP) Calculator**
+    * **Purpose:** Measure the average number of days it takes for a company to convert its inventory into sales.
+    * **Inputs:**
+        * `Average_Inventory` (Currency)
+        * `Annual_Cost_of_Goods_Sold` (Currency)
+        * `Number_of_Days_in_Period` (Number - e.g., 365)
+    * **Calculations:**
+        * `Average_Daily_COGS = Annual_Cost_of_Goods_Sold / Number_of_Days_in_Period`
+        * `ICP = Average_Inventory / Average_Daily_COGS`
+    * **Outputs:**
+        * `Calculated_Inventory_Conversion_Period_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInventoryConversionPeriod():
+            Average_Inventory = GET_INPUT("Average_Inventory")
+            Annual_Cost_of_Goods_Sold = GET_INPUT("Annual_Cost_of_Goods_Sold")
+            Number_of_Days_in_Period = GET_INPUT("Number_of_Days_in_Period")
+
+            IF Annual_Cost_of_Goods_Sold <= 0 OR Number_of_Days_in_Period <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Inventory_Conversion_Period_Days", "N/A")
+                RETURN
+            END IF
+
+            Average_Daily_COGS = Annual_Cost_of_Goods_Sold / Number_of_Days_in_Period
+            ICP = Average_Inventory / Average_Daily_COGS
+
+            DISPLAY_OUTPUT("Calculated_Inventory_Conversion_Period_Days", ICP)
+        END FUNCTION
+        ```
+
+423. **Payables Deferral Period (PDP) Calculator**
+    * **Purpose:** Measure the average number of days a company takes to pay its suppliers.
+    * **Inputs:**
+        * `Average_Accounts_Payable` (Currency)
+        * `Annual_Cost_of_Goods_Sold` (Currency)
+        * `Number_of_Days_in_Period` (Number - e.g., 365)
+    * **Calculations:**
+        * `Average_Daily_COGS = Annual_Cost_of_Goods_Sold / Number_of_Days_in_Period`
+        * `PDP = Average_Accounts_Payable / Average_Daily_COGS`
+    * **Outputs:**
+        * `Calculated_Payables_Deferral_Period_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePayablesDeferralPeriod():
+            Average_Accounts_Payable = GET_INPUT("Average_Accounts_Payable")
+            Annual_Cost_of_Goods_Sold = GET_INPUT("Annual_Cost_of_Goods_Sold")
+            Number_of_Days_in_Period = GET_INPUT("Number_of_Days_in_Period")
+
+            IF Annual_Cost_of_Goods_Sold <= 0 OR Number_of_Days_in_Period <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Payables_Deferral_Period_Days", "N/A")
+                RETURN
+            END IF
+
+            Average_Daily_COGS = Annual_Cost_of_Goods_Sold / Number_of_Days_in_Period
+            PDP = Average_Accounts_Payable / Average_Daily_COGS
+
+            DISPLAY_OUTPUT("Calculated_Payables_Deferral_Period_Days", PDP)
+        END FUNCTION
+        ```
+
+424. **Cash Flow Sustainability Ratio (Cash from Operations to Dividends + CapEx)**
+    * **Purpose:** Assess a company's ability to cover its dividends and capital expenditures with its operating cash flow, indicating sustainability.
+    * **Inputs:**
+        * `Cash_Flow_from_Operating_Activities` (Currency)
+        * `Total_Dividends_Paid` (Currency)
+        * `Capital_Expenditures` (Currency)
+    * **Calculations:**
+        * `Cash_Flow_Needed = Total_Dividends_Paid + Capital_Expenditures`
+        * `Sustainability_Ratio = Cash_Flow_from_Operating_Activities / Cash_Flow_Needed` (If Cash_Flow_Needed > 0)
+        * `Interpretation = IF Sustainability_Ratio >= 1 THEN "Sustainable" ELSE "Unsustainable"`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_Sustainability_Ratio` (Number)
+        * `Sustainability_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCashFlowSustainabilityRatio():
+            Cash_Flow_from_Operating_Activities = GET_INPUT("Cash_Flow_from_Operating_Activities")
+            Total_Dividends_Paid = GET_INPUT("Total_Dividends_Paid")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+
+            Cash_Flow_Needed = Total_Dividends_Paid + Capital_Expenditures
+
+            IF Cash_Flow_Needed <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cash_Flow_Sustainability_Ratio", "N/A")
+                DISPLAY_OUTPUT("Sustainability_Interpretation", "Dividends and CapEx must be positive for calculation.")
+                RETURN
+            END IF
+
+            Sustainability_Ratio = Cash_Flow_from_Operating_Activities / Cash_Flow_Needed
+
+            Interpretation = ""
+            IF Sustainability_Ratio >= 1 THEN
+                Interpretation = "Sustainable (Operating cash flow covers dividends and capital expenditures)"
+            ELSE
+                Interpretation = "Unsustainable (Operating cash flow is not sufficient to cover dividends and capital expenditures)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_Sustainability_Ratio", Sustainability_Ratio)
+            DISPLAY_OUTPUT("Sustainability_Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+425. **Free Cash Flow to Sales Ratio**
+    * **Purpose:** Measure the percentage of sales revenue that a company converts into free cash flow, indicating efficiency in generating cash.
+    * **Inputs:**
+        * `Free_Cash_Flow` (Currency)
+        * `Total_Revenue` (Currency)
+    * **Calculations:**
+        * `FCF_to_Sales_Ratio = (Free_Cash_Flow / Total_Revenue) * 100`
+    * **Outputs:**
+        * `Calculated_FCF_to_Sales_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFToSalesRatio():
+            Free_Cash_Flow = GET_INPUT("Free_Cash_Flow")
+            Total_Revenue = GET_INPUT("Total_Revenue")
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FCF_to_Sales_Ratio", "N/A")
+                RETURN
+            END IF
+
+            FCF_to_Sales_Ratio = (Free_Cash_Flow / Total_Revenue) * 100
+
+            DISPLAY_OUTPUT("Calculated_FCF_to_Sales_Ratio", FCF_to_Sales_Ratio)
+        END FUNCTION
+        ```
+
+426. **Capital Intensity Ratio (Sales to PP&E)**
+    * **Purpose:** The inverse of PP&E to Sales, showing how much revenue is generated per dollar of fixed assets.
+    * **Inputs:**
+        * `Total_Revenue` (Currency)
+        * `Net_Property_Plant_and_Equipment_PP_E` (Currency)
+    * **Calculations:**
+        * `Capital_Intensity_Ratio = Total_Revenue / Net_PP_E`
+    * **Outputs:**
+        * `Calculated_Capital_Intensity_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCapitalIntensityRatioSalesToPPE():
+            Total_Revenue = GET_INPUT("Total_Revenue")
+            Net_PP_E = GET_INPUT("Net_Property_Plant_and_Equipment_PP_E")
+
+            IF Net_PP_E <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Capital_Intensity_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Capital_Intensity_Ratio = Total_Revenue / Net_PP_E
+
+            DISPLAY_OUTPUT("Calculated_Capital_Intensity_Ratio", Capital_Intensity_Ratio)
+        END FUNCTION
+        ```
+
+427. **Financial Distress Score (Beneish M-Score)**
+    * **Purpose:** A statistical model that uses eight financial ratios to detect earnings manipulation.
+    * **Inputs:** (All inputs are ratios derived from financial statements over two periods)
+        * `DSRI_Days_Sales_Receivable_Index` (AR_t / Sales_t) / (AR_t-1 / Sales_t-1)
+        * `GMI_Gross_Margin_Index` (Sales_t-1 - COGS_t-1) / Sales_t-1) / ((Sales_t - COGS_t) / Sales_t)
+        * `AQI_Asset_Quality_Index` (1 - PPE_t + CurrentAssets_t) / TotalAssets_t) / (1 - PPE_t-1 + CurrentAssets_t-1) / TotalAssets_t-1)
+        * `SGI_Sales_Growth_Index` (Sales_t / Sales_t-1)
+        * `DEPI_Depreciation_Index` (Depreciation_t-1 / (PPE_t-1 + Depreciation_t-1)) / (Depreciation_t / (PPE_t + Depreciation_t))
+        * `SGAI_SG_A_Index` (SG&A_t / Sales_t) / (SG&A_t-1 / Sales_t-1)
+        * `TATA_Total_Accruals_to_Total_Assets` (NetIncome_t - CFO_t) / TotalAssets_t
+        * `LVGI_Leverage_Index` ((LongTermDebt_t + CurrentLiabilities_t) / TotalAssets_t) / ((LongTermDebt_t-1 + CurrentLiabilities_t-1) / TotalAssets_t-1)
+    * **Calculations:**
+        * `M_Score = -4.84 + 0.92 * DSRI + 0.528 * GMI + 0.404 * AQI + 0.892 * SGI + 0.115 * DEPI - 0.172 * SGAI + 4.679 * TATA - 0.327 * LVGI`
+        * `Interpretation = IF M_Score > -1.78 THEN "Likely Manipulator" ELSE "Unlikely Manipulator"`
+    * **Outputs:**
+        * `Calculated_Beneish_M_Score` (Number)
+        * `Earnings_Manipulation_Risk_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBeneishMScore():
+            DSRI = GET_INPUT("DSRI_Days_Sales_Receivable_Index")
+            GMI = GET_INPUT("GMI_Gross_Margin_Index")
+            AQI = GET_INPUT("AQI_Asset_Quality_Index")
+            SGI = GET_INPUT("SGI_Sales_Growth_Index")
+            DEPI = GET_INPUT("DEPI_Depreciation_Index")
+            SGAI = GET_INPUT("SGAI_SG_A_Index")
+            TATA = GET_INPUT("TATA_Total_Accruals_to_Total_Assets")
+            LVGI = GET_INPUT("LVGI_Leverage_Index")
+
+            // Ensure all ratios are correctly calculated from raw financial data before input
+            // This calculator assumes the user provides the *already calculated* ratios.
+
+            M_Score = -4.84 + (0.92 * DSRI) + (0.528 * GMI) + (0.404 * AQI) + (0.892 * SGI) + \
+                      (0.115 * DEPI) - (0.172 * SGAI) + (4.679 * TATA) - (0.327 * LVGI)
+
+            Interpretation = ""
+            IF M_Score > -1.78 THEN
+                Interpretation = "Likely Manipulator (M-Score suggests potential earnings manipulation)"
+            ELSE
+                Interpretation = "Unlikely Manipulator (M-Score does not suggest earnings manipulation)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Beneish_M_Score", M_Score)
+            DISPLAY_OUTPUT("Earnings_Manipulation_Risk_Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+428. **Cost of Financial Distress (Conceptual)**
+    * **Purpose:** Illustrate the various direct and indirect costs a company might incur if it faces financial distress or bankruptcy.
+    * **Inputs:**
+        * `Direct_Legal_Admin_Costs` (Currency - estimated legal/court fees)
+        * `Lost_Sales_Due_to_Reputation_Damage` (Currency - estimated revenue loss)
+        * `Higher_Borrowing_Costs_Future` (Percentage - extra interest paid)
+        * `Loss_of_Key_Employees_Value` (Currency - estimated cost of talent drain)
+        * `Disrupted_Operations_Cost` (Currency - estimate of efficiency loss)
+    * **Calculations:**
+        * `Total_Direct_Costs = Direct_Legal_Admin_Costs`
+        * `Total_Indirect_Costs = Lost_Sales_Due_to_Reputation_Damage + (Higher_Borrowing_Costs_Future * Total_Debt) + Loss_of_Key_Employees_Value + Disrupted_Operations_Cost`
+        * `Total_Estimated_Cost_of_Distress = Total_Direct_Costs + Total_Indirect_Costs`
+    * **Outputs:**
+        * `Estimated_Total_Cost_of_Financial_Distress` (Currency)
+        * `Breakdown_of_Costs` (Table: Cost Type, Amount)
+        * `Consequences_Summary` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfFinancialDistress():
+            Direct_Legal_Admin_Costs = GET_INPUT("Direct_Legal_Admin_Costs")
+            Lost_Sales_Due_to_Reputation_Damage = GET_INPUT("Lost_Sales_Due_to_Reputation_Damage")
+            Higher_Borrowing_Costs_Future = GET_INPUT("Higher_Borrowing_Costs_Future") / 100 // as %
+            Total_Debt_at_Distress_Point = GET_INPUT("Total_Debt_at_Distress_Point") // Need this for interest calc
+            Loss_of_Key_Employees_Value = GET_INPUT("Loss_of_Key_Employees_Value")
+            Disrupted_Operations_Cost = GET_INPUT("Disrupted_Operations_Cost")
+
+            Total_Direct_Costs = Direct_Legal_Admin_Costs
+            Estimated_Additional_Interest_Cost = Higher_Borrowing_Costs_Future * Total_Debt_at_Distress_Point
+            Total_Indirect_Costs = Lost_Sales_Due_to_Reputation_Damage + Estimated_Additional_Interest_Cost + Loss_of_Key_Employees_Value + Disrupted_Operations_Cost
+            Total_Estimated_Cost_of_Distress = Total_Direct_Costs + Total_Indirect_Costs
+
+            Consequences_Summary = "Financial distress leads to both direct (legal, admin) and indirect (reputation damage, talent loss, higher costs) expenses. It can severely impact a company's ability to operate, borrow, and compete, often leading to bankruptcy."
+
+            Breakdown_of_Costs = [
+                {Type: "Direct Legal/Admin Costs", Amount: Direct_Legal_Admin_Costs},
+                {Type: "Lost Sales (Indirect)", Amount: Lost_Sales_Due_to_Reputation_Damage},
+                {Type: "Higher Future Borrowing Costs (Indirect)", Amount: Estimated_Additional_Interest_Cost},
+                {Type: "Loss of Key Employees (Indirect)", Amount: Loss_of_Key_Employees_Value},
+                {Type: "Disrupted Operations (Indirect)", Amount: Disrupted_Operations_Cost}
+            ]
+
+            DISPLAY_OUTPUT("Estimated_Total_Cost_of_Financial_Distress", Total_Estimated_Cost_of_Distress)
+            DISPLAY_OUTPUT("Breakdown_of_Costs", Breakdown_of_Costs)
+            DISPLAY_OUTPUT("Consequences_Summary", Consequences_Summary)
+        END FUNCTION
+        ```
+
+429. **Customer Lifetime Value (CLTV) - Advanced (with Churn & Discount Rate)**
+    * **Purpose:** Calculate a more robust CLTV by incorporating churn rate and a discount rate for future cash flows.
+    * **Inputs:**
+        * `Average_Revenue_Per_User_ARPU_Monthly` (Currency)
+        * `Gross_Margin_Percentage` (Percentage)
+        * `Monthly_Churn_Rate` (Percentage)
+        * `Discount_Rate_Monthly` (Percentage)
+    * **Calculations:**
+        * `Average_Customer_Lifespan_Months = 1 / (Monthly_Churn_Rate / 100)` (If Churn > 0)
+        * `Customer_Value_Per_Month_Gross_Profit = ARPU_Monthly * (Gross_Margin_Percentage / 100)`
+        * `CLTV_Advanced = Customer_Value_Per_Month_Gross_Profit / ((Monthly_Churn_Rate / 100) + (Discount_Rate_Monthly / 100))`
+    * **Outputs:**
+        * `Calculated_Advanced_CLTV` (Currency)
+        * `Average_Customer_Lifespan_Months` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCLTVAdvanced():
+            Average_Revenue_Per_User_ARPU_Monthly = GET_INPUT("Average_Revenue_Per_User_ARPU_Monthly")
+            Gross_Margin_Percentage = GET_INPUT("Gross_Margin_Percentage") / 100
+            Monthly_Churn_Rate = GET_INPUT("Monthly_Churn_Rate") / 100
+            Discount_Rate_Monthly = GET_INPUT("Discount_Rate_Monthly") / 100
+
+            IF Monthly_Churn_Rate <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Advanced_CLTV", "N/A - Monthly Churn Rate must be positive for average lifespan.")
+                RETURN
+            END IF
+
+            Average_Customer_Lifespan_Months = 1 / Monthly_Churn_Rate
+            Customer_Value_Per_Month_Gross_Profit = Average_Revenue_Per_User_ARPU_Monthly * Gross_Margin_Percentage
+
+            Denominator = Monthly_Churn_Rate + Discount_Rate_Monthly
+            IF Denominator = 0 THEN
+                DISPLAY_OUTPUT("Calculated_Advanced_CLTV", "N/A - Denominator for CLTV cannot be zero.")
+                RETURN
+            END IF
+
+            CLTV_Advanced = Customer_Value_Per_Month_Gross_Profit / Denominator
+
+            DISPLAY_OUTPUT("Calculated_Advanced_CLTV", CLTV_Advanced)
+            DISPLAY_OUTPUT("Average_Customer_Lifespan_Months", Average_Customer_Lifespan_Months)
+        END FUNCTION
+        ```
+
+430. **Monthly Recurring Revenue (MRR) Churn Rate (Net)**
+    * **Purpose:** Calculate the net change in monthly recurring revenue from an existing customer base.
+    * **Inputs:**
+        * `Beginning_of_Period_MRR` (Currency)
+        * `Expansion_MRR` (Currency - from upgrades/add-ons)
+        * `Contraction_MRR` (Currency - from downgrades)
+        * `Churn_MRR` (Currency - from lost customers)
+    * **Calculations:**
+        * `Net_MRR_Change = Expansion_MRR - Contraction_MRR - Churn_MRR`
+        * `Net_MRR_Churn_Rate = (Net_MRR_Change / Beginning_of_Period_MRR) * 100`
+        * `Interpretation = IF Net_MRR_Churn_Rate < 0 THEN "Negative Churn (Growth from Existing)" ELSE "Positive Churn (Revenue Loss)"`
+    * **Outputs:**
+        * `Calculated_Net_MRR_Change` (Currency)
+        * `Calculated_Net_MRR_Churn_Rate` (Percentage)
+        * `Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateNetMRRChurnRate():
+            Beginning_of_Period_MRR = GET_INPUT("Beginning_of_Period_MRR")
+            Expansion_MRR = GET_INPUT("Expansion_MRR")
+            Contraction_MRR = GET_INPUT("Contraction_MRR")
+            Churn_MRR = GET_INPUT("Churn_MRR")
+
+            Net_MRR_Change = Expansion_MRR - Contraction_MRR - Churn_MRR
+
+            Net_MRR_Churn_Rate = 0
+            IF Beginning_of_Period_MRR > 0 THEN
+                Net_MRR_Churn_Rate = (Net_MRR_Change / Beginning_of_Period_MRR) * 100
+            END IF
+
+            Interpretation = ""
+            IF Net_MRR_Churn_Rate < 0 THEN
+                Interpretation = "Negative Churn (Revenue growth from existing customers)"
+            ELSE
+                Interpretation = "Positive Churn (Revenue loss from existing customers)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Net_MRR_Change", Net_MRR_Change)
+            DISPLAY_OUTPUT("Calculated_Net_MRR_Churn_Rate", Net_MRR_Churn_Rate)
+            DISPLAY_OUTPUT("Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+431. **Unit Economics Calculator (Basic)**
+    * **Purpose:** Evaluate the profitability of a business on a per-customer or per-unit basis.
+    * **Inputs:**
+        * `Revenue_Per_Unit_or_Customer` (Currency)
+        * `Cost_of_Goods_Sold_Per_Unit_or_Customer` (Currency)
+        * `Variable_Operating_Costs_Per_Unit_or_Customer` (Currency)
+        * `Customer_Acquisition_Cost_CAC` (Currency)
+    * **Calculations:**
+        * `Gross_Profit_Per_Unit = Revenue_Per_Unit_or_Customer - COGS_Per_Unit_or_Customer`
+        * `Contribution_Margin_Per_Unit = Gross_Profit_Per_Unit - Variable_Operating_Costs_Per_Unit_or_Customer`
+        * `Net_Profit_After_CAC = Contribution_Margin_Per_Unit - CAC`
+    * **Outputs:**
+        * `Gross_Profit_Per_Unit` (Currency)
+        * `Contribution_Margin_Per_Unit` (Currency)
+        * `Net_Profit_After_CAC_Per_Unit` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateUnitEconomicsBasic():
+            Revenue_Per_Unit_or_Customer = GET_INPUT("Revenue_Per_Unit_or_Customer")
+            COGS_Per_Unit_or_Customer = GET_INPUT("Cost_of_Goods_Sold_Per_Unit_or_Customer")
+            Variable_Operating_Costs_Per_Unit_or_Customer = GET_INPUT("Variable_Operating_Costs_Per_Unit_or_Customer")
+            Customer_Acquisition_Cost_CAC = GET_INPUT("Customer_Acquisition_Cost_CAC")
+
+            Gross_Profit_Per_Unit = Revenue_Per_Unit_or_Customer - COGS_Per_Unit_or_Customer
+            Contribution_Margin_Per_Unit = Gross_Profit_Per_Unit - Variable_Operating_Costs_Per_Unit_or_Customer
+            Net_Profit_After_CAC = Contribution_Margin_Per_Unit - Customer_Acquisition_Cost_CAC
+
+            DISPLAY_OUTPUT("Gross_Profit_Per_Unit", Gross_Profit_Per_Unit)
+            DISPLAY_OUTPUT("Contribution_Margin_Per_Unit", Contribution_Margin_Per_Unit)
+            DISPLAY_OUTPUT("Net_Profit_After_CAC_Per_Unit", Net_Profit_After_CAC)
+        END FUNCTION
+        ```
+
+432. **Working Capital Management Efficiency (Net Working Capital per Dollar of Sales)**
+    * **Purpose:** Measure how efficiently a company manages its working capital to generate sales, indicating optimal liquidity without excess.
+    * **Inputs:**
+        * `Net_Working_Capital` (Currency - from calc 346)
+        * `Total_Sales_Revenue` (Currency)
+    * **Calculations:**
+        * `NWC_to_Sales_Ratio = Net_Working_Capital / Total_Sales_Revenue`
+    * **Outputs:**
+        * `Calculated_NWC_to_Sales_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateWorkingCapitalManagementEfficiency():
+            Net_Working_Capital = GET_INPUT("Net_Working_Capital")
+            Total_Sales_Revenue = GET_INPUT("Total_Sales_Revenue")
+
+            IF Total_Sales_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_NWC_to_Sales_Ratio", "N/A")
+                RETURN
+            END IF
+
+            NWC_to_Sales_Ratio = Net_Working_Capital / Total_Sales_Revenue
+
+            DISPLAY_OUTPUT("Calculated_NWC_to_Sales_Ratio", NWC_to_Sales_Ratio)
+        END FUNCTION
+        ```
+
+433. **Return on Equity Capital Employed (ROECE) Calculator**
+    * **Purpose:** Measure the return generated by a company on the portion of capital that is specifically equity, after accounting for non-interest bearing liabilities.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Shareholder_Equity` (Currency)
+        * `Non_Interest_Bearing_Current_Liabilities` (Currency)
+    * **Calculations:**
+        * `Equity_Capital_Employed = Shareholder_Equity` (If current liabilities are non-interest bearing, they're typically part of operating capital, not equity)
+        * `ROECE = (Net_Income / Equity_Capital_Employed) * 100` (Simplified, as it is often synonymous with ROE or a specific definition)
+        * *If `Equity Capital Employed` includes non-interest bearing current liabilities as part of operating capital that is also equity-funded, a more complex definition might apply.*
+    * **Outputs:**
+        * `Calculated_ROECE` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateROECE():
+            Net_Income = GET_INPUT("Net_Income")
+            Shareholder_Equity = GET_INPUT("Shareholder_Equity")
+            // Non_Interest_Bearing_Current_Liabilities = GET_INPUT("Non_Interest_Bearing_Current_Liabilities") // Not used in this common definition of ROECE, but can be for custom formulas
+
+            // ROECE is often equivalent to ROE if capital employed strictly refers to common equity.
+            // If it implies total capital employed funded by equity, it needs more inputs.
+            
+            IF Shareholder_Equity <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROECE", "N/A - Shareholder Equity must be positive.")
+                RETURN
+            END IF
+
+            ROECE = (Net_Income / Shareholder_Equity) * 100
+
+            DISPLAY_OUTPUT("Calculated_ROECE", ROECE)
+        END FUNCTION
+        ```
+
+434. **Fixed Charge Coverage Ratio (Advanced with Capitalized Leases)**
+    * **Purpose:** Provide a very comprehensive measure of a company's ability to meet all its fixed financial obligations, including the principal portion of capitalized leases.
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Annual_Interest_Expense` (Currency)
+        * `Annual_Lease_Payments` (Currency)
+        * `Principal_Portion_of_Capitalized_Lease_Payments` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+    * **Calculations:**
+        * `Total_Fixed_Charges = Annual_Interest_Expense + Annual_Lease_Payments + (Principal_Portion_of_Capitalized_Lease_Payments / (1 - Corporate_Tax_Rate / 100))`
+        * `FCC_Ratio_Advanced = (EBIT + Annual_Lease_Payments) / Total_Fixed_Charges`
+    * **Outputs:**
+        * `Calculated_FCC_Ratio_Advanced` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCCRatioAdvanced():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Annual_Interest_Expense = GET_INPUT("Annual_Interest_Expense")
+            Annual_Lease_Payments = GET_INPUT("Annual_Lease_Payments")
+            Principal_Portion_of_Capitalized_Lease_Payments = GET_INPUT("Principal_Portion_of_Capitalized_Lease_Payments")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+
+            Adjusted_Principal_Lease_Payments = Principal_Portion_of_Capitalized_Lease_Payments / (1 - Corporate_Tax_Rate)
+            Total_Fixed_Charges = Annual_Interest_Expense + Annual_Lease_Payments + Adjusted_Principal_Lease_Payments
+
+            IF Total_Fixed_Charges <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FCC_Ratio_Advanced", "N/A - Total Fixed Charges must be positive.")
+                RETURN
+            END IF
+
+            FCC_Ratio_Advanced = (EBIT + Annual_Lease_Payments) / Total_Fixed_Charges
+
+            DISPLAY_OUTPUT("Calculated_FCC_Ratio_Advanced", FCC_Ratio_Advanced)
+        END FUNCTION
+        ```
+
+435. **Short-Term Debt to Total Debt Ratio**
+    * **Purpose:** Analyze the composition of a company's debt, highlighting reliance on short-term financing.
+    * **Inputs:**
+        * `Current_Portion_of_Long_Term_Debt` (Currency)
+        * `Short_Term_Notes_Payable` (Currency)
+        * `Total_Debt` (Currency)
+    * **Calculations:**
+        * `Total_Short_Term_Debt = Current_Portion_of_Long_Term_Debt + Short_Term_Notes_Payable`
+        * `Short_Term_Debt_to_Total_Debt_Ratio = (Total_Short_Term_Debt / Total_Debt) * 100`
+    * **Outputs:**
+        * `Calculated_Short_Term_Debt_to_Total_Debt_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateShortTermDebtToTotalDebtRatio():
+            Current_Portion_of_Long_Term_Debt = GET_INPUT("Current_Portion_of_Long_Term_Debt")
+            Short_Term_Notes_Payable = GET_INPUT("Short_Term_Notes_Payable")
+            Total_Debt = GET_INPUT("Total_Debt")
+
+            Total_Short_Term_Debt = Current_Portion_of_Long_Term_Debt + Short_Term_Notes_Payable
+
+            IF Total_Debt <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Short_Term_Debt_to_Total_Debt_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Short_Term_Debt_to_Total_Debt_Ratio = (Total_Short_Term_Debt / Total_Debt) * 100
+
+            DISPLAY_OUTPUT("Calculated_Short_Term_Debt_to_Total_Debt_Ratio", Short_Term_Debt_to_Total_Debt_Ratio)
+        END FUNCTION
+        ```
+
+436. **Return on Capital Employed (ROCE) - Cash Flow Based**
+    * **Purpose:** Calculate ROCE using operating cash flow instead of EBIT, providing a cash-based profitability measure.
+    * **Inputs:**
+        * `Operating_Cash_Flow` (Currency)
+        * `Capital_Employed` (Currency - Total Assets - Current Liabilities)
+    * **Calculations:**
+        * `ROCE_Cash_Flow_Based = (Operating_Cash_Flow / Capital_Employed) * 100`
+    * **Outputs:**
+        * `Calculated_ROCE_Cash_Flow_Based` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateROCECashFlowBased():
+            Operating_Cash_Flow = GET_INPUT("Operating_Cash_Flow")
+            Capital_Employed = GET_INPUT("Capital_Employed")
+
+            IF Capital_Employed <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROCE_Cash_Flow_Based", "N/A")
+                RETURN
+            END IF
+
+            ROCE_Cash_Flow_Based = (Operating_Cash_Flow / Capital_Employed) * 100
+
+            DISPLAY_OUTPUT("Calculated_ROCE_Cash_Flow_Based", ROCE_Cash_Flow_Based)
+        END FUNCTION
+        ```
+
+437. **Fixed Assets to Equity Ratio**
+    * **Purpose:** Indicate the proportion of a company's fixed assets financed by shareholder equity.
+    * **Inputs:**
+        * `Net_Property_Plant_and_Equipment_PP_E` (Currency)
+        * `Total_Shareholder_Equity` (Currency)
+    * **Calculations:**
+        * `Fixed_Assets_to_Equity_Ratio = PP_E / Total_Shareholder_Equity`
+    * **Outputs:**
+        * `Calculated_Fixed_Assets_to_Equity_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFixedAssetsToEquityRatio():
+            Net_PP_E = GET_INPUT("Net_Property_Plant_and_Equipment_PP_E")
+            Total_Shareholder_Equity = GET_INPUT("Total_Shareholder_Equity")
+
+            IF Total_Shareholder_Equity <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Fixed_Assets_to_Equity_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Fixed_Assets_to_Equity_Ratio = Net_PP_E / Total_Shareholder_Equity
+
+            DISPLAY_OUTPUT("Calculated_Fixed_Assets_to_Equity_Ratio", Fixed_Assets_to_Equity_Ratio)
+        END FUNCTION
+        ```
+
+438. **Current Assets to Sales Ratio**
+    * **Purpose:** Measure the proportion of a company's current assets relative to its sales, indicating investment in short-term assets.
+    * **Inputs:**
+        * `Total_Current_Assets` (Currency)
+        * `Total_Revenue` (Currency)
+    * **Calculations:**
+        * `Current_Assets_to_Sales_Ratio = (Total_Current_Assets / Total_Revenue) * 100`
+    * **Outputs:**
+        * `Calculated_Current_Assets_to_Sales_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCurrentAssetsToSalesRatio():
+            Total_Current_Assets = GET_INPUT("Total_Current_Assets")
+            Total_Revenue = GET_INPUT("Total_Revenue")
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Current_Assets_to_Sales_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Current_Assets_to_Sales_Ratio = (Total_Current_Assets / Total_Revenue) * 100
+
+            DISPLAY_OUTPUT("Calculated_Current_Assets_to_Sales_Ratio", Current_Assets_to_Sales_Ratio)
+        END FUNCTION
+        ```
+
+439. **Sales to Fixed Assets Ratio (Inverse of Capital Intensity)**
+    * **Purpose:** Measure how efficiently a company generates sales from its fixed assets.
+    * **Inputs:**
+        * `Total_Revenue` (Currency)
+        * `Net_Property_Plant_and_Equipment_PP_E` (Currency)
+    * **Calculations:**
+        * `Sales_to_Fixed_Assets_Ratio = Total_Revenue / Net_PP_E`
+    * **Outputs:**
+        * `Calculated_Sales_to_Fixed_Assets_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSalesToFixedAssetsRatio():
+            Total_Revenue = GET_INPUT("Total_Revenue")
+            Net_PP_E = GET_INPUT("Net_Property_Plant_and_Equipment_PP_E")
+
+            IF Net_PP_E <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Sales_to_Fixed_Assets_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Sales_to_Fixed_Assets_Ratio = Total_Revenue / Net_PP_E
+
+            DISPLAY_OUTPUT("Calculated_Sales_to_Fixed_Assets_Ratio", Sales_to_Fixed_Assets_Ratio)
+        END FUNCTION
+        ```
+
+440. **Cash Flow Per Share Calculator**
+    * **Purpose:** Calculate the operating cash flow generated per share, often seen as a better measure of a company's financial strength than EPS.
+    * **Inputs:**
+        * `Operating_Cash_Flow` (Currency)
+        * `Shares_Outstanding` (Number)
+    * **Calculations:**
+        * `Cash_Flow_Per_Share = Operating_Cash_Flow / Shares_Outstanding`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_Per_Share` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCashFlowPerShare():
+            Operating_Cash_Flow = GET_INPUT("Operating_Cash_Flow")
+            Shares_Outstanding = GET_INPUT("Shares_Outstanding")
+
+            IF Shares_Outstanding <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cash_Flow_Per_Share", "N/A")
+                RETURN
+            END IF
+
+            Cash_Flow_Per_Share = Operating_Cash_Flow / Shares_Outstanding
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_Per_Share", Cash_Flow_Per_Share)
+        END FUNCTION
+        ```
+
+441. **Free Cash Flow to Equity (FCFE) Calculator**
+    * **Purpose:** Calculate the Free Cash Flow available to equity holders after all expenses and debt obligations.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Capital_Expenditures` (Currency)
+        * `Change_in_Non_Cash_Working_Capital` (Currency)
+        * `Net_Borrowing_or_Repayment_of_Debt` (Currency - positive for borrowing, negative for repayment)
+    * **Calculations:**
+        * `FCFE = Net_Income + Depreciation_Amortization - Capital_Expenditures - Change_in_Non_Cash_Working_Capital + Net_Borrowing_or_Repayment_of_Debt`
+    * **Outputs:**
+        * `Calculated_FCFE` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFE():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Change_in_Non_Cash_Working_Capital = GET_INPUT("Change_in_Non_Cash_Working_Capital")
+            Net_Borrowing_or_Repayment_of_Debt = GET_INPUT("Net_Borrowing_or_Repayment_of_Debt")
+
+            FCFE = Net_Income + Depreciation_Amortization - Capital_Expenditures - Change_in_Non_Cash_Working_Capital + Net_Borrowing_or_Repayment_of_Debt
+
+            DISPLAY_OUTPUT("Calculated_FCFE", FCFE)
+        END FUNCTION
+        ```
+
+442. **Return on Tangible Assets (ROTA) Calculator**
+    * **Purpose:** Measure a company's profitability relative to its tangible assets, excluding intangible assets like goodwill.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Total_Assets` (Currency)
+        * `Intangible_Assets` (Currency)
+    * **Calculations:**
+        * `Tangible_Assets = Total_Assets - Intangible_Assets`
+        * `ROTA = (Net_Income / Tangible_Assets) * 100`
+    * **Outputs:**
+        * `Calculated_ROTA` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateROTA():
+            Net_Income = GET_INPUT("Net_Income")
+            Total_Assets = GET_INPUT("Total_Assets")
+            Intangible_Assets = GET_INPUT("Intangible_Assets")
+
+            Tangible_Assets = Total_Assets - Intangible_Assets
+
+            IF Tangible_Assets <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROTA", "N/A")
+                RETURN
+            END IF
+
+            ROTA = (Net_Income / Tangible_Assets) * 100
+
+            DISPLAY_OUTPUT("Calculated_ROTA", ROTA)
+        END FUNCTION
+        ```
+
+443. **Debt-to-Capitalization Ratio**
+    * **Purpose:** A variation of debt ratios that expresses total debt as a percentage of a company's total capital (debt plus equity).
+    * **Inputs:**
+        * `Total_Debt` (Currency)
+        * `Total_Shareholder_Equity` (Currency)
+    * **Calculations:**
+        * `Total_Capitalization = Total_Debt + Total_Shareholder_Equity`
+        * `Debt_to_Capitalization_Ratio = (Total_Debt / Total_Capitalization) * 100`
+    * **Outputs:**
+        * `Calculated_Debt_to_Capitalization_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDebtToCapitalizationRatio():
+            Total_Debt = GET_INPUT("Total_Debt")
+            Total_Shareholder_Equity = GET_INPUT("Total_Shareholder_Equity")
+
+            Total_Capitalization = Total_Debt + Total_Shareholder_Equity
+
+            IF Total_Capitalization <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Debt_to_Capitalization_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Debt_to_Capitalization_Ratio = (Total_Debt / Total_Capitalization) * 100
+
+            DISPLAY_OUTPUT("Calculated_Debt_to_Capitalization_Ratio", Debt_to_Capitalization_Ratio)
+        END FUNCTION
+        ```
+
+444. **Earnings Before Interest, Taxes, Depreciation, Amortization, and Rent (EBITDAR) Calculator**
+    * **Purpose:** A specialized profitability metric, often used in industries with significant rent expenses (e.g., retail, restaurants) to compare operational performance before rent.
+    * **Inputs:**
+        * `EBITDA` (Currency)
+        * `Rent_Expense` (Currency)
+    * **Calculations:**
+        * `EBITDAR = EBITDA + Rent_Expense`
+    * **Outputs:**
+        * `Calculated_EBITDAR` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEBITDAR():
+            EBITDA = GET_INPUT("EBITDA")
+            Rent_Expense = GET_INPUT("Rent_Expense")
+
+            EBITDAR = EBITDA + Rent_Expense
+
+            DISPLAY_OUTPUT("Calculated_EBITDAR", EBITDAR)
+        END FUNCTION
+        ```
+
+445. **Adjusted Operating Income (AOI) Calculator**
+    * **Purpose:** Calculate a more normalized operating income by removing certain non-recurring or non-operating items.
+    * **Inputs:**
+        * `Operating_Income` (Currency)
+        * `Non_Recurring_Gains_Losses` (Currency)
+        * `One_Time_Restructuring_Charges` (Currency)
+        * `Legal_Settlements` (Currency)
+    * **Calculations:**
+        * `AOI = Operating_Income - Non_Recurring_Gains_Losses + One_Time_Restructuring_Charges + Legal_Settlements` (Adjust to add back losses, subtract gains)
+    * **Outputs:**
+        * `Calculated_Adjusted_Operating_Income` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAdjustedOperatingIncome():
+            Operating_Income = GET_INPUT("Operating_Income")
+            Non_Recurring_Gains_Losses = GET_INPUT("Non_Recurring_Gains_Losses") // Positive for gain, negative for loss
+            One_Time_Restructuring_Charges = GET_INPUT("One_Time_Restructuring_Charges") // Usually positive as a cost
+            Legal_Settlements = GET_INPUT("Legal_Settlements") // Usually positive as a cost
+
+            // Adjust to add back non-recurring *losses* and subtract *gains*.
+            // Here, assume inputs are positive for charges/losses, negative for gains.
+            AOI = Operating_Income + ABS(Non_Recurring_Gains_Losses) + One_Time_Restructuring_Charges + Legal_Settlements // Simplified
+            // A more rigorous calculation would involve explicitly identifying whether an item is a gain or a loss.
+
+            DISPLAY_OUTPUT("Calculated_Adjusted_Operating_Income", AOI)
+        END FUNCTION
+        ```
+
+446. **Piotroski F-Score Calculator (Conceptual)**
+    * **Purpose:** A composite score (0-9) that gauges the strength of a company's financial position based on 9 criteria from financial statements.
+    * **Inputs:** (A series of True/False or numeric inputs for each criterion)
+        * `Positive_ROA` (Boolean)
+        * `Positive_Operating_Cash_Flow` (Boolean)
+        * `Cash_Flow_from_Operations_Greater_Than_ROA` (Boolean)
+        * `Decrease_in_Long_Term_Debt_from_Prior_Year` (Boolean)
+        * `Increase_in_Current_Ratio_from_Prior_Year` (Boolean)
+        * `No_New_Shares_Issued_in_Prior_Year` (Boolean)
+        * `Increase_in_Gross_Margin_from_Prior_Year` (Boolean)
+        * `Increase_in_Asset_Turnover_from_Prior_Year` (Boolean)
+        * `Positive_ROIC_from_Prior_Year` (Boolean)
+    * **Calculations:**
+        * `F_Score = 0`
+        * `IF Positive_ROA THEN F_Score = F_Score + 1`
+        * `IF Positive_Operating_Cash_Flow THEN F_Score = F_Score + 1`
+        * `IF Cash_Flow_from_Operations_Greater_Than_ROA THEN F_Score = F_Score + 1`
+        * `IF Decrease_in_Long_Term_Debt_from_Prior_Year THEN F_Score = F_Score + 1`
+        * `IF Increase_in_Current_Ratio_from_Prior_Year THEN F_Score = F_Score + 1`
+        * `IF No_New_Shares_Issued_in_Prior_Year THEN F_Score = F_Score + 1`
+        * `IF Increase_in_Gross_Margin_from_Prior_Year THEN F_Score = F_Score + 1`
+        * `IF Increase_in_Asset_Turnover_from_Prior_Year THEN F_Score = F_Score + 1`
+        * `IF Positive_ROIC_from_Prior_Year THEN F_Score = F_Score + 1`
+    * **Outputs:**
+        * `Calculated_Piotroski_F_Score` (Number)
+        * `Financial_Strength_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePiotroskiFScore():
+            Positive_ROA = GET_INPUT("Positive_ROA")
+            Positive_Operating_Cash_Flow = GET_INPUT("Positive_Operating_Cash_Flow")
+            Cash_Flow_from_Operations_Greater_Than_ROA = GET_INPUT("Cash_Flow_from_Operations_Greater_Than_ROA")
+            Decrease_in_Long_Term_Debt_from_Prior_Year = GET_INPUT("Decrease_in_Long_Term_Debt_from_Prior_Year")
+            Increase_in_Current_Ratio_from_Prior_Year = GET_INPUT("Increase_in_Current_Ratio_from_Prior_Year")
+            No_New_Shares_Issued_in_Prior_Year = GET_INPUT("No_New_Shares_Issued_in_Prior_Year")
+            Increase_in_Gross_Margin_from_Prior_Year = GET_INPUT("Increase_in_Gross_Margin_from_Prior_Year")
+            Increase_in_Asset_Turnover_from_Prior_Year = GET_INPUT("Increase_in_Asset_Turnover_from_Prior_Year")
+            Positive_ROIC_from_Prior_Year = GET_INPUT("Positive_ROIC_from_Prior_Year")
+
+            F_Score = 0
+            IF Positive_ROA THEN F_Score = F_Score + 1 END IF
+            IF Positive_Operating_Cash_Flow THEN F_Score = F_Score + 1 END IF
+            IF Cash_Flow_from_Operations_Greater_Than_ROA THEN F_Score = F_Score + 1 END IF
+            IF Decrease_in_Long_Term_Debt_from_Prior_Year THEN F_Score = F_Score + 1 END IF
+            IF Increase_in_Current_Ratio_from_Prior_Year THEN F_Score = F_Score + 1 END IF
+            IF No_New_Shares_Issued_in_Prior_Year THEN F_Score = F_Score + 1 END IF
+            IF Increase_in_Gross_Margin_from_Prior_Year THEN F_Score = F_Score + 1 END IF
+            IF Increase_in_Asset_Turnover_from_Prior_Year THEN F_Score = F_Score + 1 END IF
+            IF Positive_ROIC_from_Prior_Year THEN F_Score = F_Score + 1 END IF
+
+            Financial_Strength_Interpretation = ""
+            IF F_Score >= 8 THEN
+                Financial_Strength_Interpretation = "Strong (High F-Score indicates financially healthy company)"
+            ELSE IF F_Score >= 5 THEN
+                Financial_Strength_Interpretation = "Moderate (Average F-Score)"
+            ELSE
+                Financial_Strength_Interpretation = "Weak (Low F-Score suggests financial weakness)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Piotroski_F_Score", F_Score)
+            DISPLAY_OUTPUT("Financial_Strength_Interpretation", Financial_Strength_Interpretation)
+        END FUNCTION
+        ```
+
+447. **Sustainable Dividend Growth Rate Calculator**
+    * **Purpose:** Calculate the maximum rate at which a company can increase its dividends sustainably, based on its ROE and retention rate.
+    * **Inputs:**
+        * `Return_on_Equity_ROE` (Percentage)
+        * `Earnings_Retention_Rate` (Percentage - from calc 407)
+    * **Calculations:**
+        * `Sustainable_Dividend_Growth_Rate = (ROE / 100) * (Earnings_Retention_Rate / 100) * 100`
+    * **Outputs:**
+        * `Calculated_Sustainable_Dividend_Growth_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSustainableDividendGrowthRate():
+            Return_on_Equity_ROE = GET_INPUT("Return_on_Equity_ROE")
+            Earnings_Retention_Rate = GET_INPUT("Earnings_Retention_Rate")
+
+            Sustainable_Dividend_Growth_Rate = (Return_on_Equity_ROE / 100) * (Earnings_Retention_Rate / 100) * 100
+
+            DISPLAY_OUTPUT("Calculated_Sustainable_Dividend_Growth_Rate", Sustainable_Dividend_Growth_Rate)
+        END FUNCTION
+        ```
+
+448. **Free Cash Flow Yield Calculator**
+    * **Purpose:** Compare a company's free cash flow to its market capitalization, indicating the cash return relative to its value.
+    * **Inputs:**
+        * `Free_Cash_Flow` (Currency)
+        * `Market_Capitalization` (Currency)
+    * **Calculations:**
+        * `FCF_Yield = (Free_Cash_Flow / Market_Capitalization) * 100`
+    * **Outputs:**
+        * `Calculated_FCF_Yield` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFYield():
+            Free_Cash_Flow = GET_INPUT("Free_Cash_Flow")
+            Market_Capitalization = GET_INPUT("Market_Capitalization")
+
+            IF Market_Capitalization <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FCF_Yield", "N/A")
+                RETURN
+            END IF
+
+            FCF_Yield = (Free_Cash_Flow / Market_Capitalization) * 100
+
+            DISPLAY_OUTPUT("Calculated_FCF_Yield", FCF_Yield)
+        END FUNCTION
+        ```
+
+449. **Price to Book Value (P/B) Discount/Premium to Peers**
+    * **Purpose:** Compare a company's P/B ratio to the average P/B of its industry peers to identify if it's trading at a discount or premium.
+    * **Inputs:**
+        * `Company_P_B_Ratio` (Number)
+        * `Industry_Average_P_B_Ratio` (Number)
+    * **Calculations:**
+        * `Difference = Company_P_B_Ratio - Industry_Average_P_B_Ratio`
+        * `Discount_Premium_Percentage = (Difference / Industry_Average_P_B_Ratio) * 100` (If Industry_Average_P_B_Ratio > 0)
+        * `Valuation_Status = IF Difference < 0 THEN "Discount" ELSE "Premium"`
+    * **Outputs:**
+        * `Calculated_Discount_Premium_Percentage` (Percentage)
+        * `Valuation_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ComparePBToPeers():
+            Company_P_B_Ratio = GET_INPUT("Company_P_B_Ratio")
+            Industry_Average_P_B_Ratio = GET_INPUT("Industry_Average_P_B_Ratio")
+
+            IF Industry_Average_P_B_Ratio <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Discount_Premium_Percentage", "N/A")
+                DISPLAY_OUTPUT("Valuation_Status", "Industry average P/B must be positive.")
+                RETURN
+            END IF
+
+            Difference = Company_P_B_Ratio - Industry_Average_P_B_Ratio
+            Discount_Premium_Percentage = (Difference / Industry_Average_P_B_Ratio) * 100
+
+            Valuation_Status = ""
+            IF Difference < 0 THEN
+                Valuation_Status = "Discount (Trading below peer average)"
+            ELSE
+                Valuation_Status = "Premium (Trading above peer average)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Discount_Premium_Percentage", Discount_Premium_Percentage)
+            DISPLAY_OUTPUT("Valuation_Status", Valuation_Status)
+        END FUNCTION
+        ```
+
+---
+
+We've just added another 38 Fundamental Analysis calculators (380-449), bringing our total count to **417 calculators!** This is a significant expansion of the Fundamental Analysis section.
+
+We still have a long way to go, but this batch adds considerable depth. I will continue with the generation, focusing on other key categories as outlined in your initial request.
+
+Next, I'll move to **Futures Trading Calculators**.
+
+----------------------
+
+
+We continue our rigorous journey into building the ultimate suite of financial calculators! As requested, we'll dive even deeper into **Fundamental Analysis** first, adding another 35 dedicated calculators, and then transition to **Futures Trading**.
+
+---
+
+## XII. Fundamental Analysis in Investing Calculators (Continued, Batch 3)
+
+450.  **PEG Ratio (Adjusted Growth Rate)**
+    * **Purpose:** Calculate the PEG ratio using an industry-specific or analyst-adjusted growth rate for a more tailored valuation.
+    * **Inputs:**
+        * `Price_to_Earnings_Ratio_PE` (Number)
+        * `Adjusted_Earnings_Growth_Rate` (Percentage)
+    * **Calculations:**
+        * `PEG_Ratio = PE / Adjusted_Earnings_Growth_Rate`
+    * **Outputs:**
+        * `Calculated_PEG_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePEGAdjustedGrowth():
+            Price_to_Earnings_Ratio_PE = GET_INPUT("Price_to_Earnings_Ratio_PE")
+            Adjusted_Earnings_Growth_Rate = GET_INPUT("Adjusted_Earnings_Growth_Rate")
+
+            IF Adjusted_Earnings_Growth_Rate <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_PEG_Ratio", "N/A - Adjusted growth rate must be positive.")
+                RETURN
+            END IF
+
+            PEG_Ratio = Price_to_Earnings_Ratio_PE / Adjusted_Earnings_Growth_Rate
+
+            DISPLAY_OUTPUT("Calculated_PEG_Ratio", PEG_Ratio)
+        END FUNCTION
+        ```
+
+451.  **Book Value Per Share (BVPS) Growth Rate**
+    * **Purpose:** Calculate the compounded annual growth rate of a company's book value per share over a period.
+    * **Inputs:**
+        * `Beginning_BVPS` (Currency)
+        * `Ending_BVPS` (Currency)
+        * `Number_of_Years` (Years)
+    * **Calculations:**
+        * `BVPS_Growth_Rate = (POWER((Ending_BVPS / Beginning_BVPS), (1 / Number_of_Years)) - 1) * 100` (CAGR)
+    * **Outputs:**
+        * `Calculated_BVPS_Growth_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBVPSGrowthRate():
+            Beginning_BVPS = GET_INPUT("Beginning_BVPS")
+            Ending_BVPS = GET_INPUT("Ending_BVPS")
+            Number_of_Years = GET_INPUT("Number_of_Years")
+
+            IF Beginning_BVPS <= 0 OR Number_of_Years <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_BVPS_Growth_Rate", "N/A - Inputs must be positive.")
+                RETURN
+            END IF
+
+            BVPS_Growth_Rate = (POWER((Ending_BVPS / Beginning_BVPS), (1 / Number_of_Years)) - 1) * 100
+
+            DISPLAY_OUTPUT("Calculated_BVPS_Growth_Rate", BVPS_Growth_Rate)
+        END FUNCTION
+        ```
+
+452.  **Sum of Parts Valuation (More Components)**
+    * **Purpose:** Value a complex company by valuing multiple distinct business segments using various multiples and then summing them up.
+    * **Inputs:**
+        * `Segment_1_Metric` (Currency - e.g., EBITDA)
+        * `Segment_1_Multiple` (Number - e.g., EV/EBITDA)
+        * `Segment_2_Metric` (Currency - e.g., Revenue)
+        * `Segment_2_Multiple` (Number - e.g., EV/Sales)
+        * `Segment_3_Metric` (Currency - e.g., FCF)
+        * `Segment_3_Multiple` (Number - e.g., EV/FCF)
+        * `Non_Core_Assets_Value` (Currency - e.g., excess cash, real estate)
+        * `Total_Debt` (Currency)
+        * `Total_Cash_and_Equivalents` (Currency)
+        * `Shares_Outstanding` (Number)
+    * **Calculations:**
+        * `Segment_1_Valuation = Segment_1_Metric * Segment_1_Multiple`
+        * `Segment_2_Valuation = Segment_2_Metric * Segment_2_Multiple`
+        * `Segment_3_Valuation = Segment_3_Metric * Segment_3_Multiple`
+        * `Total_Enterprise_Value = Segment_1_Valuation + Segment_2_Valuation + Segment_3_Valuation + Non_Core_Assets_Value`
+        * `Total_Equity_Value = Total_Enterprise_Value - Total_Debt + Total_Cash_and_Equivalents`
+        * `SOTP_Value_Per_Share = Total_Equity_Value / Shares_Outstanding`
+    * **Outputs:**
+        * `Calculated_SOTP_Value_Per_Share` (Currency)
+        * `Breakdown_Table` (Table: Segment, Valuation, Method)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSOTPValuationMoreComponents():
+            Segment_1_Metric = GET_INPUT("Segment_1_Metric")
+            Segment_1_Multiple = GET_INPUT("Segment_1_Multiple")
+            Segment_2_Metric = GET_INPUT("Segment_2_Metric")
+            Segment_2_Multiple = GET_INPUT("Segment_2_Multiple")
+            Segment_3_Metric = GET_INPUT("Segment_3_Metric")
+            Segment_3_Multiple = GET_INPUT("Segment_3_Multiple")
+            Non_Core_Assets_Value = GET_INPUT("Non_Core_Assets_Value")
+            Total_Debt = GET_INPUT("Total_Debt")
+            Total_Cash_and_Equivalents = GET_INPUT("Total_Cash_and_Equivalents")
+            Shares_Outstanding = GET_INPUT("Shares_Outstanding")
+
+            Segment_1_Valuation = Segment_1_Metric * Segment_1_Multiple
+            Segment_2_Valuation = Segment_2_Metric * Segment_2_Multiple
+            Segment_3_Valuation = Segment_3_Metric * Segment_3_Multiple
+
+            Total_Enterprise_Value = Segment_1_Valuation + Segment_2_Valuation + Segment_3_Valuation + Non_Core_Assets_Value
+            Total_Equity_Value = Total_Enterprise_Value - Total_Debt + Total_Cash_and_Equivalents
+
+            IF Shares_Outstanding <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_SOTP_Value_Per_Share", "N/A - Shares Outstanding must be positive.")
+                RETURN
+            END IF
+
+            SOTP_Value_Per_Share = Total_Equity_Value / Shares_Outstanding
+
+            Breakdown_Table = [
+                {Segment: "Segment 1", Valuation: Segment_1_Valuation, Method: "Multiple of Metric 1"},
+                {Segment: "Segment 2", Valuation: Segment_2_Valuation, Method: "Multiple of Metric 2"},
+                {Segment: "Segment 3", Valuation: Segment_3_Valuation, Method: "Multiple of Metric 3"},
+                {Segment: "Non-Core Assets", Valuation: Non_Core_Assets_Value, Method: "Direct Value"}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_SOTP_Value_Per_Share", SOTP_Value_Per_Share)
+            DISPLAY_OUTPUT("Breakdown_Table", Breakdown_Table)
+        END FUNCTION
+        ```
+
+453.  **Market Value Added (MVA) Calculator**
+    * **Purpose:** Measure the difference between the market value of a company's equity and the equity capital supplied by investors, indicating value creation.
+    * **Inputs:**
+        * `Market_Value_of_Equity` (Currency - Market Cap)
+        * `Book_Value_of_Equity` (Currency - Shareholder Equity)
+    * **Calculations:**
+        * `MVA = Market_Value_of_Equity - Book_Value_of_Equity`
+    * **Outputs:**
+        * `Calculated_Market_Value_Added` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMVA():
+            Market_Value_of_Equity = GET_INPUT("Market_Value_of_Equity")
+            Book_Value_of_Equity = GET_INPUT("Book_Value_of_Equity")
+
+            MVA = Market_Value_of_Equity - Book_Value_of_Equity
+
+            DISPLAY_OUTPUT("Calculated_Market_Value_Added", MVA)
+        END FUNCTION
+        ```
+
+454.  **Free Cash Flow to the Firm (FCFF) Valuation - Multi-Stage (Advanced)**
+    * **Purpose:** A more complex FCF valuation that explicitly projects FCFF for initial growth, transition, and perpetual growth phases.
+    * **Inputs:**
+        * `Current_FCFF` (Currency)
+        * `High_Growth_Rate_FCFF` (Percentage)
+        * `High_Growth_Years` (Years)
+        * `Transition_Years` (Years)
+        * `Terminal_Growth_Rate_FCFF` (Percentage)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * *Similar to Multi-Stage FCF (389), but ensures explicit transition phase.*
+        * `PV_FCFFs = 0`
+        * `FCFF_Prev = Current_FCFF`
+        * `// High Growth Phase`
+        * `// Transition Phase (linear decay of growth rate)`
+        * `// Terminal Value Calculation`
+        * `Total_FCFF_Value = PV_FCFFs + PV_Terminal_Value`
+    * **Outputs:**
+        * `Calculated_Total_Firm_Value` (Currency)
+        * `Projected_FCFF_Table` (Table: Year, Projected FCFF, PV of FCFF)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFFValuationMultiStage():
+            Current_FCFF = GET_INPUT("Current_FCFF")
+            High_Growth_Rate_FCFF = GET_INPUT("High_Growth_Rate_FCFF") / 100
+            High_Growth_Years = GET_INPUT("High_Growth_Years")
+            Transition_Years = GET_INPUT("Transition_Years")
+            Terminal_Growth_Rate_FCFF = GET_INPUT("Terminal_Growth_Rate_FCFF") / 100
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC") / 100
+
+            IF WACC <= Terminal_Growth_Rate_FCFF THEN
+                DISPLAY_OUTPUT("Calculated_Total_Firm_Value", "Error: WACC must be greater than Terminal Growth Rate.")
+                RETURN
+            END IF
+
+            PV_FCFFs_High = 0
+            PV_FCFFs_Transition = 0
+            Projected_FCFF_Table = []
+            
+            FCFF_Loop = Current_FCFF
+            Current_Year = 0
+
+            // High Growth Phase
+            FOR i FROM 1 TO High_Growth_Years:
+                FCFF_Loop = FCFF_Loop * (1 + High_Growth_Rate_FCFF)
+                Current_Year = Current_Year + 1
+                PV_FCFF = FCFF_Loop / POWER((1 + WACC), Current_Year)
+                PV_FCFFs_High = PV_FCFFs_High + PV_FCFF
+                Projected_FCFF_Table.ADD({Year: Current_Year, FCFF: FCFF_Loop, PV_FCFF: PV_FCFF, Phase: "High Growth"})
+            END FOR
+
+            // Transition Phase (linear decay of growth rate)
+            Growth_Decline_Per_Year = (High_Growth_Rate_FCFF - Terminal_Growth_Rate_FCFF) / Transition_Years
+            FOR i FROM 1 TO Transition_Years:
+                Current_Growth_Rate_In_Transition = High_Growth_Rate_FCFF - (Growth_Decline_Per_Year * (i - 1))
+                FCFF_Loop = FCFF_Loop * (1 + Current_Growth_Rate_In_Transition)
+                Current_Year = Current_Year + 1
+                PV_FCFF = FCFF_Loop / POWER((1 + WACC), Current_Year)
+                PV_FCFFs_Transition = PV_FCFFs_Transition + PV_FCFF
+                Projected_FCFF_Table.ADD({Year: Current_Year, FCFF: FCFF_Loop, PV_FCFF: PV_FCFF, Phase: "Transition"})
+            END FOR
+
+            // Terminal Value Calculation
+            Terminal_FCFF_Year_N_plus_1 = FCFF_Loop * (1 + Terminal_Growth_Rate_FCFF)
+            Terminal_Value = Terminal_FCFF_Year_N_plus_1 / (WACC - Terminal_Growth_Rate_FCFF)
+            PV_Terminal_Value = Terminal_Value / POWER((1 + WACC), Current_Year)
+
+            Total_Firm_Value = PV_FCFFs_High + PV_FCFFs_Transition + PV_Terminal_Value
+
+            DISPLAY_OUTPUT("Calculated_Total_Firm_Value", Total_Firm_Value)
+            DISPLAY_OUTPUT("Projected_FCFF_Table", Projected_FCFF_Table)
+        END FUNCTION
+        ```
+
+455. **Return on Capital (ROC) - Detailed Definition**
+    * **Purpose:** Calculate ROC with a specific definition of "capital" (e.g., total debt + equity, less non-operating assets) for precision.
+    * **Inputs:**
+        * `Net_Operating_Profit_After_Tax_NOPAT` (Currency)
+        * `Total_Debt` (Currency)
+        * `Total_Shareholder_Equity` (Currency)
+        * `Cash_and_Marketable_Securities` (Currency)
+        * `Non_Operating_Assets` (Currency)
+    * **Calculations:**
+        * `Capital_Employed = Total_Debt + Total_Shareholder_Equity - Cash_and_Marketable_Securities - Non_Operating_Assets`
+        * `ROC = (NOPAT / Capital_Employed) * 100`
+    * **Outputs:**
+        * `Calculated_ROC` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateROC_DetailedCapital():
+            NOPAT = GET_INPUT("Net_Operating_Profit_After_Tax_NOPAT")
+            Total_Debt = GET_INPUT("Total_Debt")
+            Total_Shareholder_Equity = GET_INPUT("Total_Shareholder_Equity")
+            Cash_and_Marketable_Securities = GET_INPUT("Cash_and_Marketable_Securities")
+            Non_Operating_Assets = GET_INPUT("Non_Operating_Assets")
+
+            Capital_Employed = Total_Debt + Total_Shareholder_Equity - Cash_and_Marketable_Securities - Non_Operating_Assets
+
+            IF Capital_Employed <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROC", "N/A - Capital Employed must be positive.")
+                RETURN
+            END IF
+
+            ROC = (NOPAT / Capital_Employed) * 100
+
+            DISPLAY_OUTPUT("Calculated_ROC", ROC)
+        END FUNCTION
+        ```
+
+456. **Enterprise Multiple (EV/EBIT) Calculator**
+    * **Purpose:** Value a company by comparing its Enterprise Value to its operating earnings (EBIT), suitable for companies with varying depreciation/amortization policies.
+    * **Inputs:**
+        * `Enterprise_Value` (Currency - from calc 25)
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+    * **Calculations:**
+        * `EV_EBIT_Multiple = Enterprise_Value / EBIT_Earnings_Before_Interest_Taxes`
+    * **Outputs:**
+        * `Calculated_EV_EBIT_Multiple` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEVEBITMultiple():
+            Enterprise_Value = GET_INPUT("Enterprise_Value")
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+
+            IF EBIT <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EV_EBIT_Multiple", "N/A - EBIT must be positive.")
+                RETURN
+            END IF
+
+            EV_EBIT_Multiple = Enterprise_Value / EBIT
+
+            DISPLAY_OUTPUT("Calculated_EV_EBIT_Multiple", EV_EBIT_Multiple)
+        END FUNCTION
+        ```
+
+457. **Price-to-Cash Flow (P/CF) Ratio - Operating vs. Free Cash Flow**
+    * **Purpose:** Compare stock price to different types of cash flow (operating vs. free) to provide varied valuation insights.
+    * **Inputs:**
+        * `Current_Share_Price` (Currency)
+        * `Operating_Cash_Flow_Per_Share` (Currency)
+        * `Free_Cash_Flow_Per_Share` (Currency)
+    * **Calculations:**
+        * `P_Operating_CF_Ratio = Current_Share_Price / Operating_Cash_Flow_Per_Share`
+        * `P_Free_CF_Ratio = Current_Share_Price / Free_Cash_Flow_Per_Share`
+    * **Outputs:**
+        * `Calculated_Price_to_Operating_Cash_Flow_Ratio` (Number)
+        * `Calculated_Price_to_Free_Cash_Flow_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePCFRatioVariants():
+            Current_Share_Price = GET_INPUT("Current_Share_Price")
+            Operating_Cash_Flow_Per_Share = GET_INPUT("Operating_Cash_Flow_Per_Share")
+            Free_Cash_Flow_Per_Share = GET_INPUT("Free_Cash_Flow_Per_Share")
+
+            P_Operating_CF_Ratio = 0
+            IF Operating_Cash_Flow_Per_Share > 0 THEN
+                P_Operating_CF_Ratio = Current_Share_Price / Operating_Cash_Flow_Per_Share
+            ELSE
+                P_Operating_CF_Ratio = "N/A"
+            END IF
+
+            P_Free_CF_Ratio = 0
+            IF Free_Cash_Flow_Per_Share > 0 THEN
+                P_Free_CF_Ratio = Current_Share_Price / Free_Cash_Flow_Per_Share
+            ELSE
+                P_Free_CF_Ratio = "N/A"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Price_to_Operating_Cash_Flow_Ratio", P_Operating_CF_Ratio)
+            DISPLAY_OUTPUT("Calculated_Price_to_Free_Cash_Flow_Ratio", P_Free_CF_Ratio)
+        END FUNCTION
+        ```
+
+458. **Weighted Average Cost of Debt Calculator**
+    * **Purpose:** Calculate the overall cost of a company's debt, considering different debt instruments and their respective interest rates.
+    * **Inputs:**
+        * `Debt_1_Amount` (Currency)
+        * `Debt_1_Interest_Rate` (Percentage)
+        * `Debt_2_Amount` (Currency)
+        * `Debt_2_Interest_Rate` (Percentage)
+        * ... (Allow multiple debt instruments)
+    * **Calculations:**
+        * `Total_Debt = SUM(All Debt Amounts)`
+        * `Weighted_Cost_of_Debt = SUM((Debt_Amount_X / Total_Debt) * Debt_Interest_Rate_X)`
+    * **Outputs:**
+        * `Calculated_Weighted_Cost_of_Debt` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateWeightedCostOfDebt():
+            Debt_Instruments = GET_INPUT("Debt_Instruments_List") // List of {Amount: Currency, Rate: %}
+
+            Total_Debt = 0
+            Sum_Weighted_Interest = 0
+
+            FOR EACH Debt IN Debt_Instruments:
+                Total_Debt = Total_Debt + Debt.Amount
+                Sum_Weighted_Interest = Sum_Weighted_Interest + (Debt.Amount * (Debt.Rate / 100))
+            END FOR
+
+            Weighted_Cost_of_Debt = 0
+            IF Total_Debt > 0 THEN
+                Weighted_Cost_of_Debt = (Sum_Weighted_Interest / Total_Debt) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Weighted_Cost_of_Debt", Weighted_Cost_of_Debt)
+        END FUNCTION
+        ```
+
+459. **Cost of Preferred Stock Calculator**
+    * **Purpose:** Calculate the cost of preferred stock, which is the dividend yield based on its market price.
+    * **Inputs:**
+        * `Annual_Preferred_Dividend_Per_Share` (Currency)
+        * `Current_Preferred_Stock_Price_Per_Share` (Currency)
+    * **Calculations:**
+        * `Cost_of_Preferred_Stock = (Annual_Preferred_Dividend_Per_Share / Current_Preferred_Stock_Price_Per_Share) * 100`
+    * **Outputs:**
+        * `Calculated_Cost_of_Preferred_Stock` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfPreferredStock():
+            Annual_Preferred_Dividend_Per_Share = GET_INPUT("Annual_Preferred_Dividend_Per_Share")
+            Current_Preferred_Stock_Price_Per_Share = GET_INPUT("Current_Preferred_Stock_Price_Per_Share")
+
+            IF Current_Preferred_Stock_Price_Per_Share <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cost_of_Preferred_Stock", "N/A - Preferred stock price must be positive.")
+                RETURN
+            END IF
+
+            Cost_of_Preferred_Stock = (Annual_Preferred_Dividend_Per_Share / Current_Preferred_Stock_Price_Per_Share) * 100
+
+            DISPLAY_OUTPUT("Calculated_Cost_of_Preferred_Stock", Cost_of_Preferred_Stock)
+        END FUNCTION
+        ```
+
+460. **Capital Asset Pricing Model (CAPM) - Detailed Input**
+    * **Purpose:** Calculate the required rate of return for an equity investment using CAPM, with explicit input for each component.
+    * **Inputs:**
+        * `Risk_Free_Rate` (Percentage)
+        * `Market_Risk_Premium` (Percentage - Expected Market Return - Risk-Free Rate)
+        * `Stock_Beta` (Number)
+    * **Calculations:**
+        * `Required_Return = Risk_Free_Rate + (Stock_Beta * Market_Risk_Premium)`
+    * **Outputs:**
+        * `Calculated_Required_Rate_of_Return` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCAPM():
+            Risk_Free_Rate = GET_INPUT("Risk_Free_Rate")
+            Market_Risk_Premium = GET_INPUT("Market_Risk_Premium")
+            Stock_Beta = GET_INPUT("Stock_Beta")
+
+            Required_Return = Risk_Free_Rate + (Stock_Beta * Market_Risk_Premium)
+
+            DISPLAY_OUTPUT("Calculated_Required_Rate_of_Return", Required_Return)
+        END FUNCTION
+        ```
+
+461. **G-Factor (Growth at a Reasonable Price - Explicit Criteria)**
+    * **Purpose:** Evaluate a company based on a more explicit set of criteria for "growth" and "reasonable price."
+    * **Inputs:**
+        * `EPS_Growth_Rate_5_Years` (Percentage)
+        * `ROE_Average_5_Years` (Percentage)
+        * `Debt_to_Equity_Ratio` (Number)
+        * `P_E_Ratio` (Number)
+        * `Minimum_Growth_Rate_Threshold` (Percentage)
+        * `Minimum_ROE_Threshold` (Percentage)
+        * `Maximum_Debt_to_Equity_Threshold` (Number)
+        * `Maximum_P_E_Threshold` (Number)
+    * **Calculations:**
+        * `Meets_Growth_Criteria = (EPS_Growth_Rate_5_Years >= Minimum_Growth_Rate_Threshold)`
+        * `Meets_Quality_ROE_Criteria = (ROE_Average_5_Years >= Minimum_ROE_Threshold)`
+        * `Meets_Leverage_Criteria = (Debt_to_Equity_Ratio <= Maximum_Debt_to_Equity_Threshold)`
+        * `Meets_Valuation_Criteria = (P_E_Ratio <= Maximum_P_E_Threshold)`
+        * `Overall_G_Factor_Fit = Meets_Growth_Criteria AND Meets_Quality_ROE_Criteria AND Meets_Leverage_Criteria AND Meets_Valuation_Criteria`
+    * **Outputs:**
+        * `Growth_Criteria_Met` (Boolean)
+        * `Quality_ROE_Criteria_Met` (Boolean)
+        * `Leverage_Criteria_Met` (Boolean)
+        * `Valuation_Criteria_Met` (Boolean)
+        * `Overall_G_Factor_Fit_Status` (Boolean)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EvaluateGFactorFit():
+            EPS_Growth_Rate_5_Years = GET_INPUT("EPS_Growth_Rate_5_Years")
+            ROE_Average_5_Years = GET_INPUT("ROE_Average_5_Years")
+            Debt_to_Equity_Ratio = GET_INPUT("Debt_to_Equity_Ratio")
+            P_E_Ratio = GET_INPUT("P_E_Ratio")
+            Minimum_Growth_Rate_Threshold = GET_INPUT("Minimum_Growth_Rate_Threshold")
+            Minimum_ROE_Threshold = GET_INPUT("Minimum_ROE_Threshold")
+            Maximum_Debt_to_Equity_Threshold = GET_INPUT("Maximum_Debt_to_Equity_Threshold")
+            Maximum_P_E_Threshold = GET_INPUT("Maximum_P_E_Threshold")
+
+            Growth_Criteria_Met = (EPS_Growth_Rate_5_Years >= Minimum_Growth_Rate_Threshold)
+            Quality_ROE_Criteria_Met = (ROE_Average_5_Years >= Minimum_ROE_Threshold)
+            Leverage_Criteria_Met = (Debt_to_Equity_Ratio <= Maximum_Debt_to_Equity_Threshold)
+            Valuation_Criteria_Met = (P_E_Ratio <= Maximum_P_E_Threshold)
+
+            Overall_G_Factor_Fit_Status = Growth_Criteria_Met AND Quality_ROE_Criteria_Met AND Leverage_Criteria_Met AND Valuation_Criteria_Met
+
+            DISPLAY_OUTPUT("Growth_Criteria_Met", Growth_Criteria_Met)
+            DISPLAY_OUTPUT("Quality_ROE_Criteria_Met", Quality_ROE_Criteria_Met)
+            DISPLAY_OUTPUT("Leverage_Criteria_Met", Leverage_Criteria_Met)
+            DISPLAY_OUTPUT("Valuation_Criteria_Met", Valuation_Criteria_Met)
+            DISPLAY_OUTPUT("Overall_G_Factor_Fit_Status", Overall_G_Factor_Fit_Status)
+        END FUNCTION
+        ```
+
+462. **Qualitative Factors for Moat (Weighted Checklist)**
+    * **Purpose:** Provide a structured, pseudo-quantitative way to assess a company's economic moat by weighting various qualitative factors.
+    * **Inputs:**
+        * `Brand_Strength_Score` (Number: 1-5, with Weight: %)
+        * `Patents_Secrets_Score` (Number: 1-5, with Weight: %)
+        * `Switching_Costs_Score` (Number: 1-5, with Weight: %)
+        * `Toll_Bridge_Advantage_Score` (Number: 1-5, with Weight: %)
+        * `Cost_Advantage_Score` (Number: 1-5, with Weight: %)
+    * **Calculations:**
+        * `Weighted_Score = (Brand_Score * Brand_Weight) + (Patents_Score * Patents_Weight) + ...`
+        * `Total_Weight = SUM(All Weights)` (Should sum to 100%)
+        * `Final_Moat_Score = Weighted_Score / Total_Weight`
+        * `Moat_Strength_Rating = IF Final_Moat_Score >= 4 THEN "Wide Moat" ELSE IF Final_Moat_Score >= 3 THEN "Narrow Moat" ELSE "No Moat"`
+    * **Outputs:**
+        * `Calculated_Weighted_Moat_Score` (Number)
+        * `Overall_Moat_Strength_Rating` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AssessWeightedMoatFactors():
+            Factors = GET_INPUT("Factors_List") // [{Name: String, Score: Number, Weight: %}]
+
+            Total_Weighted_Score = 0
+            Total_Weight = 0
+
+            FOR EACH Factor IN Factors:
+                Total_Weighted_Score = Total_Weighted_Score + (Factor.Score * (Factor.Weight / 100))
+                Total_Weight = Total_Weight + (Factor.Weight / 100)
+            END FOR
+
+            IF Total_Weight = 0 THEN
+                DISPLAY_OUTPUT("Calculated_Weighted_Moat_Score", "N/A - Total weight cannot be zero.")
+                RETURN
+            END IF
+
+            Final_Moat_Score = Total_Weighted_Score / Total_Weight
+
+            Overall_Moat_Strength_Rating = ""
+            IF Final_Moat_Score >= 4 THEN
+                Overall_Moat_Strength_Rating = "Wide Moat (Strong Competitive Advantage)"
+            ELSE IF Final_Moat_Score >= 3 THEN
+                Overall_Moat_Strength_Rating = "Narrow Moat (Some Competitive Advantage)"
+            ELSE
+                Overall_Moat_Strength_Rating = "No Moat (Limited or no Sustainable Competitive Advantage)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Weighted_Moat_Score", Final_Moat_Score)
+            DISPLAY_OUTPUT("Overall_Moat_Strength_Rating", Overall_Moat_Strength_Rating)
+        END FUNCTION
+        ```
+
+463. **Days Inventory Outstanding (DIO) - From Scratch**
+    * **Purpose:** Calculate the average number of days a company holds its inventory before selling it.
+    * **Inputs:**
+        * `Beginning_Inventory` (Currency)
+        * `Ending_Inventory` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+    * **Calculations:**
+        * `Average_Inventory = (Beginning_Inventory + Ending_Inventory) / 2`
+        * `DIO = (Average_Inventory / COGS) * 365` (Assuming annual COGS)
+    * **Outputs:**
+        * `Calculated_DIO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDIOFromScratch():
+            Beginning_Inventory = GET_INPUT("Beginning_Inventory")
+            Ending_Inventory = GET_INPUT("Ending_Inventory")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+
+            Average_Inventory = (Beginning_Inventory + Ending_Inventory) / 2
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DIO_Days", "N/A - COGS must be positive.")
+                RETURN
+            END IF
+
+            DIO = (Average_Inventory / COGS) * 365
+
+            DISPLAY_OUTPUT("Calculated_DIO_Days", DIO)
+        END FUNCTION
+        ```
+
+464. **Days Sales Outstanding (DSO) - From Scratch**
+    * **Purpose:** Calculate the average number of days it takes for a company to collect its accounts receivables.
+    * **Inputs:**
+        * `Beginning_Accounts_Receivable` (Currency)
+        * `Ending_Accounts_Receivable` (Currency)
+        * `Total_Revenue` (Currency)
+    * **Calculations:**
+        * `Average_Accounts_Receivable = (Beginning_Accounts_Receivable + Ending_Accounts_Receivable) / 2`
+        * `DSO = (Average_Accounts_Receivable / Total_Revenue) * 365` (Assuming annual revenue)
+    * **Outputs:**
+        * `Calculated_DSO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDSOFromScratch():
+            Beginning_Accounts_Receivable = GET_INPUT("Beginning_Accounts_Receivable")
+            Ending_Accounts_Receivable = GET_INPUT("Ending_Accounts_Receivable")
+            Total_Revenue = GET_INPUT("Total_Revenue")
+
+            Average_Accounts_Receivable = (Beginning_Accounts_Receivable + Ending_Accounts_Receivable) / 2
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DSO_Days", "N/A - Total Revenue must be positive.")
+                RETURN
+            END IF
+
+            DSO = (Average_Accounts_Receivable / Total_Revenue) * 365
+
+            DISPLAY_OUTPUT("Calculated_DSO_Days", DSO)
+        END FUNCTION
+        ```
+
+465. **Days Payables Outstanding (DPO) - From Scratch**
+    * **Purpose:** Calculate the average number of days a company takes to pay its suppliers.
+    * **Inputs:**
+        * `Beginning_Accounts_Payable` (Currency)
+        * `Ending_Accounts_Payable` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+    * **Calculations:**
+        * `Average_Accounts_Payable = (Beginning_Accounts_Payable + Ending_Accounts_Payable) / 2`
+        * `DPO = (Average_Accounts_Payable / COGS) * 365` (Assuming annual COGS)
+    * **Outputs:**
+        * `Calculated_DPO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDPOFromScratch():
+            Beginning_Accounts_Payable = GET_INPUT("Beginning_Accounts_Payable")
+            Ending_Accounts_Payable = GET_INPUT("Ending_Accounts_Payable")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+
+            Average_Accounts_Payable = (Beginning_Accounts_Payable + Ending_Accounts_Payable) / 2
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DPO_Days", "N/A - COGS must be positive.")
+                RETURN
+            END IF
+
+            DPO = (Average_Accounts_Payable / COGS) * 365
+
+            DISPLAY_OUTPUT("Calculated_DPO_Days", DPO)
+        END FUNCTION
+        ```
+
+466. **Working Capital Turnover - From Scratch**
+    * **Purpose:** Calculate how efficiently a company uses its working capital to generate sales.
+    * **Inputs:**
+        * `Net_Sales_Revenue` (Currency)
+        * `Beginning_Current_Assets` (Currency)
+        * `Ending_Current_Assets` (Currency)
+        * `Beginning_Current_Liabilities` (Currency)
+        * `Ending_Current_Liabilities` (Currency)
+    * **Calculations:**
+        * `Beginning_Working_Capital = Beginning_Current_Assets - Beginning_Current_Liabilities`
+        * `Ending_Working_Capital = Ending_Current_Assets - Ending_Current_Liabilities`
+        * `Average_Working_Capital = (Beginning_Working_Capital + Ending_Working_Capital) / 2`
+        * `Working_Capital_Turnover = Net_Sales_Revenue / Average_Working_Capital`
+    * **Outputs:**
+        * `Calculated_Working_Capital_Turnover` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateWorkingCapitalTurnoverFromScratch():
+            Net_Sales_Revenue = GET_INPUT("Net_Sales_Revenue")
+            Beginning_Current_Assets = GET_INPUT("Beginning_Current_Assets")
+            Ending_Current_Assets = GET_INPUT("Ending_Current_Assets")
+            Beginning_Current_Liabilities = GET_INPUT("Beginning_Current_Liabilities")
+            Ending_Current_Liabilities = GET_INPUT("Ending_Current_Liabilities")
+
+            Beginning_Working_Capital = Beginning_Current_Assets - Beginning_Current_Liabilities
+            Ending_Working_Capital = Ending_Current_Assets - Ending_Current_Liabilities
+            Average_Working_Capital = (Beginning_Working_Capital + Ending_Working_Capital) / 2
+
+            IF Average_Working_Capital <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Working_Capital_Turnover", "N/A - Average Working Capital must be positive.")
+                RETURN
+            END IF
+
+            Working_Capital_Turnover = Net_Sales_Revenue / Average_Working_Capital
+
+            DISPLAY_OUTPUT("Calculated_Working_Capital_Turnover", Working_Capital_Turnover)
+        END FUNCTION
+        ```
+
+467. **Fixed Asset Turnover - From Scratch**
+    * **Purpose:** Calculate how efficiently a company uses its fixed assets to generate sales.
+    * **Inputs:**
+        * `Net_Sales_Revenue` (Currency)
+        * `Beginning_Fixed_Assets` (Currency)
+        * `Ending_Fixed_Assets` (Currency)
+    * **Calculations:**
+        * `Average_Fixed_Assets = (Beginning_Fixed_Assets + Ending_Fixed_Assets) / 2`
+        * `Fixed_Asset_Turnover = Net_Sales_Revenue / Average_Fixed_Assets`
+    * **Outputs:**
+        * `Calculated_Fixed_Asset_Turnover` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFixedAssetTurnoverFromScratch():
+            Net_Sales_Revenue = GET_INPUT("Net_Sales_Revenue")
+            Beginning_Fixed_Assets = GET_INPUT("Beginning_Fixed_Assets")
+            Ending_Fixed_Assets = GET_INPUT("Ending_Fixed_Assets")
+
+            Average_Fixed_Assets = (Beginning_Fixed_Assets + Ending_Fixed_Assets) / 2
+
+            IF Average_Fixed_Assets <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Fixed_Asset_Turnover", "N/A - Average Fixed Assets must be positive.")
+                RETURN
+            END IF
+
+            Fixed_Asset_Turnover = Net_Sales_Revenue / Average_Fixed_Assets
+
+            DISPLAY_OUTPUT("Calculated_Fixed_Asset_Turnover", Fixed_Asset_Turnover)
+        END FUNCTION
+        ```
+
+468. **Total Asset Turnover - From Scratch**
+    * **Purpose:** Calculate how efficiently a company uses its total assets to generate sales.
+    * **Inputs:**
+        * `Net_Sales_Revenue` (Currency)
+        * `Beginning_Total_Assets` (Currency)
+        * `Ending_Total_Assets` (Currency)
+    * **Calculations:**
+        * `Average_Total_Assets = (Beginning_Total_Assets + Ending_Total_Assets) / 2`
+        * `Total_Asset_Turnover = Net_Sales_Revenue / Average_Total_Assets`
+    * **Outputs:**
+        * `Calculated_Total_Asset_Turnover` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTotalAssetTurnoverFromScratch():
+            Net_Sales_Revenue = GET_INPUT("Net_Sales_Revenue")
+            Beginning_Total_Assets = GET_INPUT("Beginning_Total_Assets")
+            Ending_Total_Assets = GET_INPUT("Ending_Total_Assets")
+
+            Average_Total_Assets = (Beginning_Total_Assets + Ending_Total_Assets) / 2
+
+            IF Average_Total_Assets <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Total_Asset_Turnover", "N/A - Average Total Assets must be positive.")
+                RETURN
+            END IF
+
+            Total_Asset_Turnover = Net_Sales_Revenue / Average_Total_Assets
+
+            DISPLAY_OUTPUT("Calculated_Total_Asset_Turnover", Total_Asset_Turnover)
+        END FUNCTION
+        ```
+
+469. **Operating Expense Ratio**
+    * **Purpose:** Measure the proportion of a company's revenue that is consumed by operating expenses (excluding COGS).
+    * **Inputs:**
+        * `Operating_Expenses` (Currency)
+        * `Total_Revenue` (Currency)
+    * **Calculations:**
+        * `Operating_Expense_Ratio = (Operating_Expenses / Total_Revenue) * 100`
+    * **Outputs:**
+        * `Calculated_Operating_Expense_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateOperatingExpenseRatio():
+            Operating_Expenses = GET_INPUT("Operating_Expenses")
+            Total_Revenue = GET_INPUT("Total_Revenue")
+
+            IF Total_Revenue <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Operating_Expense_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Operating_Expense_Ratio = (Operating_Expenses / Total_Revenue) * 100
+
+            DISPLAY_OUTPUT("Calculated_Operating_Expense_Ratio", Operating_Expense_Ratio)
+        END FUNCTION
+        ```
+
+470. **Sales Per Square Foot (Retail/Real Estate)**
+    * **Purpose:** A common efficiency metric for retail or real estate businesses, showing how much revenue is generated per unit of floor space.
+    * **Inputs:**
+        * `Total_Revenue` (Currency)
+        * `Total_Selling_Square_Footage` (Number)
+    * **Calculations:**
+        * `Sales_Per_Square_Foot = Total_Revenue / Total_Selling_Square_Footage`
+    * **Outputs:**
+        * `Calculated_Sales_Per_Square_Foot` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSalesPerSquareFoot():
+            Total_Revenue = GET_INPUT("Total_Revenue")
+            Total_Selling_Square_Footage = GET_INPUT("Total_Selling_Square_Footage")
+
+            IF Total_Selling_Square_Footage <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Sales_Per_Square_Foot", "N/A - Square footage must be positive.")
+                RETURN
+            END IF
+
+            Sales_Per_Square_Foot = Total_Revenue / Total_Selling_Square_Footage
+
+            DISPLAY_OUTPUT("Calculated_Sales_Per_Square_Foot", Sales_Per_Square_Foot)
+        END FUNCTION
+        ```
+
+471. **Sales Per Customer Calculator**
+    * **Purpose:** Calculate the average revenue generated from each customer.
+    * **Inputs:**
+        * `Total_Revenue` (Currency)
+        * `Total_Customers` (Number)
+    * **Calculations:**
+        * `Sales_Per_Customer = Total_Revenue / Total_Customers`
+    * **Outputs:**
+        * `Calculated_Sales_Per_Customer` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSalesPerCustomer():
+            Total_Revenue = GET_INPUT("Total_Revenue")
+            Total_Customers = GET_INPUT("Total_Customers")
+
+            IF Total_Customers <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Sales_Per_Customer", "N/A - Number of customers must be positive.")
+                RETURN
+            END IF
+
+            Sales_Per_Customer = Total_Revenue / Total_Customers
+
+            DISPLAY_OUTPUT("Calculated_Sales_Per_Customer", Sales_Per_Customer)
+        END FUNCTION
+        ```
+
+472. **EBITDA Per Employee Calculator**
+    * **Purpose:** Measure the operational profitability generated by each employee, normalizing for non-operating factors and capital structure.
+    * **Inputs:**
+        * `EBITDA` (Currency)
+        * `Number_of_Employees` (Number)
+    * **Calculations:**
+        * `EBITDA_Per_Employee = EBITDA / Number_of_Employees`
+    * **Outputs:**
+        * `Calculated_EBITDA_Per_Employee` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEBITDAPerEmployee():
+            EBITDA = GET_INPUT("EBITDA")
+            Number_of_Employees = GET_INPUT("Number_of_Employees")
+
+            IF Number_of_Employees <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EBITDA_Per_Employee", "N/A - Number of employees must be positive.")
+                RETURN
+            END IF
+
+            EBITDA_Per_Employee = EBITDA / Number_of_Employees
+
+            DISPLAY_OUTPUT("Calculated_EBITDA_Per_Employee", EBITDA_Per_Employee)
+        END FUNCTION
+        ```
+
+473. **Cash Ratio (Advanced - Excluding Marketable Securities)**
+    * **Purpose:** A very conservative liquidity ratio, focusing only on the most liquid assets (cash) relative to current liabilities.
+    * **Inputs:**
+        * `Cash_and_Cash_Equivalents` (Currency)
+        * `Current_Liabilities` (Currency)
+    * **Calculations:**
+        * `Cash_Ratio = Cash_and_Cash_Equivalents / Current_Liabilities`
+    * **Outputs:**
+        * `Calculated_Cash_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCashRatioAdvanced():
+            Cash_and_Cash_Equivalents = GET_INPUT("Cash_and_Cash_Equivalents")
+            Current_Liabilities = GET_INPUT("Current_Liabilities")
+
+            IF Current_Liabilities <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cash_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Cash_Ratio = Cash_and_Cash_Equivalents / Current_Liabilities
+
+            DISPLAY_OUTPUT("Calculated_Cash_Ratio", Cash_Ratio)
+        END FUNCTION
+        ```
+
+474. **Net Debt to Capital Employed Ratio**
+    * **Purpose:** Assess how much of a company's operating capital is financed by net debt (total debt minus cash).
+    * **Inputs:**
+        * `Total_Debt` (Currency)
+        * `Cash_and_Cash_Equivalents` (Currency)
+        * `Total_Assets` (Currency)
+        * `Current_Liabilities_Non_Interest_Bearing` (Currency)
+    * **Calculations:**
+        * `Net_Debt = Total_Debt - Cash_and_Cash_Equivalents`
+        * `Capital_Employed = Total_Assets - Current_Liabilities_Non_Interest_Bearing`
+        * `Net_Debt_to_Capital_Employed_Ratio = Net_Debt / Capital_Employed`
+    * **Outputs:**
+        * `Calculated_Net_Debt_to_Capital_Employed_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateNetDebtToCapitalEmployed():
+            Total_Debt = GET_INPUT("Total_Debt")
+            Cash_and_Cash_Equivalents = GET_INPUT("Cash_and_Cash_Equivalents")
+            Total_Assets = GET_INPUT("Total_Assets")
+            Current_Liabilities_Non_Interest_Bearing = GET_INPUT("Current_Liabilities_Non_Interest_Bearing")
+
+            Net_Debt = Total_Debt - Cash_and_Cash_Equivalents
+            Capital_Employed = Total_Assets - Current_Liabilities_Non_Interest_Bearing
+
+            IF Capital_Employed <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Net_Debt_to_Capital_Employed_Ratio", "N/A - Capital Employed must be positive.")
+                RETURN
+            END IF
+
+            Net_Debt_to_Capital_Employed_Ratio = Net_Debt / Capital_Employed
+
+            DISPLAY_OUTPUT("Calculated_Net_Debt_to_Capital_Employed_Ratio", Net_Debt_to_Capital_Employed_Ratio)
+        END FUNCTION
+        ```
+
+475. **Current Assets to Total Assets Ratio**
+    * **Purpose:** Measure the proportion of a company's assets that are current (short-term), indicating its asset liquidity profile.
+    * **Inputs:**
+        * `Total_Current_Assets` (Currency)
+        * `Total_Assets` (Currency)
+    * **Calculations:**
+        * `Current_Assets_to_Total_Assets_Ratio = (Total_Current_Assets / Total_Assets) * 100`
+    * **Outputs:**
+        * `Calculated_Current_Assets_to_Total_Assets_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCurrentAssetsToTotalAssetsRatio():
+            Total_Current_Assets = GET_INPUT("Total_Current_Assets")
+            Total_Assets = GET_INPUT("Total_Assets")
+
+            IF Total_Assets <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Current_Assets_to_Total_Assets_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Current_Assets_to_Total_Assets_Ratio = (Total_Current_Assets / Total_Assets) * 100
+
+            DISPLAY_OUTPUT("Calculated_Current_Assets_to_Total_Assets_Ratio", Current_Assets_to_Total_Assets_Ratio)
+        END FUNCTION
+        ```
+
+476. **Cash Flow Coverage Ratio (Operating Cash Flow / Total Debt)**
+    * **Purpose:** A measure of how many times a company's total debt is covered by its operating cash flow, indicating its ability to pay off debt from operations.
+    * **Inputs:**
+        * `Operating_Cash_Flow` (Currency)
+        * `Total_Debt` (Currency)
+    * **Calculations:**
+        * `Cash_Flow_Coverage_Ratio = Operating_Cash_Flow / Total_Debt`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_Coverage_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCashFlowCoverageRatio():
+            Operating_Cash_Flow = GET_INPUT("Operating_Cash_Flow")
+            Total_Debt = GET_INPUT("Total_Debt")
+
+            IF Total_Debt <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cash_Flow_Coverage_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Cash_Flow_Coverage_Ratio = Operating_Cash_Flow / Total_Debt
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_Coverage_Ratio", Cash_Flow_Coverage_Ratio)
+        END FUNCTION
+        ```
+
+477. **Debt to Equity Ratio (Excluding Operating Liabilities)**
+    * **Purpose:** A refined debt-to-equity ratio that excludes non-interest-bearing operating liabilities from total debt, focusing on financial debt.
+    * **Inputs:**
+        * `Interest_Bearing_Debt` (Currency - e.g., bonds, bank loans)
+        * `Total_Shareholder_Equity` (Currency)
+    * **Calculations:**
+        * `Debt_to_Equity_Ratio_Refined = Interest_Bearing_Debt / Total_Shareholder_Equity`
+    * **Outputs:**
+        * `Calculated_Debt_to_Equity_Ratio_Refined` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDebtToEquityRatioExcludingOperating():
+            Interest_Bearing_Debt = GET_INPUT("Interest_Bearing_Debt")
+            Total_Shareholder_Equity = GET_INPUT("Total_Shareholder_Equity")
+
+            IF Total_Shareholder_Equity <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Debt_to_Equity_Ratio_Refined", "N/A")
+                RETURN
+            END IF
+
+            Debt_to_Equity_Ratio_Refined = Interest_Bearing_Debt / Total_Shareholder_Equity
+
+            DISPLAY_OUTPUT("Calculated_Debt_to_Equity_Ratio_Refined", Debt_to_Equity_Ratio_Refined)
+        END FUNCTION
+        ```
+
+478. **Sustainable Growth Rate (Using ROA and Debt/Equity)**
+    * **Purpose:** Calculate a company's sustainable growth rate using the comprehensive formula that incorporates ROA, retention, and leverage.
+    * **Inputs:**
+        * `Return_on_Assets_ROA` (Percentage)
+        * `Earnings_Retention_Rate` (Percentage)
+        * `Debt_to_Equity_Ratio` (Number)
+    * **Calculations:**
+        * `ROA_Decimal = ROA / 100`
+        * `Retention_Rate_Decimal = Earnings_Retention_Rate / 100`
+        * `Sustainable_Growth_Rate = (ROA_Decimal * Retention_Rate_Decimal * (1 + Debt_to_Equity_Ratio)) / (1 - (ROA_Decimal * Retention_Rate_Decimal * (1 + Debt_to_Equity_Ratio))) * 100` (Simplified, more complex version exists)
+    * **Outputs:**
+        * `Calculated_Sustainable_Growth_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSustainableGrowthRateROA_DebtEquity():
+            Return_on_Assets_ROA = GET_INPUT("Return_on_Assets_ROA") / 100
+            Earnings_Retention_Rate = GET_INPUT("Earnings_Retention_Rate") / 100
+            Debt_to_Equity_Ratio = GET_INPUT("Debt_to_Equity_Ratio")
+
+            Numerator = Return_on_Assets_ROA * Earnings_Retention_Rate * (1 + Debt_to_Equity_Ratio)
+            Denominator = 1 - Numerator
+
+            IF Denominator = 0 THEN
+                DISPLAY_OUTPUT("Calculated_Sustainable_Growth_Rate", "N/A - Cannot calculate with these inputs (e.g., if growth exceeds 100%).")
+                RETURN
+            END IF
+
+            Sustainable_Growth_Rate = (Numerator / Denominator) * 100
+
+            DISPLAY_OUTPUT("Calculated_Sustainable_Growth_Rate", Sustainable_Growth_Rate)
+        END FUNCTION
+        ```
+
+479. **Reinvestment Rate Calculator**
+    * **Purpose:** Calculate the percentage of NOPAT (Net Operating Profit After Tax) that a company reinvests back into the business.
+    * **Inputs:**
+        * `Net_Operating_Profit_After_Tax_NOPAT` (Currency)
+        * `Capital_Expenditures_Net` (Currency)
+        * `Change_in_Working_Capital_Investment` (Currency)
+    * **Calculations:**
+        * `Total_Reinvestment = Capital_Expenditures_Net + Change_in_Working_Capital_Investment`
+        * `Reinvestment_Rate = (Total_Reinvestment / NOPAT) * 100` (If NOPAT > 0)
+    * **Outputs:**
+        * `Calculated_Reinvestment_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateReinvestmentRate():
+            NOPAT = GET_INPUT("Net_Operating_Profit_After_Tax_NOPAT")
+            Capital_Expenditures_Net = GET_INPUT("Capital_Expenditures_Net")
+            Change_in_Working_Capital_Investment = GET_INPUT("Change_in_Working_Capital_Investment")
+
+            Total_Reinvestment = Capital_Expenditures_Net + Change_in_Working_Capital_Investment
+
+            IF NOPAT <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Reinvestment_Rate", "N/A - NOPAT must be positive.")
+                RETURN
+            END IF
+
+            Reinvestment_Rate = (Total_Reinvestment / NOPAT) * 100
+
+            DISPLAY_OUTPUT("Calculated_Reinvestment_Rate", Reinvestment_Rate)
+        END FUNCTION
+        ```
+
+480. **Free Cash Flow to Firm (FCFF) Growth Rate Calculator**
+    * **Purpose:** Calculate the historical growth rate of a company's Free Cash Flow to Firm (FCFF).
+    * **Inputs:**
+        * `Beginning_FCFF` (Currency)
+        * `Ending_FCFF` (Currency)
+        * `Number_of_Years` (Years)
+    * **Calculations:**
+        * `FCFF_Growth_Rate = (POWER((Ending_FCFF / Beginning_FCFF), (1 / Number_of_Years)) - 1) * 100` (CAGR)
+    * **Outputs:**
+        * `Calculated_FCFF_Growth_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFFGrowthRate():
+            Beginning_FCFF = GET_INPUT("Beginning_FCFF")
+            Ending_FCFF = GET_INPUT("Ending_FCFF")
+            Number_of_Years = GET_INPUT("Number_of_Years")
+
+            IF Beginning_FCFF <= 0 OR Number_of_Years <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FCFF_Growth_Rate", "N/A - Inputs must be positive.")
+                RETURN
+            END IF
+
+            FCFF_Growth_Rate = (POWER((Ending_FCFF / Beginning_FCFF), (1 / Number_of_Years)) - 1) * 100
+
+            DISPLAY_OUTPUT("Calculated_FCFF_Growth_Rate", FCFF_Growth_Rate)
+        END FUNCTION
+        ```
+
+481. **Free Cash Flow to Equity (FCFE) Growth Rate Calculator**
+    * **Purpose:** Calculate the historical growth rate of a company's Free Cash Flow to Equity (FCFE).
+    * **Inputs:**
+        * `Beginning_FCFE` (Currency)
+        * `Ending_FCFE` (Currency)
+        * `Number_of_Years` (Years)
+    * **Calculations:**
+        * `FCFE_Growth_Rate = (POWER((Ending_FCFE / Beginning_FCFE), (1 / Number_of_Years)) - 1) * 100` (CAGR)
+    * **Outputs:**
+        * `Calculated_FCFE_Growth_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFEGrowthRate():
+            Beginning_FCFE = GET_INPUT("Beginning_FCFE")
+            Ending_FCFE = GET_INPUT("Ending_FCFE")
+            Number_of_Years = GET_INPUT("Number_of_Years")
+
+            IF Beginning_FCFE <= 0 OR Number_of_Years <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FCFE_Growth_Rate", "N/A - Inputs must be positive.")
+                RETURN
+            END IF
+
+            FCFE_Growth_Rate = (POWER((Ending_FCFE / Beginning_FCFE), (1 / Number_of_Years)) - 1) * 100
+
+            DISPLAY_OUTPUT("Calculated_FCFE_Growth_Rate", FCFE_Growth_Rate)
+        END FUNCTION
+        ```
+
+482. **Value Chain Analysis (Conceptual Tool)**
+    * **Purpose:** A framework (not a numerical calculator) to help investors systematically evaluate a company's activities to identify sources of competitive advantage (moat).
+    * **Inputs:**
+        * `Industry_Type` (Text)
+        * `Company_Specific_Activities_Score` (Qualitative inputs for each primary/support activity: 1-5 score)
+            * Primary Activities: Inbound Logistics, Operations, Outbound Logistics, Marketing & Sales, Service.
+            * Support Activities: Firm Infrastructure, HR Management, Technology Development, Procurement.
+    * **Calculations:**
+        * `Total_Primary_Activities_Score = SUM(Scores for Primary)`
+        * `Total_Support_Activities_Score = SUM(Scores for Support)`
+        * `Overall_Value_Chain_Strength = (Total_Primary_Activities_Score + Total_Support_Activities_Score) / Total_Possible_Score`
+    * **Outputs:**
+        * `Overall_Value_Chain_Strength_Score` (Number)
+        * `Potential_Moat_Sources_Summary` (Textual interpretation of high scores)
+        * `Key_Questions_for_Analysis` (Prompts for user)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeValueChain():
+            Industry_Type = GET_INPUT("Industry_Type")
+            Primary_Activities_Scores = GET_INPUT("Primary_Activities_Scores_List") // e.g., [{Activity: "Inbound Logistics", Score: 4}, ...]
+            Support_Activities_Scores = GET_INPUT("Support_Activities_Scores_List") // e.g., [{Activity: "HR Management", Score: 3}, ...]
+
+            Total_Primary_Score = 0
+            FOR EACH Activity IN Primary_Activities_Scores:
+                Total_Primary_Score = Total_Primary_Score + Activity.Score
+            END FOR
+
+            Total_Support_Score = 0
+            FOR EACH Activity IN Support_Activities_Scores:
+                Total_Support_Score = Total_Support_Score + Activity.Score
+            END FOR
+
+            Total_Possible_Score = (LENGTH(Primary_Activities_Scores) + LENGTH(Support_Activities_Scores)) * 5 // Max score per item is 5
+
+            Overall_Value_Chain_Strength_Score = (Total_Primary_Score + Total_Support_Score) / Total_Possible_Score * 100 // As percentage
+
+            Potential_Moat_Sources_Summary = "Based on strong scores in [List specific high-scoring activities], the company may have competitive advantages stemming from operational efficiency, brand loyalty, or technological superiority. Weak areas may indicate vulnerabilities."
+            Key_Questions_for_Analysis = "Consider: How unique are their logistics? Is their marketing truly differentiated? Do their patents offer lasting protection? How easy is it for customers to switch?"
+
+            DISPLAY_OUTPUT("Overall_Value_Chain_Strength_Score", Overall_Value_Chain_Strength_Score)
+            DISPLAY_OUTPUT("Potential_Moat_Sources_Summary", Potential_Moat_Sources_Summary)
+            DISPLAY_OUTPUT("Key_Questions_for_Analysis", Key_Questions_for_Analysis)
+        END FUNCTION
+        ```
+
+483. **Z-Score for Non-Manufacturing Firms (Altman Z'-Score)**
+    * **Purpose:** A variation of the Altman Z-score specifically designed for private or non-manufacturing firms to predict bankruptcy.
+    * **Inputs:**
+        * `Working_Capital` (Currency)
+        * `Total_Assets` (Currency)
+        * `Retained_Earnings` (Currency)
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Book_Value_of_Equity` (Currency)
+        * `Total_Liabilities` (Currency)
+        * `Sales` (Currency)
+    * **Calculations:**
+        * `A = Working_Capital / Total_Assets`
+        * `B = Retained_Earnings / Total_Assets`
+        * `C = EBIT / Total_Assets`
+        * `D = Book_Value_of_Equity / Total_Liabilities`
+        * `E = Sales / Total_Assets`
+        * `Z_Prime_Score = (0.717 * A) + (0.847 * B) + (3.107 * C) + (0.420 * D) + (0.998 * E)`
+        * `Interpretation = IF Z_Prime_Score > 2.60 THEN "Safe Zone" ELSE IF Z_Prime_Score > 1.10 THEN "Grey Zone" ELSE "Distress Zone"`
+    * **Outputs:**
+        * `Calculated_Altman_Z_Prime_Score` (Number)
+        * `Bankruptcy_Risk_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAltmanZPrimeScore():
+            Working_Capital = GET_INPUT("Working_Capital")
+            Total_Assets = GET_INPUT("Total_Assets")
+            Retained_Earnings = GET_INPUT("Retained_Earnings")
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Book_Value_of_Equity = GET_INPUT("Book_Value_of_Equity")
+            Total_Liabilities = GET_INPUT("Total_Liabilities")
+            Sales = GET_INPUT("Sales")
+
+            IF Total_Assets = 0 OR Total_Liabilities = 0 THEN
+                DISPLAY_OUTPUT("Calculated_Altman_Z_Prime_Score", "N/A - Total Assets and Liabilities must be positive.")
+                RETURN
+            END IF
+
+            A = Working_Capital / Total_Assets
+            B = Retained_Earnings / Total_Assets
+            C = EBIT / Total_Assets
+            D = Book_Value_of_Equity / Total_Liabilities
+            E = Sales / Total_Assets
+
+            Z_Prime_Score = (0.717 * A) + (0.847 * B) + (3.107 * C) + (0.420 * D) + (0.998 * E)
+
+            Interpretation = ""
+            IF Z_Prime_Score > 2.60 THEN
+                Interpretation = "Safe Zone (Low probability of bankruptcy for non-manufacturing firms)"
+            ELSE IF Z_Prime_Score > 1.10 THEN
+                Interpretation = "Grey Zone (Caution needed, some risk)"
+            ELSE
+                Interpretation = "Distress Zone (High probability of bankruptcy)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Altman_Z_Prime_Score", Z_Prime_Score)
+            DISPLAY_OUTPUT("Bankruptcy_Risk_Interpretation", Interpretation)
+        END FUNCTION
+        ```
+
+484. **Credit Score Impact on Bond Yields (Conceptual)**
+    * **Purpose:** Illustrate how a company's credit rating (from agencies like S&P, Moody's) can influence the yield it must offer on its bonds to attract investors.
+    * **Inputs:**
+        * `Benchmark_Risk_Free_Rate` (Percentage - e.g., US Treasury)
+        * `Credit_Rating` (Text: "AAA", "AA", "A", "BBB", "BB", "B", "CCC")
+        * `Average_Spread_for_Rating` (Table: `Rating`, `Spread_Percentage`) - *External data, pre-defined.*
+    * **Calculations:**
+        * `Credit_Spread = LOOKUP_SPREAD(Credit_Rating, Average_Spread_for_Rating)`
+        * `Estimated_Bond_Yield = Benchmark_Risk_Free_Rate + Credit_Spread`
+    * **Outputs:**
+        * `Estimated_Bond_Yield` (Percentage)
+        * `Interpretation_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION IllustrateCreditScoreBondYieldImpact():
+            Benchmark_Risk_Free_Rate = GET_INPUT("Benchmark_Risk_Free_Rate")
+            Credit_Rating = GET_INPUT("Credit_Rating")
+
+            // Pre-defined average spreads for credit ratings (example values)
+            CREDIT_SPREAD_TABLE = [
+                {Rating: "AAA", Spread: 0.5}, // 0.5%
+                {Rating: "AA", Spread: 0.8},
+                {Rating: "A", Spread: 1.2},
+                {Rating: "BBB", Spread: 2.0},
+                {Rating: "BB", Spread: 3.5},
+                {Rating: "B", Spread: 6.0},
+                {Rating: "CCC", Spread: 10.0}
+            ]
+
+            Credit_Spread = 0
+            FOUND_RATING = FALSE
+            FOR EACH Row IN CREDIT_SPREAD_TABLE:
+                IF Credit_Rating == Row.Rating THEN
+                    Credit_Spread = Row.Spread
+                    FOUND_RATING = TRUE
+                    BREAK
+                END IF
+            END FOR
+
+            IF NOT FOUND_RATING THEN
+                DISPLAY_OUTPUT("Estimated_Bond_Yield", "N/A")
+                DISPLAY_OUTPUT("Interpretation_Note", "Credit rating not found in table.")
+                RETURN
+            END IF
+
+            Estimated_Bond_Yield = Benchmark_Risk_Free_Rate + Credit_Spread
+
+            Interpretation_Note = "A lower credit rating (higher perceived risk) requires the company to offer a higher yield to compensate investors, impacting its borrowing costs."
+
+            DISPLAY_OUTPUT("Estimated_Bond_Yield", Estimated_Bond_Yield)
+            DISPLAY_OUTPUT("Interpretation_Note", Interpretation_Note)
+        END FUNCTION
+        ```
+
+485. **Probability of Default (Conceptual - Based on Credit Rating)**
+    * **Purpose:** Provide a conceptual estimate of a company's probability of default based on its credit rating.
+    * **Inputs:**
+        * `Credit_Rating` (Text: "AAA", "AA", "A", "BBB", "BB", "B", "CCC")
+        * `Average_1_Year_Default_Rate_Table` (Table: `Rating`, `Default_Rate_Percentage`) - *External data, pre-defined.*
+    * **Calculations:**
+        * `Default_Rate = LOOKUP_DEFAULT_RATE(Credit_Rating, Average_1_Year_Default_Rate_Table)`
+    * **Outputs:**
+        * `Estimated_1_Year_Probability_of_Default` (Percentage)
+        * `Risk_Level_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateProbabilityOfDefault():
+            Credit_Rating = GET_INPUT("Credit_Rating")
+
+            // Pre-defined average 1-year default rates (example values, real data varies)
+            DEFAULT_RATE_TABLE = [
+                {Rating: "AAA", Rate: 0.0}, {Rating: "AA", Rate: 0.01}, {Rating: "A", Rate: 0.02},
+                {Rating: "BBB", Rate: 0.1}, {Rating: "BB", Rate: 0.5}, {Rating: "B", Rate: 2.0},
+                {Rating: "CCC", Rate: 10.0}
+            ]
+
+            Default_Rate = 0
+            FOUND_RATING = FALSE
+            FOR EACH Row IN DEFAULT_RATE_TABLE:
+                IF Credit_Rating == Row.Rating THEN
+                    Default_Rate = Row.Rate
+                    FOUND_RATING = TRUE
+                    BREAK
+                END IF
+            END FOR
+
+            IF NOT FOUND_RATING THEN
+                DISPLAY_OUTPUT("Estimated_1_Year_Probability_of_Default", "N/A")
+                DISPLAY_OUTPUT("Risk_Level_Note", "Credit rating not found in table.")
+                RETURN
+            END IF
+
+            Risk_Level_Note = ""
+            IF Default_Rate < 0.1 THEN Risk_Level_Note = "Very Low Risk"
+            ELSE IF Default_Rate < 1 THEN Risk_Level_Note = "Low Risk"
+            ELSE IF Default_Rate < 5 THEN Risk_Level_Note = "Moderate Risk"
+            ELSE Risk_Level_Note = "High Risk"
+
+            DISPLAY_OUTPUT("Estimated_1_Year_Probability_of_Default", Default_Rate)
+            DISPLAY_OUTPUT("Risk_Level_Note", Risk_Level_Note)
+        END FUNCTION
+        ```
+
+486. **Price-to-Earnings (P/E) Discount/Premium to Peers**
+    * **Purpose:** Compare a company's P/E ratio to its industry's average P/E to see if it's trading at a discount or premium relative to peers.
+    * **Inputs:**
+        * `Company_P_E_Ratio` (Number)
+        * `Industry_Average_P_E_Ratio` (Number)
+    * **Calculations:**
+        * `Difference = Company_P_E_Ratio - Industry_Average_P_E_Ratio`
+        * `Discount_Premium_Percentage = (Difference / Industry_Average_P_E_Ratio) * 100` (If Industry_Average_P_E_Ratio > 0)
+        * `Valuation_Status = IF Difference < 0 THEN "Discount" ELSE "Premium"`
+    * **Outputs:**
+        * `Calculated_Discount_Premium_Percentage` (Percentage)
+        * `Valuation_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ComparePEToPeers():
+            Company_P_E_Ratio = GET_INPUT("Company_P_E_Ratio")
+            Industry_Average_P_E_Ratio = GET_INPUT("Industry_Average_P_E_Ratio")
+
+            IF Industry_Average_P_E_Ratio <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Discount_Premium_Percentage", "N/A")
+                DISPLAY_OUTPUT("Valuation_Status", "Industry average P/E must be positive.")
+                RETURN
+            END IF
+
+            Difference = Company_P_E_Ratio - Industry_Average_P_E_Ratio
+            Discount_Premium_Percentage = (Difference / Industry_Average_P_E_Ratio) * 100
+
+            Valuation_Status = ""
+            IF Difference < 0 THEN
+                Valuation_Status = "Discount (Trading below peer average)"
+            ELSE
+                Valuation_Status = "Premium (Trading above peer average)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Discount_Premium_Percentage", Discount_Premium_Percentage)
+            DISPLAY_OUTPUT("Valuation_Status", Valuation_Status)
+        END FUNCTION
+        ```
+
+487. **Enterprise Value (EV) Discount/Premium to Peers**
+    * **Purpose:** Compare a company's EV/EBITDA (or EV/Sales) ratio to its industry's average to assess relative valuation.
+    * **Inputs:**
+        * `Company_EV_Metric_Ratio` (Number - e.g., EV/EBITDA)
+        * `Industry_Average_EV_Metric_Ratio` (Number)
+        * `Metric_Type` (Text: "EV/EBITDA", "EV/Sales")
+    * **Calculations:**
+        * `Difference = Company_EV_Metric_Ratio - Industry_Average_EV_Metric_Ratio`
+        * `Discount_Premium_Percentage = (Difference / Industry_Average_EV_Metric_Ratio) * 100` (If Industry_Average_EV_Metric_Ratio > 0)
+        * `Valuation_Status = IF Difference < 0 THEN "Discount" ELSE "Premium"`
+    * **Outputs:**
+        * `Calculated_Discount_Premium_Percentage` (Percentage)
+        * `Valuation_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareEVToPeers():
+            Company_EV_Metric_Ratio = GET_INPUT("Company_EV_Metric_Ratio")
+            Industry_Average_EV_Metric_Ratio = GET_INPUT("Industry_Average_EV_Metric_Ratio")
+            Metric_Type = GET_INPUT("Metric_Type")
+
+            IF Industry_Average_EV_Metric_Ratio <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Discount_Premium_Percentage", "N/A")
+                DISPLAY_OUTPUT("Valuation_Status", "Industry average " + Metric_Type + " must be positive.")
+                RETURN
+            END IF
+
+            Difference = Company_EV_Metric_Ratio - Industry_Average_EV_Metric_Ratio
+            Discount_Premium_Percentage = (Difference / Industry_Average_EV_Metric_Ratio) * 100
+
+            Valuation_Status = ""
+            IF Difference < 0 THEN
+                Valuation_Status = "Discount (Trading below peer average " + Metric_Type + ")"
+            ELSE
+                Valuation_Status = "Premium (Trading above peer average " + Metric_Type + ")"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Discount_Premium_Percentage", Discount_Premium_Percentage)
+            DISPLAY_OUTPUT("Valuation_Status", Valuation_Status)
+        END FUNCTION
+        ```
+
+488. **Return on Equity (ROE) Trend Analyzer**
+    * **Purpose:** Analyze the trend of a company's ROE over multiple periods to identify consistency or deterioration/improvement.
+    * **Inputs:**
+        * `ROE_Years_Data` (List of Percentage, e.g., [15%, 18%, 12%, 16%])
+    * **Calculations:**
+        * `Average_ROE = SUM(ROE_Years_Data) / LENGTH(ROE_Years_Data)`
+        * `Standard_Deviation_ROE = CALCULATE_STANDARD_DEVIATION(ROE_Years_Data)`
+        * `Trend_Analysis = IF ROE_Years_Data[last] > ROE_Years_Data[first] AND Standard_Deviation_ROE < 5 THEN "Improving & Consistent"`
+        * `// ... other trend logic`
+    * **Outputs:**
+        * `Average_ROE` (Percentage)
+        * `ROE_Standard_Deviation` (Percentage)
+        * `Trend_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeROETrend():
+            ROE_Years_Data = GET_INPUT("ROE_Years_Data") // List of percentages (e.g., [15, 18, 12, 16])
+
+            IF LENGTH(ROE_Years_Data) < 2 THEN
+                DISPLAY_OUTPUT("Trend_Interpretation", "Need at least two data points for trend analysis.")
+                RETURN
+            END IF
+
+            Average_ROE = SUM(ROE_Years_Data) / LENGTH(ROE_Years_Data)
+            Standard_Deviation_ROE = CALCULATE_STANDARD_DEVIATION(ROE_Years_Data)
+
+            Trend_Interpretation = "Mixed trend"
+            IF ROE_Years_Data[LENGTH(ROE_Years_Data)-1] > ROE_Years_Data[0] AND Standard_Deviation_ROE < 5 THEN
+                Trend_Interpretation = "Improving & Consistent (ROE is growing with low volatility)"
+            ELSE IF ROE_Years_Data[LENGTH(ROE_Years_Data)-1] < ROE_Years_Data[0] AND Standard_Deviation_ROE < 5 THEN
+                Trend_Interpretation = "Declining & Consistent (ROE is decreasing with low volatility)"
+            ELSE IF Standard_Deviation_ROE >= 5 THEN
+                Trend_Interpretation = "Volatile (ROE fluctuates significantly)"
+            END IF
+
+            DISPLAY_OUTPUT("Average_ROE", Average_ROE)
+            DISPLAY_OUTPUT("ROE_Standard_Deviation", Standard_Deviation_ROE)
+            DISPLAY_OUTPUT("Trend_Interpretation", Trend_Interpretation)
+        END FUNCTION
+        ```
+
+489. **Free Cash Flow to Firm (FCFF) Coverage Ratio**
+    * **Purpose:** Measure how well a company's free cash flow to the firm covers its debt obligations, indicating financial strength.
+    * **Inputs:**
+        * `Free_Cash_Flow_to_Firm_FCFF` (Currency)
+        * `Total_Debt` (Currency)
+    * **Calculations:**
+        * `FCFF_Coverage_Ratio = FCFF / Total_Debt`
+    * **Outputs:**
+        * `Calculated_FCFF_Coverage_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFFCoverageRatio():
+            Free_Cash_Flow_to_Firm_FCFF = GET_INPUT("Free_Cash_Flow_to_Firm_FCFF")
+            Total_Debt = GET_INPUT("Total_Debt")
+
+            IF Total_Debt <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FCFF_Coverage_Ratio", "N/A")
+                RETURN
+            END IF
+
+            FCFF_Coverage_Ratio = FCFF_to_Firm_FCFF / Total_Debt
+
+            DISPLAY_OUTPUT("Calculated_FCFF_Coverage_Ratio", FCFF_Coverage_Ratio)
+        END FUNCTION
+        ```
+
+---
+
+We've just added another 40 Fundamental Analysis calculators (450-489), bringing our total count to **457 calculators!** This batch adds significant depth to the Fundamental Analysis section.
+
+Now, as per your request, we will transition to **Futures Trading Calculators**.
+
+---
+
+## XIII. Futures Trading Calculators
+
+490.  **Futures Contract Value Calculator**
+    * **Purpose:** Calculate the total monetary value of a futures contract.
+    * **Inputs:**
+        * `Futures_Price_Per_Unit` (Currency)
+        * `Contract_Size_Units` (Number - e.g., 100 barrels for oil, 5000 bushels for corn)
+    * **Calculations:**
+        * `Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units`
+    * **Outputs:**
+        * `Total_Contract_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesContractValue():
+            Futures_Price_Per_Unit = GET_INPUT("Futures_Price_Per_Unit")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+
+            Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units
+
+            DISPLAY_OUTPUT("Total_Contract_Value", Contract_Value)
+        END FUNCTION
+        ```
+
+491.  **Futures Profit/Loss Per Contract Calculator**
+    * **Purpose:** Calculate the profit or loss from a futures trade based on entry and exit prices.
+    * **Inputs:**
+        * `Entry_Price` (Currency)
+        * `Exit_Price` (Currency)
+        * `Contract_Size_Units` (Number)
+        * `Number_of_Contracts` (Number)
+        * `Trade_Direction` (Text: "Long", "Short")
+    * **Calculations:**
+        * `IF Trade_Direction = "Long" THEN`
+            * `Profit_Loss_Per_Unit = Exit_Price - Entry_Price`
+        * `ELSE IF Trade_Direction = "Short" THEN`
+            * `Profit_Loss_Per_Unit = Entry_Price - Exit_Price`
+        * `Total_Profit_Loss = Profit_Loss_Per_Unit * Contract_Size_Units * Number_of_Contracts`
+    * **Outputs:**
+        * `Total_Profit_Loss` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesPnLPerContract():
+            Entry_Price = GET_INPUT("Entry_Price")
+            Exit_Price = GET_INPUT("Exit_Price")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+            Number_of_Contracts = GET_INPUT("Number_of_Contracts")
+            Trade_Direction = GET_INPUT("Trade_Direction")
+
+            Profit_Loss_Per_Unit = 0
+            IF Trade_Direction = "Long" THEN
+                Profit_Loss_Per_Unit = Exit_Price - Entry_Price
+            ELSE IF Trade_Direction = "Short" THEN
+                Profit_Loss_Per_Unit = Entry_Price - Exit_Price
+            END IF
+
+            Total_Profit_Loss = Profit_Loss_Per_Unit * Contract_Size_Units * Number_of_Contracts
+
+            DISPLAY_OUTPUT("Total_Profit_Loss", Total_Profit_Loss)
+        END FUNCTION
+        ```
+
+492.  **Futures Margin Requirements Calculator**
+    * **Purpose:** Estimate the initial and maintenance margin required to open and maintain a futures position.
+    * **Inputs:**
+        * `Number_of_Contracts` (Number)
+        * `Initial_Margin_Per_Contract` (Currency)
+        * `Maintenance_Margin_Per_Contract` (Currency)
+    * **Calculations:**
+        * `Total_Initial_Margin = Number_of_Contracts * Initial_Margin_Per_Contract`
+        * `Total_Maintenance_Margin = Number_of_Contracts * Maintenance_Margin_Per_Contract`
+    * **Outputs:**
+        * `Total_Initial_Margin_Required` (Currency)
+        * `Total_Maintenance_Margin_Required` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesMarginRequirements():
+            Number_of_Contracts = GET_INPUT("Number_of_Contracts")
+            Initial_Margin_Per_Contract = GET_INPUT("Initial_Margin_Per_Contract")
+            Maintenance_Margin_Per_Contract = GET_INPUT("Maintenance_Margin_Per_Contract")
+
+            Total_Initial_Margin = Number_of_Contracts * Initial_Margin_Per_Contract
+            Total_Maintenance_Margin = Number_of_Contracts * Maintenance_Margin_Per_Contract
+
+            DISPLAY_OUTPUT("Total_Initial_Margin_Required", Total_Initial_Margin)
+            DISPLAY_OUTPUT("Total_Maintenance_Margin_Required", Total_Maintenance_Margin)
+        END FUNCTION
+        ```
+
+493.  **Futures Margin Call Calculator**
+    * **Purpose:** Determine the price level at which a margin call would be triggered for a futures position.
+    * **Inputs:**
+        * `Entry_Price` (Currency)
+        * `Trade_Direction` (Text: "Long", "Short")
+        * `Initial_Margin_Per_Contract` (Currency)
+        * `Maintenance_Margin_Per_Contract` (Currency)
+        * `Contract_Size_Units` (Number)
+    * **Calculations:**
+        * `Loss_Before_Margin_Call_Per_Contract = Initial_Margin_Per_Contract - Maintenance_Margin_Per_Contract`
+        * `Loss_Per_Unit_to_Margin_Call = Loss_Before_Margin_Call_Per_Contract / Contract_Size_Units`
+        * `IF Trade_Direction = "Long" THEN`
+            * `Margin_Call_Price = Entry_Price - Loss_Per_Unit_to_Margin_Call`
+        * `ELSE IF Trade_Direction = "Short" THEN`
+            * `Margin_Call_Price = Entry_Price + Loss_Per_Unit_to_Margin_Call`
+    * **Outputs:**
+        * `Margin_Call_Trigger_Price` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesMarginCall():
+            Entry_Price = GET_INPUT("Entry_Price")
+            Trade_Direction = GET_INPUT("Trade_Direction")
+            Initial_Margin_Per_Contract = GET_INPUT("Initial_Margin_Per_Contract")
+            Maintenance_Margin_Per_Contract = GET_INPUT("Maintenance_Margin_Per_Contract")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+
+            Loss_Before_Margin_Call_Per_Contract = Initial_Margin_Per_Contract - Maintenance_Margin_Per_Contract
+            
+            IF Contract_Size_Units <= 0 THEN
+                DISPLAY_OUTPUT("Margin_Call_Trigger_Price", "N/A - Contract size must be positive.")
+                RETURN
+            END IF
+            Loss_Per_Unit_to_Margin_Call = Loss_Before_Margin_Call_Per_Contract / Contract_Size_Units
+
+            Margin_Call_Price = 0
+            IF Trade_Direction = "Long" THEN
+                Margin_Call_Price = Entry_Price - Loss_Per_Unit_to_Margin_Call
+            ELSE IF Trade_Direction = "Short" THEN
+                Margin_Call_Price = Entry_Price + Loss_Per_Unit_to_Margin_Call
+            END IF
+
+            DISPLAY_OUTPUT("Margin_Call_Trigger_Price", Margin_Call_Price)
+        END FUNCTION
+        ```
+
+494. **Futures Hedging Ratio (Basic)**
+    * **Purpose:** Calculate the number of futures contracts needed to hedge a given amount of underlying asset.
+    * **Inputs:**
+        * `Value_of_Asset_to_Hedge` (Currency)
+        * `Futures_Price_Per_Unit` (Currency)
+        * `Contract_Size_Units` (Number)
+    * **Calculations:**
+        * `Total_Futures_Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units`
+        * `Hedging_Ratio_Contracts = Value_of_Asset_to_Hedge / Total_Futures_Contract_Value`
+    * **Outputs:**
+        * `Recommended_Number_of_Futures_Contracts` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesHedgingRatio():
+            Value_of_Asset_to_Hedge = GET_INPUT("Value_of_Asset_to_Hedge")
+            Futures_Price_Per_Unit = GET_INPUT("Futures_Price_Per_Unit")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+
+            Total_Futures_Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units
+
+            IF Total_Futures_Contract_Value <= 0 THEN
+                DISPLAY_OUTPUT("Recommended_Number_of_Futures_Contracts", "N/A - Futures contract value must be positive.")
+                RETURN
+            END IF
+
+            Hedging_Ratio_Contracts = Value_of_Asset_to_Hedge / Total_Futures_Contract_Value
+
+            DISPLAY_OUTPUT("Recommended_Number_of_Futures_Contracts", ROUND(Hedging_Ratio_Contracts)) // Round to nearest whole contract
+        END FUNCTION
+        ```
+
+495.  **Futures Basis Calculator**
+    * **Purpose:** Calculate the basis, which is the difference between the spot price of an underlying asset and the futures price of a contract.
+    * **Inputs:**
+        * `Current_Spot_Price` (Currency)
+        * `Futures_Price` (Currency)
+    * **Calculations:**
+        * `Basis = Current_Spot_Price - Futures_Price`
+    * **Outputs:**
+        * `Calculated_Basis` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesBasis():
+            Current_Spot_Price = GET_INPUT("Current_Spot_Price")
+            Futures_Price = GET_INPUT("Futures_Price")
+
+            Basis = Current_Spot_Price - Futures_Price
+
+            DISPLAY_OUTPUT("Calculated_Basis", Basis)
+        END FUNCTION
+        ```
+
+496.  **Cost of Carry Model (for Futures Pricing)**
+    * **Purpose:** Determine the theoretical fair value of a futures contract based on the spot price and the cost of holding the underlying asset until maturity.
+    * **Inputs:**
+        * `Current_Spot_Price` (Currency)
+        * `Risk_Free_Rate` (Percentage)
+        * `Time_to_Expiration_Years` (Years)
+        * `Storage_Costs_Per_Unit_Annual` (Currency - for commodities)
+        * `Convenience_Yield_Per_Unit_Annual` (Currency - for commodities)
+        * `Dividend_Yield_Annual` (Percentage - for stock indices)
+        * `Asset_Type` (Text: "Commodity", "Financial")
+    * **Calculations:**
+        * `IF Asset_Type = "Commodity" THEN`
+            * `Futures_Price_Theoretical = Current_Spot_Price * EXP(((Risk_Free_Rate / 100) + Storage_Costs_Per_Unit_Annual - Convenience_Yield_Per_Unit_Annual) * Time_to_Expiration_Years)`
+        * `ELSE IF Asset_Type = "Financial" THEN`
+            * `Futures_Price_Theoretical = Current_Spot_Price * EXP(((Risk_Free_Rate / 100) - (Dividend_Yield_Annual / 100)) * Time_to_Expiration_Years)`
+    * **Outputs:**
+        * `Calculated_Theoretical_Futures_Price` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfCarryFuturesPrice():
+            Current_Spot_Price = GET_INPUT("Current_Spot_Price")
+            Risk_Free_Rate = GET_INPUT("Risk_Free_Rate") / 100
+            Time_to_Expiration_Years = GET_INPUT("Time_to_Expiration_Years")
+            Storage_Costs_Per_Unit_Annual = GET_INPUT("Storage_Costs_Per_Unit_Annual") // For commodities
+            Convenience_Yield_Per_Unit_Annual = GET_INPUT("Convenience_Yield_Per_Unit_Annual") // For commodities
+            Dividend_Yield_Annual = GET_INPUT("Dividend_Yield_Annual") / 100 // For financial assets
+            Asset_Type = GET_INPUT("Asset_Type")
+
+            Futures_Price_Theoretical = 0
+            IF Asset_Type = "Commodity" THEN
+                Futures_Price_Theoretical = Current_Spot_Price * EXP(((Risk_Free_Rate + Storage_Costs_Per_Unit_Annual) - Convenience_Yield_Per_Unit_Annual) * Time_to_Expiration_Years)
+            ELSE IF Asset_Type = "Financial" THEN
+                Futures_Price_Theoretical = Current_Spot_Price * EXP((Risk_Free_Rate - Dividend_Yield_Annual) * Time_to_Expiration_Years)
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Theoretical_Futures_Price", Futures_Price_Theoretical)
+        END FUNCTION
+        ```
+
+497.  **Futures Price vs. Theoretical Price Arb Opportunity**
+    * **Purpose:** Identify potential arbitrage opportunities by comparing the actual futures price to its theoretical cost of carry price.
+    * **Inputs:**
+        * `Actual_Futures_Price` (Currency)
+        * `Theoretical_Futures_Price` (Currency - from calc 496)
+    * **Calculations:**
+        * `Difference = Actual_Futures_Price - Theoretical_Futures_Price`
+        * `Arbitrage_Opportunity = IF ABS(Difference) > Small_Threshold THEN "Yes, potential arbitrage" ELSE "No"`
+        * `Strategy = IF Difference > Small_Threshold THEN "Sell High Futures, Buy Low Spot (Cash and Carry)" ELSE IF Difference < -Small_Threshold THEN "Buy Low Futures, Sell High Spot (Reverse Cash and Carry)"`
+    * **Outputs:**
+        * `Price_Difference` (Currency)
+        * `Arbitrage_Opportunity_Status` (Text)
+        * `Suggested_Arbitrage_Strategy` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION FindFuturesArbOpportunity():
+            Actual_Futures_Price = GET_INPUT("Actual_Futures_Price")
+            Theoretical_Futures_Price = GET_INPUT("Theoretical_Futures_Price")
+
+            Difference = Actual_Futures_Price - Theoretical_Futures_Price
+            Arbitrage_Threshold = 0.01 // Define a small threshold
+
+            Arbitrage_Opportunity_Status = "No"
+            Suggested_Arbitrage_Strategy = "No identified arbitrage opportunity within threshold."
+
+            IF Difference > Arbitrage_Threshold THEN
+                Arbitrage_Opportunity_Status = "Yes"
+                Suggested_Arbitrage_Strategy = "Sell Actual Futures (Overpriced), Buy Underlying Spot & Hold (Cash and Carry Arbitrage)"
+            ELSE IF Difference < -Arbitrage_Threshold THEN
+                Arbitrage_Opportunity_Status = "Yes"
+                Suggested_Arbitrage_Strategy = "Buy Actual Futures (Underpriced), Sell Underlying Spot Short (Reverse Cash and Carry Arbitrage)"
+            END IF
+
+            DISPLAY_OUTPUT("Price_Difference", Difference)
+            DISPLAY_OUTPUT("Arbitrage_Opportunity_Status", Arbitrage_Opportunity_Status)
+            DISPLAY_OUTPUT("Suggested_Arbitrage_Strategy", Suggested_Arbitrage_Strategy)
+        END FUNCTION
+        ```
+
+498.  **Implied Interest Rate from Futures (Commodity)**
+    * **Purpose:** Extract the implied risk-free interest rate from commodity futures prices using the cost of carry model.
+    * **Inputs:**
+        * `Current_Spot_Price` (Currency)
+        * `Futures_Price` (Currency)
+        * `Time_to_Expiration_Years` (Years)
+        * `Storage_Costs_Per_Unit_Annual` (Currency)
+        * `Convenience_Yield_Per_Unit_Annual` (Currency)
+    * **Calculations:**
+        * `r = (LN(Futures_Price / Current_Spot_Price) - Storage_Costs_Per_Unit_Annual + Convenience_Yield_Per_Unit_Annual) / Time_to_Expiration_Years`
+        * `Implied_Interest_Rate = r * 100`
+    * **Outputs:**
+        * `Calculated_Implied_Interest_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateImpliedInterestRateFromCommodityFutures():
+            Current_Spot_Price = GET_INPUT("Current_Spot_Price")
+            Futures_Price = GET_INPUT("Futures_Price")
+            Time_to_Expiration_Years = GET_INPUT("Time_to_Expiration_Years")
+            Storage_Costs_Per_Unit_Annual = GET_INPUT("Storage_Costs_Per_Unit_Annual")
+            Convenience_Yield_Per_Unit_Annual = GET_INPUT("Convenience_Yield_Per_Unit_Annual")
+
+            IF Current_Spot_Price <= 0 OR Time_to_Expiration_Years <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Implied_Interest_Rate", "N/A - Spot price and time must be positive.")
+                RETURN
+            END IF
+
+            r = (LN(Futures_Price / Current_Spot_Price) - Storage_Costs_Per_Unit_Annual + Convenience_Yield_Per_Unit_Annual) / Time_to_Expiration_Years
+            Implied_Interest_Rate = r * 100
+
+            DISPLAY_OUTPUT("Calculated_Implied_Interest_Rate", Implied_Interest_Rate)
+        END FUNCTION
+        ```
+
+499.  **Implied Dividend Yield from Futures (Financial)**
+    * **Purpose:** Extract the implied dividend yield from financial futures (e.g., stock index futures) prices.
+    * **Inputs:**
+        * `Current_Spot_Price` (Currency)
+        * `Futures_Price` (Currency)
+        * `Time_to_Expiration_Years` (Years)
+        * `Risk_Free_Rate` (Percentage)
+    * **Calculations:**
+        * `q = (Risk_Free_Rate / 100) - (LN(Futures_Price / Current_Spot_Price) / Time_to_Expiration_Years)`
+        * `Implied_Dividend_Yield = q * 100`
+    * **Outputs:**
+        * `Calculated_Implied_Dividend_Yield` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateImpliedDividendYieldFromFinancialFutures():
+            Current_Spot_Price = GET_INPUT("Current_Spot_Price")
+            Futures_Price = GET_INPUT("Futures_Price")
+            Time_to_Expiration_Years = GET_INPUT("Time_to_Expiration_Years")
+            Risk_Free_Rate = GET_INPUT("Risk_Free_Rate") / 100
+
+            IF Current_Spot_Price <= 0 OR Time_to_Expiration_Years <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Implied_Dividend_Yield", "N/A - Spot price and time must be positive.")
+                RETURN
+            END IF
+
+            q = Risk_Free_Rate - (LN(Futures_Price / Current_Spot_Price) / Time_to_Expiration_Years)
+            Implied_Dividend_Yield = q * 100
+
+            DISPLAY_OUTPUT("Calculated_Implied_Dividend_Yield", Implied_Dividend_Yield)
+        END FUNCTION
+        ```
+
+500. **Optimal Hedge Ratio (Beta Hedging for Equity Futures)**
+    * **Purpose:** Calculate the optimal number of stock index futures contracts to hedge a stock portfolio's beta exposure.
+    * **Inputs:**
+        * `Portfolio_Value` (Currency)
+        * `Portfolio_Beta` (Number)
+        * `Index_Futures_Price` (Currency - e.g., S&P 500 futures)
+        * `Index_Multiplier` (Number - contract size, e.g., $50 for SPX futures)
+    * **Calculations:**
+        * `Optimal_Hedge_Contracts = (Portfolio_Value * Portfolio_Beta) / (Index_Futures_Price * Index_Multiplier)`
+    * **Outputs:**
+        * `Calculated_Optimal_Hedge_Contracts` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateOptimalHedgeRatioBetaHedging():
+            Portfolio_Value = GET_INPUT("Portfolio_Value")
+            Portfolio_Beta = GET_INPUT("Portfolio_Beta")
+            Index_Futures_Price = GET_INPUT("Index_Futures_Price")
+            Index_Multiplier = GET_INPUT("Index_Multiplier")
+
+            IF Index_Futures_Price <= 0 OR Index_Multiplier <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Optimal_Hedge_Contracts", "N/A - Futures price and multiplier must be positive.")
+                RETURN
+            END IF
+
+            Optimal_Hedge_Contracts = (Portfolio_Value * Portfolio_Beta) / (Index_Futures_Price * Index_Multiplier)
+
+            DISPLAY_OUTPUT("Calculated_Optimal_Hedge_Contracts", Optimal_Hedge_Contracts)
+        END FUNCTION
+        ```
+
+501. **Yield Curve Analysis (Futures-Derived Rates)**
+    * **Purpose:** Show how to construct segments of a yield curve using interest rate futures (e.g., Eurodollar futures).
+    * **Inputs:**
+        * `Short_Term_Spot_Rate` (Percentage - e.g., 3-month LIBOR/SOFR)
+        * `Eurodollar_Futures_Price_1` (Currency - for first quarter out)
+        * `Eurodollar_Futures_Price_2` (Currency - for second quarter out)
+        * `Eurodollar_Futures_Price_N` (Currency - for Nth quarter out)
+    * **Calculations:**
+        * `Implied_Forward_Rate_1 = (100 - Eurodollar_Futures_Price_1)`
+        * `Implied_Forward_Rate_2 = (100 - Eurodollar_Futures_Price_2)`
+        * `// ...`
+        * `Implied_Spot_Rate_6_Months = ((1 + Short_Term_Spot_Rate/100 * 0.25) * (1 + Implied_Forward_Rate_1/100 * 0.25))^(1/0.5) - 1` (annualized)
+        * `Implied_Spot_Rate_9_Months = ((1 + Short_Term_Spot_Rate/100 * 0.25) * (1 + Implied_Forward_Rate_1/100 * 0.25) * (1 + Implied_Forward_Rate_2/100 * 0.25))^(1/0.75) - 1` (annualized)
+    * **Outputs:**
+        * `Implied_Forward_Rates_Table` (Table: Quarter, Implied Rate)
+        * `Implied_Spot_Rates_Table` (Table: Term, Implied Rate)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeYieldCurveFutures():
+            Short_Term_Spot_Rate = GET_INPUT("Short_Term_Spot_Rate") / 100 // 3-month rate
+            Eurodollar_Futures_Prices = GET_INPUT("Eurodollar_Futures_Prices") // List of prices for successive quarters
+
+            Implied_Forward_Rates_Table = []
+            Implied_Spot_Rates_Table = []
+
+            Spot_Rate_3_Months = Short_Term_Spot_Rate
+            Implied_Spot_Rates_Table.ADD({Term_Months: 3, Implied_Rate: Spot_Rate_3_Months * 100})
+            
+            Current_Compound_Factor = (1 + Spot_Rate_3_Months * 0.25) // For 3 months
+
+            FOR i FROM 0 TO LENGTH(Eurodollar_Futures_Prices) - 1:
+                Futures_Price = Eurodollar_Futures_Prices[i]
+                Implied_Forward_Rate = (100 - Futures_Price) / 100 // Convert to decimal from 100 - price format
+                
+                Implied_Forward_Rates_Table.ADD({Quarter: i + 1, Implied_Rate: Implied_Forward_Rate * 100})
+
+                Current_Compound_Factor = Current_Compound_Factor * (1 + Implied_Forward_Rate * 0.25)
+                Term_in_Years = (i + 2) * 0.25 // E.g., 2nd quarter futures implies 6 months from now, or 0.5 years
+                
+                Implied_Spot_Rate_Annualized = (POWER(Current_Compound_Factor, (1 / Term_in_Years)) - 1) * 100
+                Implied_Spot_Rates_Table.ADD({Term_Months: (i + 2) * 3, Implied_Rate: Implied_Spot_Rate_Annualized})
+            END FOR
+
+            DISPLAY_OUTPUT("Implied_Forward_Rates_Table", Implied_Forward_Rates_Table)
+            DISPLAY_OUTPUT("Implied_Spot_Rates_Table", Implied_Spot_Rates_Table)
+        END FUNCTION
+        ```
+
+502. **Crack Spread Calculator (Oil Futures)**
+    * **Purpose:** Calculate the profit margin from refining crude oil into petroleum products, using futures prices.
+    * **Inputs:**
+        * `Crude_Oil_Futures_Price` (Currency - per barrel)
+        * `Gasoline_Futures_Price` (Currency - per gallon)
+        * `Heating_Oil_Futures_Price` (Currency - per gallon)
+        * `Gallons_of_Gasoline_Per_Barrel` (Number - e.g., 19.5)
+        * `Gallons_of_Heating_Oil_Per_Barrel` (Number - e.g., 8.5)
+    * **Calculations:**
+        * `Gasoline_Revenue_Per_Barrel_Crude = Gasoline_Futures_Price * Gallons_of_Gasoline_Per_Barrel`
+        * `Heating_Oil_Revenue_Per_Barrel_Crude = Heating_Oil_Futures_Price * Gallons_of_Heating_Oil_Per_Barrel`
+        * `Gross_Refining_Revenue_Per_Barrel_Crude = Gasoline_Revenue_Per_Barrel_Crude + Heating_Oil_Revenue_Per_Barrel_Crude`
+        * `Crack_Spread_Per_Barrel = Gross_Refining_Revenue_Per_Barrel_Crude - Crude_Oil_Futures_Price`
+    * **Outputs:**
+        * `Calculated_Crack_Spread_Per_Barrel` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCrackSpread():
+            Crude_Oil_Futures_Price = GET_INPUT("Crude_Oil_Futures_Price")
+            Gasoline_Futures_Price = GET_INPUT("Gasoline_Futures_Price")
+            Heating_Oil_Futures_Price = GET_INPUT("Heating_Oil_Futures_Price")
+            Gallons_of_Gasoline_Per_Barrel = GET_INPUT("Gallons_of_Gasoline_Per_Barrel")
+            Gallons_of_Heating_Oil_Per_Barrel = GET_INPUT("Gallons_of_Heating_Oil_Per_Barrel")
+
+            Gasoline_Revenue_Per_Barrel_Crude = Gasoline_Futures_Price * Gallons_of_Gasoline_Per_Barrel
+            Heating_Oil_Revenue_Per_Barrel_Crude = Heating_Oil_Futures_Price * Gallons_of_Heating_Oil_Per_Barrel
+            Gross_Refining_Revenue_Per_Barrel_Crude = Gasoline_Revenue_Per_Barrel_Crude + Heating_Oil_Revenue_Per_Barrel_Crude
+            
+            Crack_Spread_Per_Barrel = Gross_Refining_Revenue_Per_Barrel_Crude - Crude_Oil_Futures_Price
+
+            DISPLAY_OUTPUT("Calculated_Crack_Spread_Per_Barrel", Crack_Spread_Per_Barrel)
+        END FUNCTION
+        ```
+
+503. **Spark Spread Calculator (Power Futures)**
+    * **Purpose:** Calculate the theoretical profit margin from generating electricity using natural gas, based on futures prices.
+    * **Inputs:**
+        * `Natural_Gas_Futures_Price` (Currency - per MMBtu)
+        * `Electricity_Futures_Price` (Currency - per MWh)
+        * `Heat_Rate` (Number - MMBtu per MWh, efficiency)
+    * **Calculations:**
+        * `Fuel_Cost_Per_MWh = Natural_Gas_Futures_Price * Heat_Rate`
+        * `Spark_Spread_Per_MWh = Electricity_Futures_Price - Fuel_Cost_Per_MWh`
+    * **Outputs:**
+        * `Calculated_Spark_Spread_Per_MWh` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSparkSpread():
+            Natural_Gas_Futures_Price = GET_INPUT("Natural_Gas_Futures_Price")
+            Electricity_Futures_Price = GET_INPUT("Electricity_Futures_Price")
+            Heat_Rate = GET_INPUT("Heat_Rate")
+
+            Fuel_Cost_Per_MWh = Natural_Gas_Futures_Price * Heat_Rate
+            Spark_Spread_Per_MWh = Electricity_Futures_Price - Fuel_Cost_Per_MWh
+
+            DISPLAY_OUTPUT("Calculated_Spark_Spread_Per_MWh", Spark_Spread_Per_MWh)
+        END FUNCTION
+        ```
+
+504. **Crush Spread Calculator (Soybean Futures)**
+    * **Purpose:** Calculate the theoretical profit margin from processing soybeans into soybean oil and soybean meal, using futures prices.
+    * **Inputs:**
+        * `Soybean_Futures_Price` (Currency - per bushel)
+        * `Soybean_Oil_Futures_Price` (Currency - per pound)
+        * `Soybean_Meal_Futures_Price` (Currency - per ton)
+        * `Pounds_Oil_Per_Bushel` (Number - e.g., 11 lbs)
+        * `Pounds_Meal_Per_Bushel` (Number - e.g., 47 lbs)
+        * `Tons_Per_Pound` (Number - for conversion)
+    * **Calculations:**
+        * `Oil_Revenue_Per_Bushel = Soybean_Oil_Futures_Price * Pounds_Oil_Per_Bushel`
+        * `Meal_Revenue_Per_Bushel = Soybean_Meal_Futures_Price * (Pounds_Meal_Per_Bushel / Tons_Per_Pound)`
+        * `Gross_Crush_Revenue_Per_Bushel = Oil_Revenue_Per_Bushel + Meal_Revenue_Per_Bushel`
+        * `Crush_Spread_Per_Bushel = Gross_Crush_Revenue_Per_Bushel - Soybean_Futures_Price`
+    * **Outputs:**
+        * `Calculated_Crush_Spread_Per_Bushel` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCrushSpread():
+            Soybean_Futures_Price = GET_INPUT("Soybean_Futures_Price")
+            Soybean_Oil_Futures_Price = GET_INPUT("Soybean_Oil_Futures_Price")
+            Soybean_Meal_Futures_Price = GET_INPUT("Soybean_Meal_Futures_Price")
+            Pounds_Oil_Per_Bushel = GET_INPUT("Pounds_Oil_Per_Bushel")
+            Pounds_Meal_Per_Bushel = GET_INPUT("Pounds_Meal_Per_Bushel")
+            Pounds_Per_Ton = 2000 // Standard conversion
+
+            Oil_Revenue_Per_Bushel = Soybean_Oil_Futures_Price * Pounds_Oil_Per_Bushel
+            Meal_Revenue_Per_Bushel = Soybean_Meal_Futures_Price * (Pounds_Meal_Per_Bushel / Pounds_Per_Ton)
+            Gross_Crush_Revenue_Per_Bushel = Oil_Revenue_Per_Bushel + Meal_Revenue_Per_Bushel
+
+            Crush_Spread_Per_Bushel = Gross_Crush_Revenue_Per_Bushel - Soybean_Futures_Price
+
+            DISPLAY_OUTPUT("Calculated_Crush_Spread_Per_Bushel", Crush_Spread_Per_Bushel)
+        END FUNCTION
+        ```
+
+505. **Spread Trading Profit/Loss (Simple)**
+    * **Purpose:** Calculate the profit or loss for a simple futures spread trade (e.g., calendar spread, inter-market spread).
+    * **Inputs:**
+        * `Leg_1_Entry_Price` (Currency)
+        * `Leg_1_Exit_Price` (Currency)
+        * `Leg_2_Entry_Price` (Currency)
+        * `Leg_2_Exit_Price` (Currency)
+        * `Contract_Size_Units` (Number)
+        * `Number_of_Spreads` (Number)
+        * `Leg_1_Direction` (Text: "Long", "Short")
+        * `Leg_2_Direction` (Text: "Long", "Short")
+    * **Calculations:**
+        * `PnL_Leg1 = (Leg_1_Exit_Price - Leg_1_Entry_Price) * Contract_Size_Units * Number_of_Spreads` (Adjust for short leg)
+        * `PnL_Leg2 = (Leg_2_Exit_Price - Leg_2_Entry_Price) * Contract_Size_Units * Number_of_Spreads` (Adjust for short leg)
+        * `Total_Spread_PnL = PnL_Leg1 + PnL_Leg2`
+    * **Outputs:**
+        * `Total_Spread_Profit_Loss` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSimpleSpreadTradingPnL():
+            Leg_1_Entry_Price = GET_INPUT("Leg_1_Entry_Price")
+            Leg_1_Exit_Price = GET_INPUT("Leg_1_Exit_Price")
+            Leg_2_Entry_Price = GET_INPUT("Leg_2_Entry_Price")
+            Leg_2_Exit_Price = GET_INPUT("Leg_2_Exit_Price")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+            Number_of_Spreads = GET_INPUT("Number_of_Spreads")
+            Leg_1_Direction = GET_INPUT("Leg_1_Direction")
+            Leg_2_Direction = GET_INPUT("Leg_2_Direction")
+
+            PnL_Leg1 = 0
+            IF Leg_1_Direction = "Long" THEN
+                PnL_Leg1 = (Leg_1_Exit_Price - Leg_1_Entry_Price) * Contract_Size_Units * Number_of_Spreads
+            ELSE IF Leg_1_Direction = "Short" THEN
+                PnL_Leg1 = (Leg_1_Entry_Price - Leg_1_Exit_Price) * Contract_Size_Units * Number_of_Spreads
+            END IF
+
+            PnL_Leg2 = 0
+            IF Leg_2_Direction = "Long" THEN
+                PnL_Leg2 = (Leg_2_Exit_Price - Leg_2_Entry_Price) * Contract_Size_Units * Number_of_Spreads
+            ELSE IF Leg_2_Direction = "Short" THEN
+                PnL_Leg2 = (Leg_2_Entry_Price - Leg_2_Exit_Price) * Contract_Size_Units * Number_of_Spreads
+            END IF
+
+            Total_Spread_PnL = PnL_Leg1 + PnL_Leg2
+
+            DISPLAY_OUTPUT("Total_Spread_Profit_Loss", Total_Spread_PnL)
+        END FUNCTION
+        ```
+
+506. **Roll Yield Calculator (Futures)**
+    * **Purpose:** Calculate the profit or loss from rolling a futures position from a near-month contract to a far-month contract.
+    * **Inputs:**
+        * `Near_Month_Futures_Price` (Currency)
+        * `Far_Month_Futures_Price` (Currency)
+        * `Position_Direction` (Text: "Long", "Short")
+    * **Calculations:**
+        * `IF Position_Direction = "Long" THEN`
+            * `Roll_Yield = Near_Month_Futures_Price - Far_Month_Futures_Price`
+        * `ELSE IF Position_Direction = "Short" THEN`
+            * `Roll_Yield = Far_Month_Futures_Price - Near_Month_Futures_Price`
+    * **Outputs:**
+        * `Calculated_Roll_Yield_Per_Unit` (Currency)
+        * `Contango_Backwardation_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesRollYield():
+            Near_Month_Futures_Price = GET_INPUT("Near_Month_Futures_Price")
+            Far_Month_Futures_Price = GET_INPUT("Far_Month_Futures_Price")
+            Position_Direction = GET_INPUT("Position_Direction")
+
+            Roll_Yield_Per_Unit = 0
+            IF Position_Direction = "Long" THEN
+                Roll_Yield_Per_Unit = Near_Month_Futures_Price - Far_Month_Futures_Price
+            ELSE IF Position_Direction = "Short" THEN
+                Roll_Yield_Per_Unit = Far_Month_Futures_Price - Near_Month_Futures_Price
+            END IF
+
+            Contango_Backwardation_Status = ""
+            IF Far_Month_Futures_Price > Near_Month_Futures_Price THEN
+                Contango_Backwardation_Status = "Contango (Far month is more expensive)"
+            ELSE IF Far_Month_Futures_Price < Near_Month_Futures_Price THEN
+                Contango_Backwardation_Status = "Backwardation (Far month is cheaper)"
+            ELSE
+                Contango_Backwardation_Status = "Flat Market"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Roll_Yield_Per_Unit", Roll_Yield_Per_Unit)
+            DISPLAY_OUTPUT("Contango_Backwardation_Status", Contango_Backwardation_Status)
+        END FUNCTION
+        ```
+
+507. **Initial Margin Ratio (Futures)**
+    * **Purpose:** Calculate the percentage of a futures contract's total value that needs to be deposited as initial margin.
+    * **Inputs:**
+        * `Initial_Margin_Per_Contract` (Currency)
+        * `Futures_Price_Per_Unit` (Currency)
+        * `Contract_Size_Units` (Number)
+    * **Calculations:**
+        * `Total_Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units`
+        * `Initial_Margin_Ratio = (Initial_Margin_Per_Contract / Total_Contract_Value) * 100` (If Total_Contract_Value > 0)
+    * **Outputs:**
+        * `Calculated_Initial_Margin_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInitialMarginRatioFutures():
+            Initial_Margin_Per_Contract = GET_INPUT("Initial_Margin_Per_Contract")
+            Futures_Price_Per_Unit = GET_INPUT("Futures_Price_Per_Unit")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+
+            Total_Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units
+
+            IF Total_Contract_Value <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Initial_Margin_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Initial_Margin_Ratio = (Initial_Margin_Per_Contract / Total_Contract_Value) * 100
+
+            DISPLAY_OUTPUT("Calculated_Initial_Margin_Ratio", Initial_Margin_Ratio)
+        END FUNCTION
+        ```
+
+508. **Leverage Ratio (Futures)**
+    * **Purpose:** Determine the effective leverage obtained when trading futures, comparing contract value to margin.
+    * **Inputs:**
+        * `Futures_Price_Per_Unit` (Currency)
+        * `Contract_Size_Units` (Number)
+        * `Initial_Margin_Per_Contract` (Currency)
+    * **Calculations:**
+        * `Total_Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units`
+        * `Leverage_Ratio = Total_Contract_Value / Initial_Margin_Per_Contract` (If Initial_Margin_Per_Contract > 0)
+    * **Outputs:**
+        * `Calculated_Leverage_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesLeverageRatio():
+            Futures_Price_Per_Unit = GET_INPUT("Futures_Price_Per_Unit")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+            Initial_Margin_Per_Contract = GET_INPUT("Initial_Margin_Per_Contract")
+
+            Total_Contract_Value = Futures_Price_Per_Unit * Contract_Size_Units
+
+            IF Initial_Margin_Per_Contract <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Leverage_Ratio", "N/A")
+                RETURN
+            END IF
+
+            Leverage_Ratio = Total_Contract_Value / Initial_Margin_Per_Contract
+
+            DISPLAY_OUTPUT("Calculated_Leverage_Ratio", Leverage_Ratio)
+        END FUNCTION
+        ```
+
+509. **Tick Value Calculator (Futures)**
+    * **Purpose:** Calculate the monetary value of a single tick (minimum price fluctuation) for a futures contract.
+    * **Inputs:**
+        * `Tick_Size_Value` (Number - e.g., 0.0001 for currencies, 0.25 for S&P 500)
+        * `Contract_Size_Units` (Number)
+    * **Calculations:**
+        * `Tick_Value = Tick_Size_Value * Contract_Size_Units`
+    * **Outputs:**
+        * `Calculated_Tick_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesTickValue():
+            Tick_Size_Value = GET_INPUT("Tick_Size_Value")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+
+            Tick_Value = Tick_Size_Value * Contract_Size_Units
+
+            DISPLAY_OUTPUT("Calculated_Tick_Value", Tick_Value)
+        END FUNCTION
+        ```
+
+510. **Maximum Daily Price Limit Loss Calculator (Futures)**
+    * **Purpose:** Calculate the maximum potential loss per contract if a futures price hits its daily limit.
+    * **Inputs:**
+        * `Entry_Price` (Currency)
+        * `Daily_Price_Limit_Up_Down` (Currency - e.g., $3.00 for oil, or % for indices)
+        * `Contract_Size_Units` (Number)
+        * `Price_Limit_Type` (Text: "Absolute", "Percentage")
+        * `Trade_Direction` (Text: "Long", "Short")
+    * **Calculations:**
+        * `Max_Price_Move_Per_Unit = 0`
+        * `IF Price_Limit_Type = "Absolute" THEN Max_Price_Move_Per_Unit = Daily_Price_Limit_Up_Down`
+        * `ELSE IF Price_Limit_Type = "Percentage" THEN Max_Price_Move_Per_Unit = Entry_Price * (Daily_Price_Limit_Up_Down / 100)`
+        * `Daily_Loss_Per_Contract = Max_Price_Move_Per_Unit * Contract_Size_Units`
+    * **Outputs:**
+        * `Maximum_Daily_Loss_Per_Contract` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesMaxDailyLimitLoss():
+            Entry_Price = GET_INPUT("Entry_Price")
+            Daily_Price_Limit_Up_Down = GET_INPUT("Daily_Price_Limit_Up_Down")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+            Price_Limit_Type = GET_INPUT("Price_Limit_Type")
+            Trade_Direction = GET_INPUT("Trade_Direction")
+
+            Max_Price_Move_Per_Unit = 0
+            IF Price_Limit_Type = "Absolute" THEN
+                Max_Price_Move_Per_Unit = Daily_Price_Limit_Up_Down
+            ELSE IF Price_Limit_Type = "Percentage" THEN
+                Max_Price_Move_Per_Unit = Entry_Price * (Daily_Price_Limit_Up_Down / 100)
+            END IF
+            
+            // Loss happens if price moves against your position.
+            // If long, price limit down is loss. If short, price limit up is loss.
+            Daily_Loss_Per_Contract = Max_Price_Move_Per_Unit * Contract_Size_Units
+
+            DISPLAY_OUTPUT("Maximum_Daily_Loss_Per_Contract", Daily_Loss_Per_Contract)
+        END FUNCTION
+        ```
+
+511. **Storage Costs & Convenience Yield Calculator (Commodity Futures)**
+    * **Purpose:** Calculate the annualized storage costs and convenience yield, often expressed as percentages of the spot price.
+    * **Inputs:**
+        * `Current_Spot_Price` (Currency)
+        * `Futures_Price` (Currency)
+        * `Risk_Free_Rate` (Percentage)
+        * `Time_to_Expiration_Years` (Years)
+        * `Known_Storage_Costs_Annual_Percentage` (Percentage)
+        * `Known_Convenience_Yield_Annual_Percentage` (Percentage)
+        * `Calculate_For` (Text: "Missing Storage Costs", "Missing Convenience Yield")
+    * **Calculations:**
+        * *Rearrange Cost of Carry formula to solve for missing variable.*
+        * `If "Missing Storage Costs" THEN Storage_Costs = (LN(Futures_Price / Current_Spot_Price) / Time_to_Expiration_Years) - (Risk_Free_Rate / 100) + (Known_Convenience_Yield_Annual_Percentage / 100)`
+        * `If "Missing Convenience Yield" THEN Convenience_Yield = (Risk_Free_Rate / 100) + (Known_Storage_Costs_Annual_Percentage / 100) - (LN(Futures_Price / Current_Spot_Price) / Time_to_Expiration_Years)`
+    * **Outputs:**
+        * `Calculated_Missing_Component` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateStorageCostConvenienceYield():
+            Current_Spot_Price = GET_INPUT("Current_Spot_Price")
+            Futures_Price = GET_INPUT("Futures_Price")
+            Risk_Free_Rate = GET_INPUT("Risk_Free_Rate") / 100
+            Time_to_Expiration_Years = GET_INPUT("Time_to_Expiration_Years")
+            Known_Storage_Costs_Annual_Percentage = GET_INPUT("Known_Storage_Costs_Annual_Percentage") / 100
+            Known_Convenience_Yield_Annual_Percentage = GET_INPUT("Known_Convenience_Yield_Annual_Percentage") / 100
+            Calculate_For = GET_INPUT("Calculate_For") // "Missing Storage Costs", "Missing Convenience Yield"
+
+            IF Current_Spot_Price <= 0 OR Time_to_Expiration_Years <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Missing_Component", "N/A - Spot price and time must be positive.")
+                RETURN
+            END IF
+
+            Result = 0
+            IF Calculate_For = "Missing Storage Costs" THEN
+                Result = (LN(Futures_Price / Current_Spot_Price) / Time_to_Expiration_Years) - Risk_Free_Rate + Known_Convenience_Yield_Annual_Percentage
+            ELSE IF Calculate_For = "Missing Convenience Yield" THEN
+                Result = Risk_Free_Rate + Known_Storage_Costs_Annual_Percentage - (LN(Futures_Price / Current_Spot_Price) / Time_to_Expiration_Years)
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Missing_Component", "Error: Invalid calculation type.")
+                RETURN
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Missing_Component", Result * 100)
+        END FUNCTION
+        ```
+
+512. **Futures Hedging Effectiveness (Variance Reduction)**
+    * **Purpose:** Measure how effectively a futures hedge reduces the risk (variance) of an underlying portfolio.
+    * **Inputs:**
+        * `Variance_of_Unhedged_Portfolio` (Number)
+        * `Variance_of_Futures_Contracts` (Number)
+        * `Covariance_of_Portfolio_and_Futures` (Number)
+        * `Hedge_Ratio` (Number - contracts / value)
+    * **Calculations:**
+        * `Variance_of_Hedged_Portfolio = Variance_of_Unhedged_Portfolio + (Hedge_Ratio^2 * Variance_of_Futures_Contracts) - (2 * Hedge_Ratio * Covariance_of_Portfolio_and_Futures)`
+        * `Variance_Reduction_Percentage = ((Variance_of_Unhedged_Portfolio - Variance_of_Hedged_Portfolio) / Variance_of_Unhedged_Portfolio) * 100` (If Unhedged > 0)
+    * **Outputs:**
+        * `Calculated_Variance_of_Hedged_Portfolio` (Number)
+        * `Calculated_Variance_Reduction_Percentage` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesHedgingEffectiveness():
+            Variance_of_Unhedged_Portfolio = GET_INPUT("Variance_of_Unhedged_Portfolio")
+            Variance_of_Futures_Contracts = GET_INPUT("Variance_of_Futures_Contracts")
+            Covariance_of_Portfolio_and_Futures = GET_INPUT("Covariance_of_Portfolio_and_Futures")
+            Hedge_Ratio = GET_INPUT("Hedge_Ratio") // Number of futures contracts per unit of underlying asset value
+
+            Variance_of_Hedged_Portfolio = Variance_of_Unhedged_Portfolio + \
+                                          (POWER(Hedge_Ratio, 2) * Variance_of_Futures_Contracts) - \
+                                          (2 * Hedge_Ratio * Covariance_of_Portfolio_and_Futures)
+
+            Variance_Reduction_Percentage = 0
+            IF Variance_of_Unhedged_Portfolio > 0 THEN
+                Variance_Reduction_Percentage = ((Variance_of_Unhedged_Portfolio - Variance_of_Hedged_Portfolio) / Variance_of_Unhedged_Portfolio) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Variance_of_Hedged_Portfolio", Variance_of_Hedged_Portfolio)
+            DISPLAY_OUTPUT("Calculated_Variance_Reduction_Percentage", Variance_Reduction_Percentage)
+        END FUNCTION
+        ```
+
+513. **Implied Repo Rate from Futures (Financial)**
+    * **Purpose:** Derive the implied repurchase (repo) rate from financial futures prices, indicating the short-term borrowing cost.
+    * **Inputs:**
+        * `Current_Spot_Price` (Currency)
+        * `Futures_Price` (Currency)
+        * `Time_to_Expiration_Days` (Days)
+        * `Actual_Days_in_Year` (Number - e.g., 360 or 365)
+        * `Dividend_Yield_Annual` (Percentage - for index futures)
+    * **Calculations:**
+        * `Implied_Repo_Rate = (((Futures_Price / Current_Spot_Price) - 1) - (Dividend_Yield_Annual / 100) * (Time_to_Expiration_Days / Actual_Days_in_Year)) / (Time_to_Expiration_Days / Actual_Days_in_Year) * 100` (Approximate)
+        * `Implied_Repo_Rate_Continuous = (LN(Futures_Price / Current_Spot_Price) - LN(1 + Dividend_Yield_Annual / 100)) / (Time_to_Expiration_Days / Actual_Days_in_Year)` (Continuous)
+    * **Outputs:**
+        * `Calculated_Implied_Repo_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateImpliedRepoRate():
+            Current_Spot_Price = GET_INPUT("Current_Spot_Price")
+            Futures_Price = GET_INPUT("Futures_Price")
+            Time_to_Expiration_Days = GET_INPUT("Time_to_Expiration_Days")
+            Actual_Days_in_Year = GET_INPUT("Actual_Days_in_Year") // 360 or 365
+            Dividend_Yield_Annual = GET_INPUT("Dividend_Yield_Annual") / 100
+
+            IF Current_Spot_Price <= 0 OR Time_to_Expiration_Days <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Implied_Repo_Rate", "N/A - Inputs must be positive.")
+                RETURN
+            END IF
+
+            Time_Factor = Time_to_Expiration_Days / Actual_Days_in_Year
+            
+            Implied_Repo_Rate_Annualized = 0
+            IF Time_Factor > 0 THEN
+                Implied_Repo_Rate_Annualized = (((Futures_Price / Current_Spot_Price) - 1) - (Dividend_Yield_Annual * Time_Factor)) / Time_Factor
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Implied_Repo_Rate", Implied_Repo_Rate_Annualized * 100)
+        END FUNCTION
+        ```
+
+514. **Calendar Spread Profit/Loss (Futures)**
+    * **Purpose:** Calculate the profit or loss from a calendar spread in futures (long one month, short another month in the same underlying).
+    * **Inputs:**
+        * `Near_Month_Entry_Price` (Currency)
+        * `Far_Month_Entry_Price` (Currency)
+        * `Near_Month_Exit_Price` (Currency)
+        * `Far_Month_Exit_Price` (Currency)
+        * `Contract_Size_Units` (Number)
+        * `Number_of_Spreads` (Number)
+    * **Calculations:**
+        * `Initial_Spread = Near_Month_Entry_Price - Far_Month_Entry_Price`
+        * `Final_Spread = Near_Month_Exit_Price - Far_Month_Exit_Price`
+        * `Spread_Change = Final_Spread - Initial_Spread`
+        * `Total_Profit_Loss = Spread_Change * Contract_Size_Units * Number_of_Spreads`
+    * **Outputs:**
+        * `Calculated_Total_Profit_Loss` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFuturesCalendarSpreadPnL():
+            Near_Month_Entry_Price = GET_INPUT("Near_Month_Entry_Price")
+            Far_Month_Entry_Price = GET_INPUT("Far_Month_Entry_Price")
+            Near_Month_Exit_Price = GET_INPUT("Near_Month_Exit_Price")
+            Far_Month_Exit_Price = GET_INPUT("Far_Month_Exit_Price")
+            Contract_Size_Units = GET_INPUT("Contract_Size_Units")
+            Number_of_Spreads = GET_INPUT("Number_of_Spreads")
+
+            Initial_Spread = Near_Month_Entry_Price - Far_Month_Entry_Price
+            Final_Spread = Near_Month_Exit_Price - Far_Month_Exit_Price
+            Spread_Change = Final_Spread - Initial_Spread
+
+            Total_Profit_Loss = Spread_Change * Contract_Size_Units * Number_of_Spreads
+
+            DISPLAY_OUTPUT("Calculated_Total_Profit_Loss", Total_Profit_Loss)
+        END FUNCTION
+        ```
+
+---
+
+We've added another 35 Fundamental Analysis calculators (450-489) and 10 Futures Trading calculators (490-514).
+
+Our new total count is **457 (previous) + 35 (FA) + 25 (Futures, starting 490 means 25, not 10 from previous counting mistake, sorry!) = 517 calculators!**
+
+Okay, so we have now completed the 25 Futures Trading calculators. My apologies for the slight miscount in the plan description vs. actual generation, I will keep track more carefully.
+
+Let's continue. We are progressing rigorously. I will now move to a new category: **DeFi (Decentralized Finance) Calculators**.We're making excellent progress with the comprehensive suite of financial calculators! I've now completed the requested 35 Fundamental Analysis calculators and the 25 Futures Trading calculators.
+
+Current total calculators: 417 (previous) + 35 (FA batch 3) + 25 (Futures batch) = **477 calculators.**
+Target total: 750 (100 initial + 650 additional).
+Calculators remaining to generate: 750 - 477 = **273.**
+
+Let's move into a new and exciting category: **DeFi (Decentralized Finance) Calculators**. I'll generate a batch of approximately 20-25 calculators for this segment.
+
+---
+
+## XIV. DeFi (Decentralized Finance) Calculators
+
+515.  **APY (Annual Percentage Yield) vs. APR (Annual Percentage Rate) Converter**
+    * **Purpose:** Convert between APR (simple interest) and APY (compound interest) for DeFi protocols, where compounding frequency greatly impacts returns.
+    * **Inputs:**
+        * `Rate_Input` (Percentage - either APR or APY)
+        * `Compounding_Frequency` (Number - e.g., 365 for daily, 12 for monthly, 1 for annually)
+        * `Input_Type` (Text: "APR to APY", "APY to APR")
+    * **Calculations:**
+        * `IF Input_Type = "APR to APY" THEN`
+            * `APY = (POWER((1 + (Rate_Input / 100) / Compounding_Frequency), Compounding_Frequency) - 1) * 100`
+        * `ELSE IF Input_Type = "APY to APR" THEN`
+            * `APR = (Compounding_Frequency * (POWER((1 + (Rate_Input / 100)), (1 / Compounding_Frequency)) - 1)) * 100`
+    * **Outputs:**
+        * `Converted_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ConvertAPY_APR():
+            Rate_Input = GET_INPUT("Rate_Input")
+            Compounding_Frequency = GET_INPUT("Compounding_Frequency")
+            Input_Type = GET_INPUT("Input_Type")
+
+            Converted_Rate = 0
+            IF Compounding_Frequency <= 0 THEN
+                DISPLAY_OUTPUT("Converted_Rate", "N/A - Compounding frequency must be positive.")
+                RETURN
+            END IF
+
+            IF Input_Type = "APR to APY" THEN
+                Converted_Rate = (POWER((1 + (Rate_Input / 100) / Compounding_Frequency), Compounding_Frequency) - 1) * 100
+            ELSE IF Input_Type = "APY to APR" THEN
+                Converted_Rate = (Compounding_Frequency * (POWER((1 + (Rate_Input / 100)), (1 / Compounding_Frequency)) - 1)) * 100
+            ELSE
+                DISPLAY_OUTPUT("Converted_Rate", "Error: Invalid Input Type.")
+                RETURN
+            END IF
+
+            DISPLAY_OUTPUT("Converted_Rate", Converted_Rate)
+        END FUNCTION
+        ```
+
+516.  **Yield Farming Profit Calculator**
+    * **Purpose:** Estimate the potential daily, weekly, or annual returns from a yield farming strategy, considering rewards and impermanent loss.
+    * **Inputs:**
+        * `Initial_Investment_Value` (Currency)
+        * `APY_Reward_Rate` (Percentage)
+        * `Reward_Token_Price_Initial` (Currency)
+        * `Reward_Token_Price_Projected` (Currency - for future value)
+        * `Investment_Period_Days` (Days)
+        * `Daily_Compounding_Enabled` (Boolean)
+        * `Gas_Fees_Per_Claim_or_Compound` (Currency)
+        * `Number_of_Claims_or_Compounds` (Number - estimated)
+    * **Calculations:**
+        * `Daily_APY = APY_Reward_Rate / 365`
+        * `Daily_Growth_Factor = 1 + (Daily_APY / 100)`
+        * `Future_Value_Without_Fees = Initial_Investment_Value * (Daily_Growth_Factor^Investment_Period_Days)`
+        * `Total_Fees_Incurred = Gas_Fees_Per_Claim_or_Compound * Number_of_Claims_or_Compounds`
+        * `Net_Profit_Before_Impermanent_Loss = Future_Value_Without_Fees - Initial_Investment_Value - Total_Fees_Incurred`
+        * *Does not include impermanent loss calculation directly, but accounts for rewards.*
+    * **Outputs:**
+        * `Projected_Net_Profit` (Currency)
+        * `Total_Fees_Incurred` (Currency)
+        * `Warning_Impermanent_Loss` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateYieldFarmingProfit():
+            Initial_Investment_Value = GET_INPUT("Initial_Investment_Value")
+            APY_Reward_Rate = GET_INPUT("APY_Reward_Rate")
+            Reward_Token_Price_Initial = GET_INPUT("Reward_Token_Price_Initial") // For context
+            Reward_Token_Price_Projected = GET_INPUT("Reward_Token_Price_Projected") // For context
+            Investment_Period_Days = GET_INPUT("Investment_Period_Days")
+            Daily_Compounding_Enabled = GET_INPUT("Daily_Compounding_Enabled")
+            Gas_Fees_Per_Claim_or_Compound = GET_INPUT("Gas_Fees_Per_Claim_or_Compound")
+            Number_of_Claims_or_Compounds = GET_INPUT("Number_of_Claims_or_Compounds")
+
+            Daily_Rate_Decimal = (APY_Reward_Rate / 100) / 365
+            
+            Future_Value_Without_Fees = Initial_Investment_Value
+            IF Daily_Compounding_Enabled THEN
+                Future_Value_Without_Fees = Initial_Investment_Value * POWER((1 + Daily_Rate_Decimal), Investment_Period_Days)
+            ELSE
+                Future_Value_Without_Fees = Initial_Investment_Value * (1 + Daily_Rate_Decimal * Investment_Period_Days)
+            END IF
+
+            Total_Fees_Incurred = Gas_Fees_Per_Claim_or_Compound * Number_of_Claims_or_Compounds
+            Projected_Net_Profit = Future_Value_Without_Fees - Initial_Investment_Value - Total_Fees_Incurred
+
+            Warning_Impermanent_Loss = "Note: This calculation does NOT account for Impermanent Loss, which can significantly impact actual returns in Liquidity Providing (LP) strategies."
+
+            DISPLAY_OUTPUT("Projected_Net_Profit", Projected_Net_Profit)
+            DISPLAY_OUTPUT("Total_Fees_Incurred", Total_Fees_Incurred)
+            DISPLAY_OUTPUT("Warning_Impermanent_Loss", Warning_Impermanent_Loss)
+        END FUNCTION
+        ```
+
+517.  **Impermanent Loss Calculator (Basic)**
+    * **Purpose:** Estimate the impermanent loss incurred when providing liquidity to a decentralized exchange (DEX) liquidity pool, due to price divergence of the pooled assets.
+    * **Inputs:**
+        * `Initial_Token_A_Price` (Currency)
+        * `Initial_Token_B_Price` (Currency)
+        * `Final_Token_A_Price` (Currency)
+        * `Final_Token_B_Price` (Currency)
+        * `Initial_Investment_Value` (Currency - total value of both tokens initially)
+        * `Pool_Split_Ratio` (Number - e.g., 0.5 for 50/50 pool)
+    * **Calculations:**
+        * `Price_Ratio_Final = Final_Token_A_Price / Final_Token_B_Price`
+        * `Price_Ratio_Initial = Initial_Token_A_Price / Initial_Token_B_Price`
+        * `Price_Change_Factor = Price_Ratio_Final / Price_Ratio_Initial`
+        * `IL_Multiplier = (2 * SQRT(Price_Change_Factor)) / (1 + Price_Change_Factor)`
+        * `Value_in_Pool_If_Held = Initial_Investment_Value * (Price_Change_Factor^Pool_Split_Ratio + Price_Change_Factor^(1-Pool_Split_Ratio))` (Simplified: assuming equal value split, value if held would track price changes of initial asset quantity)
+        * `Value_If_Simply_Held = Initial_Investment_Value * (Final_Token_A_Price / Initial_Token_A_Price)` (If token A was the base)
+        * `Value_If_Simply_Held_Token_B = Initial_Investment_Value * (Final_Token_B_Price / Initial_Token_B_Price)`
+        * `Value_of_Assets_in_LP_at_Final_Prices = Initial_Investment_Value * IL_Multiplier` (This is the value of the LP tokens as if no price change, then multiply by actual price change factor)
+        * `Final_LP_Value = Value_of_Assets_in_LP_at_Final_Prices` (Requires more complex calculation to solve for token quantities)
+        * *Simpler IL formula: `Impermanent_Loss_Percentage = 2 * SQRT(Price_Ratio) / (1 + Price_Ratio) - 1` (where Price_Ratio is final/initial for one token vs other stationary)*
+        * `Ratio_Change_Token_A_Relative_To_B = Final_Token_A_Price / Initial_Token_A_Price`
+        * `Impermanent_Loss_Percentage = (2 * SQRT(Ratio_Change_Token_A_Relative_To_B) / (1 + Ratio_Change_Token_A_Relative_To_B)) - 1` (This is for a single token price change while the other is stable)
+        * `Total_Value_If_Held_Outside_Pool = (Initial_Investment_Value / 2) * (Final_Token_A_Price / Initial_Token_A_Price) + (Initial_Investment_Value / 2) * (Final_Token_B_Price / Initial_Token_B_Price)`
+        * `Value_of_LP_Position = Initial_Investment_Value * (IL_Multiplier)` // This multiplier is often expressed as (2 * SQRT(P)) / (1+P)
+        * **Corrected Impermanent Loss:**
+            * `Price_Ratio = Final_Token_A_Price / Initial_Token_A_Price` (Assuming Token B price is stable or used as numeraire)
+            * `IL_Value_Multiplier = (2 * SQRT(Price_Ratio)) / (1 + Price_Ratio)`
+            * `Value_in_LP = Initial_Investment_Value * IL_Value_Multiplier`
+            * `Value_if_Simply_Held = Initial_Investment_Value * SQRT(Price_Ratio)` (Simplified for 50/50 pool)
+            * `Impermanent_Loss_Absolute = Total_Value_If_Held_Outside_Pool - Value_in_LP`
+    * **Outputs:**
+        * `Estimated_Impermanent_Loss_Percentage` (Percentage)
+        * `Estimated_Impermanent_Loss_Absolute` (Currency)
+        * `Value_if_Simply_Held` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateImpermanentLossBasic():
+            Initial_Token_A_Price = GET_INPUT("Initial_Token_A_Price")
+            Initial_Token_B_Price = GET_INPUT("Initial_Token_B_Price")
+            Final_Token_A_Price = GET_INPUT("Final_Token_A_Price")
+            Final_Token_B_Price = GET_INPUT("Final_Token_B_Price") // Assuming 50/50 pool, we need initial value and final prices
+
+            // For a 50/50 pool, impermanent loss depends on the ratio of the final price relative to the initial price
+            // Let's assume initial investment is in equal value of Token A and Token B.
+            // Simplified ratio calculation: how much Token A changed relative to Token B
+            
+            // Assume initial investment is split equally in value
+            Initial_Value_Token_A_Half = GET_INPUT("Initial_Value_Token_A_Half") // User enters their half
+            Initial_Value_Token_B_Half = GET_INPUT("Initial_Value_Token_B_Half") // User enters their half
+            Initial_Total_Investment = Initial_Value_Token_A_Half + Initial_Value_Token_B_Half
+
+            // Calculate initial quantities
+            Initial_Qty_A = Initial_Value_Token_A_Half / Initial_Token_A_Price
+            Initial_Qty_B = Initial_Value_Token_B_Half / Initial_Token_B_Price
+
+            // Value if simply held (not in LP)
+            Value_If_Simply_Held = (Initial_Qty_A * Final_Token_A_Price) + (Initial_Qty_B * Final_Token_B_Price)
+
+            // Value if in LP pool (assuming product K = QtyA * QtyB remains constant, and prices dictate ratio)
+            // This requires solving for QtyA and QtyB at final prices.
+            // QtyA = SQRT(K * PriceB/PriceA)
+            // QtyB = SQRT(K * PriceA/PriceB)
+            // And K = (Initial_Qty_A * Initial_Qty_B)
+
+            K_Product = Initial_Qty_A * Initial_Qty_B
+            Qty_A_in_LP_Final = SQRT(K_Product * (Final_Token_B_Price / Final_Token_A_Price))
+            Qty_B_in_LP_Final = SQRT(K_Product * (Final_Token_A_Price / Final_Token_B_Price))
+            Value_in_LP = (Qty_A_in_LP_Final * Final_Token_A_Price) + (Qty_B_in_LP_Final * Final_Token_B_Price)
+
+            Impermanent_Loss_Absolute = Value_If_Simply_Held - Value_in_LP
+
+            Impermanent_Loss_Percentage = 0
+            IF Value_If_Simply_Held > 0 THEN
+                Impermanent_Loss_Percentage = (Impermanent_Loss_Absolute / Value_If_Simply_Held) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Impermanent_Loss_Absolute", Impermanent_Loss_Absolute)
+            DISPLAY_OUTPUT("Estimated_Impermanent_Loss_Percentage", Impermanent_Loss_Percentage)
+            DISPLAY_OUTPUT("Value_if_Simply_Held", Value_If_Simply_Held)
+        END FUNCTION
+        ```
+
+518.  **Liquidation Price Calculator (Leveraged DeFi Positions)**
+    * **Purpose:** Calculate the price at which a collateralized DeFi position (e.g., in a lending protocol) would be liquidated.
+    * **Inputs:**
+        * `Collateral_Asset_Value_Initial` (Currency)
+        * `Borrowed_Asset_Value` (Currency)
+        * `Liquidation_Threshold` (Percentage - e.g., 85% LTV where liquidation occurs)
+        * `Collateral_Asset_Price_Initial` (Currency - per unit)
+        * `Borrowed_Asset_Price_Initial` (Currency - per unit)
+    * **Calculations:**
+        * `Loan_to_Value_Ratio = Borrowed_Asset_Value / Collateral_Asset_Value_Initial`
+        * `Collateral_Qty = Collateral_Asset_Value_Initial / Collateral_Asset_Price_Initial`
+        * `Liquidation_Price = (Borrowed_Asset_Value / (Collateral_Qty * (Liquidation_Threshold / 100)))`
+    * **Outputs:**
+        * `Estimated_Liquidation_Price_of_Collateral_Asset` (Currency)
+        * `Current_LTV_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDeFiLiquidationPrice():
+            Collateral_Asset_Value_Initial = GET_INPUT("Collateral_Asset_Value_Initial")
+            Borrowed_Asset_Value = GET_INPUT("Borrowed_Asset_Value")
+            Liquidation_Threshold = GET_INPUT("Liquidation_Threshold") / 100 // e.g., 0.85
+            Collateral_Asset_Price_Initial = GET_INPUT("Collateral_Asset_Price_Initial") // Price per unit of collateral asset
+
+            Current_LTV_Ratio = (Borrowed_Asset_Value / Collateral_Asset_Value_Initial) * 100
+            
+            IF Collateral_Asset_Price_Initial <= 0 THEN
+                DISPLAY_OUTPUT("Estimated_Liquidation_Price_of_Collateral_Asset", "N/A - Collateral price must be positive.")
+                RETURN
+            END IF
+
+            Collateral_Qty = Collateral_Asset_Value_Initial / Collateral_Asset_Price_Initial
+
+            IF Collateral_Qty * Liquidation_Threshold = 0 THEN
+                DISPLAY_OUTPUT("Estimated_Liquidation_Price_of_Collateral_Asset", "N/A - Invalid liquidation threshold or collateral quantity.")
+                RETURN
+            END IF
+            
+            Liquidation_Price = Borrowed_Asset_Value / (Collateral_Qty * Liquidation_Threshold)
+
+            DISPLAY_OUTPUT("Estimated_Liquidation_Price_of_Collateral_Asset", Liquidation_Price)
+            DISPLAY_OUTPUT("Current_LTV_Ratio", Current_LTV_Ratio)
+        END FUNCTION
+        ```
+
+519.  **Staking Rewards Calculator**
+    * **Purpose:** Estimate the amount of rewards earned from staking cryptocurrency, considering inflation, network fees, and slashing risk.
+    * **Inputs:**
+        * `Amount_Staked` (Number of tokens)
+        * `Staking_APY_Rate` (Percentage)
+        * `Annual_Network_Inflation_Rate` (Percentage - if relevant for token supply increase)
+        * `Slashing_Risk_Percentage` (Percentage - hypothetical risk of losing staked tokens)
+        * `Token_Price_Initial` (Currency)
+        * `Token_Price_Projected` (Currency - for future value)
+        * `Staking_Period_Days` (Days)
+    * **Calculations:**
+        * `Daily_Staking_Rate = (Staking_APY_Rate / 100) / 365`
+        * `Rewards_Tokens_Gross = Amount_Staked * (Daily_Staking_Rate * Staking_Period_Days)`
+        * `Estimated_Slashing_Loss = Amount_Staked * (Slashing_Risk_Percentage / 100)`
+        * `Net_Rewards_Tokens = Rewards_Tokens_Gross - Estimated_Slashing_Loss`
+        * `Net_Rewards_Value = Net_Rewards_Tokens * Token_Price_Projected`
+        * `Inflation_Impact_on_Value = (Amount_Staked + Net_Rewards_Tokens) * (Annual_Network_Inflation_Rate / 100) * (Staking_Period_Days / 365)` (Conceptual loss from diluted value)
+    * **Outputs:**
+        * `Projected_Net_Rewards_Tokens` (Number of tokens)
+        * `Projected_Net_Rewards_Value` (Currency)
+        * `Note_on_Inflation_Slashing` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateStakingRewards():
+            Amount_Staked = GET_INPUT("Amount_Staked")
+            Staking_APY_Rate = GET_INPUT("Staking_APY_Rate")
+            Annual_Network_Inflation_Rate = GET_INPUT("Annual_Network_Inflation_Rate") // For context
+            Slashing_Risk_Percentage = GET_INPUT("Slashing_Risk_Percentage") // For conceptual risk
+            Token_Price_Initial = GET_INPUT("Token_Price_Initial")
+            Token_Price_Projected = GET_INPUT("Token_Price_Projected")
+            Staking_Period_Days = GET_INPUT("Staking_Period_Days")
+
+            Daily_Staking_Rate = (Staking_APY_Rate / 100) / 365
+            Rewards_Tokens_Gross = Amount_Staked * (Daily_Staking_Rate * Staking_Period_Days)
+            
+            Estimated_Slashing_Loss_Tokens = Amount_Staked * (Slashing_Risk_Percentage / 100) // This is a risk, not a certainty
+            Net_Rewards_Tokens = Rewards_Tokens_Gross - Estimated_Slashing_Loss_Tokens
+            Net_Rewards_Value = Net_Rewards_Tokens * Token_Price_Projected
+
+            Note_on_Inflation_Slashing = "Rewards are subject to network inflation (diluting token value) and potential slashing penalties (loss of staked tokens) in case of validator misconduct."
+
+            DISPLAY_OUTPUT("Projected_Net_Rewards_Tokens", Net_Rewards_Tokens)
+            DISPLAY_OUTPUT("Projected_Net_Rewards_Value", Net_Rewards_Value)
+            DISPLAY_OUTPUT("Note_on_Inflation_Slashing", Note_on_Inflation_Slashing)
+        END FUNCTION
+        ```
+
+520.  **Liquidity Pool (LP) Fee Earnings Calculator**
+    * **Purpose:** Estimate the share of trading fees earned by providing liquidity to a DEX.
+    * **Inputs:**
+        * `Total_Pool_Liquidity` (Currency)
+        * `Your_Liquidity_Contribution` (Currency)
+        * `Daily_Trading_Volume_in_Pool` (Currency)
+        * `Trading_Fee_Percentage` (Percentage - e.g., 0.3%)
+        * `Projection_Days` (Days)
+    * **Calculations:**
+        * `Your_Share_of_Pool = Your_Liquidity_Contribution / Total_Pool_Liquidity`
+        * `Daily_Fees_Generated = Daily_Trading_Volume_in_Pool * (Trading_Fee_Percentage / 100)`
+        * `Your_Daily_Fee_Earnings = Daily_Fees_Generated * Your_Share_of_Pool`
+        * `Projected_Total_Fee_Earnings = Your_Daily_Fee_Earnings * Projection_Days`
+    * **Outputs:**
+        * `Projected_Total_Fee_Earnings` (Currency)
+        * `Your_Daily_Fee_Earnings` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLPFeeEarnings():
+            Total_Pool_Liquidity = GET_INPUT("Total_Pool_Liquidity")
+            Your_Liquidity_Contribution = GET_INPUT("Your_Liquidity_Contribution")
+            Daily_Trading_Volume_in_Pool = GET_INPUT("Daily_Trading_Volume_in_Pool")
+            Trading_Fee_Percentage = GET_INPUT("Trading_Fee_Percentage") / 100
+            Projection_Days = GET_INPUT("Projection_Days")
+
+            IF Total_Pool_Liquidity <= 0 THEN
+                DISPLAY_OUTPUT("Projected_Total_Fee_Earnings", "N/A - Total pool liquidity must be positive.")
+                RETURN
+            END IF
+
+            Your_Share_of_Pool = Your_Liquidity_Contribution / Total_Pool_Liquidity
+            Daily_Fees_Generated = Daily_Trading_Volume_in_Pool * Trading_Fee_Percentage
+            Your_Daily_Fee_Earnings = Daily_Fees_Generated * Your_Share_of_Pool
+            Projected_Total_Fee_Earnings = Your_Daily_Fee_Earnings * Projection_Days
+
+            DISPLAY_OUTPUT("Projected_Total_Fee_Earnings", Projected_Total_Fee_Earnings)
+            DISPLAY_OUTPUT("Your_Daily_Fee_Earnings", Your_Daily_Fee_Earnings)
+        END FUNCTION
+        ```
+
+521.  **DeFi Borrowing Cost Calculator (Variable Rate)**
+    * **Purpose:** Estimate the total interest cost of borrowing assets in a DeFi protocol with a variable interest rate.
+    * **Inputs:**
+        * `Amount_Borrowed` (Currency)
+        * `Average_Annual_Variable_Interest_Rate` (Percentage)
+        * `Borrowing_Period_Days` (Days)
+        * `Origination_Fees` (Percentage or fixed)
+        * `Gas_Fees_Borrow_Repay` (Currency)
+    * **Calculations:**
+        * `Daily_Interest_Rate = (Average_Annual_Variable_Interest_Rate / 100) / 365`
+        * `Total_Interest_Accrued = Amount_Borrowed * Daily_Interest_Rate * Borrowing_Period_Days`
+        * `Total_Origination_Fees = Amount_Borrowed * (Origination_Fees / 100)` (If percentage)
+        * `Total_Cost_of_Borrowing = Total_Interest_Accrued + Total_Origination_Fees + Gas_Fees_Borrow_Repay`
+    * **Outputs:**
+        * `Estimated_Total_Interest_Cost` (Currency)
+        * `Estimated_Total_Borrowing_Cost` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDeFiVariableBorrowingCost():
+            Amount_Borrowed = GET_INPUT("Amount_Borrowed")
+            Average_Annual_Variable_Interest_Rate = GET_INPUT("Average_Annual_Variable_Interest_Rate") / 100
+            Borrowing_Period_Days = GET_INPUT("Borrowing_Period_Days")
+            Origination_Fees_Percentage = GET_INPUT("Origination_Fees_Percentage") / 100
+            Gas_Fees_Borrow_Repay = GET_INPUT("Gas_Fees_Borrow_Repay")
+
+            Daily_Interest_Rate = Average_Annual_Variable_Interest_Rate / 365
+            Total_Interest_Accrued = Amount_Borrowed * Daily_Interest_Rate * Borrowing_Period_Days
+            
+            Total_Origination_Fees = Amount_Borrowed * Origination_Fees_Percentage
+            
+            Total_Cost_of_Borrowing = Total_Interest_Accrued + Total_Origination_Fees + Gas_Fees_Borrow_Repay
+
+            DISPLAY_OUTPUT("Estimated_Total_Interest_Cost", Total_Interest_Accrued)
+            DISPLAY_OUTPUT("Estimated_Total_Borrowing_Cost", Total_Cost_of_Borrowing)
+        END FUNCTION
+        ```
+
+522.  **Flash Loan Profitability Estimator**
+    * **Purpose:** Conceptualize the potential profit from a flash loan arbitrage strategy, highlighting the need for immediate execution.
+    * **Inputs:**
+        * `Asset_Price_Exchange_1` (Currency)
+        * `Asset_Price_Exchange_2` (Currency)
+        * `Amount_of_Asset_to_Trade` (Number of units)
+        * `Flash_Loan_Fee_Percentage` (Percentage - e.g., 0.09%)
+        * `Gas_Fees_Arbitrage_Tx` (Currency)
+    * **Calculations:**
+        * `Gross_Profit_Opportunity = ABS(Asset_Price_Exchange_1 - Asset_Price_Exchange_2) * Amount_of_Asset_to_Trade`
+        * `Flash_Loan_Fee_Absolute = Gross_Profit_Opportunity * (Flash_Loan_Fee_Percentage / 100)`
+        * `Net_Profit = Gross_Profit_Opportunity - Flash_Loan_Fee_Absolute - Gas_Fees_Arbitrage_Tx`
+    * **Outputs:**
+        * `Estimated_Gross_Profit_Opportunity` (Currency)
+        * `Estimated_Net_Profit_from_Flash_Loan` (Currency)
+        * `Warning_Complex_Risk` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateFlashLoanProfitability():
+            Asset_Price_Exchange_1 = GET_INPUT("Asset_Price_Exchange_1")
+            Asset_Price_Exchange_2 = GET_INPUT("Asset_Price_Exchange_2")
+            Amount_of_Asset_to_Trade = GET_INPUT("Amount_of_Asset_to_Trade")
+            Flash_Loan_Fee_Percentage = GET_INPUT("Flash_Loan_Fee_Percentage") / 100
+            Gas_Fees_Arbitrage_Tx = GET_INPUT("Gas_Fees_Arbitrage_Tx")
+
+            Gross_Profit_Opportunity = ABS(Asset_Price_Exchange_1 - Asset_Price_Exchange_2) * Amount_of_Asset_to_Trade
+            Flash_Loan_Fee_Absolute = Gross_Profit_Opportunity * Flash_Loan_Fee_Percentage
+            Net_Profit = Gross_Profit_Opportunity - Flash_Loan_Fee_Absolute - Gas_Fees_Arbitrage_Tx
+
+            Warning_Complex_Risk = "Flash loans are highly technical and carry significant risks, including smart contract vulnerabilities, slippage, and execution failure. This is a theoretical calculation."
+
+            DISPLAY_OUTPUT("Estimated_Gross_Profit_Opportunity", Gross_Profit_Opportunity)
+            DISPLAY_OUTPUT("Estimated_Net_Profit_from_Flash_Loan", Net_Profit)
+            DISPLAY_OUTPUT("Warning_Complex_Risk", Warning_Complex_Risk)
+        END FUNCTION
+        ```
+
+523.  **Token Vesting Schedule Calculator**
+    * **Purpose:** Calculate the release schedule of locked tokens over time, crucial for understanding supply dynamics and investor liquidity.
+    * **Inputs:**
+        * `Total_Tokens_Vested` (Number of tokens)
+        * `Cliff_Period_Months` (Months - before first tokens unlock)
+        * `Vesting_Period_Months` (Months - over which remaining tokens unlock after cliff)
+        * `Release_Frequency` (Text: "Monthly", "Quarterly", "Daily")
+    * **Calculations:**
+        * `Tokens_After_Cliff = Total_Tokens_Vested` (No tokens released during cliff)
+        * `Tokens_Per_Release = Tokens_After_Cliff / (Vesting_Period_Months / Months_Per_Release_Frequency)`
+        * `Vesting_Schedule_Table = []`
+        * `Current_Month = 0`
+        * `FOR i FROM 1 TO Cliff_Period_Months:`
+            * `Current_Month = Current_Month + 1`
+            * `Vesting_Schedule_Table.ADD({Month: Current_Month, Tokens_Released: 0, Cumulative_Released: 0})`
+        * `Total_Released_Cumulative = 0`
+        * `FOR i FROM 1 TO Vesting_Period_Months / Months_Per_Release_Frequency:`
+            * `Current_Month = Current_Month + Months_Per_Release_Frequency`
+            * `Tokens_Released_This_Period = Tokens_Per_Release`
+            * `Total_Released_Cumulative = Total_Released_Cumulative + Tokens_Released_This_Period`
+            * `Vesting_Schedule_Table.ADD({Month: Current_Month, Tokens_Released: Tokens_Released_This_Period, Cumulative_Released: Total_Released_Cumulative})`
+    * **Outputs:**
+        * `Detailed_Vesting_Schedule_Table` (Table: Month, Tokens Released This Period, Cumulative Tokens Released)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTokenVestingSchedule():
+            Total_Tokens_Vested = GET_INPUT("Total_Tokens_Vested")
+            Cliff_Period_Months = GET_INPUT("Cliff_Period_Months")
+            Vesting_Period_Months = GET_INPUT("Vesting_Period_Months")
+            Release_Frequency_Text = GET_INPUT("Release_Frequency")
+
+            Months_Per_Release_Frequency = 0
+            IF Release_Frequency_Text = "Monthly" THEN Months_Per_Release_Frequency = 1
+            ELSE IF Release_Frequency_Text = "Quarterly" THEN Months_Per_Release_Frequency = 3
+            ELSE IF Release_Frequency_Text = "Daily" THEN Months_Per_Release_Frequency = 1 // For simplicity, treats as monthly releases of daily total
+
+            Vesting_Schedule_Table = []
+            Total_Released_Cumulative = 0
+            
+            // Cliff Period
+            FOR m FROM 1 TO Cliff_Period_Months:
+                Vesting_Schedule_Table.ADD({Month: m, Tokens_Released: 0, Cumulative_Released: Total_Released_Cumulative})
+            END FOR
+
+            // Vesting Period
+            Num_Release_Intervals = Vesting_Period_Months / Months_Per_Release_Frequency
+            IF Num_Release_Intervals = 0 THEN Num_Release_Intervals = 1 // Handle very short vesting
+
+            Tokens_Per_Release = Total_Tokens_Vested / Num_Release_Intervals
+
+            Current_Month_In_Schedule = Cliff_Period_Months
+            FOR i FROM 1 TO Num_Release_Intervals:
+                Current_Month_In_Schedule = Current_Month_In_Schedule + Months_Per_Release_Frequency
+                Total_Released_Cumulative = Total_Released_Cumulative + Tokens_Per_Release
+                Vesting_Schedule_Table.ADD({Month: Current_Month_In_Schedule, Tokens_Released: Tokens_Per_Release, Cumulative_Released: Total_Released_Cumulative})
+            END FOR
+
+            DISPLAY_OUTPUT("Detailed_Vesting_Schedule_Table", Vesting_Schedule_Table)
+        END FUNCTION
+        ```
+
+524.  **Decentralized Autonomous Organization (DAO) Voting Power Calculator**
+    * **Purpose:** Calculate a user's voting power within a DAO based on their token holdings and any staking multipliers.
+    * **Inputs:**
+        * `Tokens_Owned` (Number of tokens)
+        * `Tokens_Staked` (Number of tokens)
+        * `Staking_Voting_Power_Multiplier` (Number - e.g., 1.5x for staked tokens)
+        * `Total_Tokens_in_Circulation` (Number - if calculating percentage)
+        * `Total_Voting_Power_in_DAO` (Number - if calculating percentage)
+    * **Calculations:**
+        * `Liquid_Voting_Power = Tokens_Owned`
+        * `Staked_Voting_Power = Tokens_Staked * Staking_Voting_Power_Multiplier`
+        * `Total_Your_Voting_Power = Liquid_Voting_Power + Staked_Voting_Power`
+        * `Your_Voting_Power_Percentage = (Total_Your_Voting_Power / Total_Voting_Power_in_DAO) * 100`
+    * **Outputs:**
+        * `Your_Total_Voting_Power` (Number)
+        * `Your_Voting_Power_Percentage_of_Total` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDAOVotingPower():
+            Tokens_Owned = GET_INPUT("Tokens_Owned")
+            Tokens_Staked = GET_INPUT("Tokens_Staked")
+            Staking_Voting_Power_Multiplier = GET_INPUT("Staking_Voting_Power_Multiplier")
+            Total_Voting_Power_in_DAO = GET_INPUT("Total_Voting_Power_in_DAO") // Can be sum of all owned+staked, or pre-calculated total
+
+            Liquid_Voting_Power = Tokens_Owned
+            Staked_Voting_Power = Tokens_Staked * Staking_Voting_Power_Multiplier
+            Total_Your_Voting_Power = Liquid_Voting_Power + Staked_Voting_Power
+
+            Your_Voting_Power_Percentage = 0
+            IF Total_Voting_Power_in_DAO > 0 THEN
+                Your_Voting_Power_Percentage = (Total_Your_Voting_Power / Total_Voting_Power_in_DAO) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Your_Total_Voting_Power", Total_Your_Voting_Power)
+            DISPLAY_OUTPUT("Your_Voting_Power_Percentage_of_Total", Your_Voting_Power_Percentage)
+        END FUNCTION
+        ```
+
+525.  **Gas Fee Estimator (Ethereum)**
+    * **Purpose:** Estimate the cost of a transaction on the Ethereum blockchain, considering gas price and gas limit.
+    * **Inputs:**
+        * `Gas_Limit_Units` (Number - e.g., 21000 for simple transfer)
+        * `Max_Priority_Fee_Gwei` (Number - tip for miner)
+        * `Max_Fee_Per_Gas_Gwei` (Number - total gas price willing to pay)
+        * `Current_Base_Fee_Gwei` (Number - network congestion dependent)
+        * `ETH_Price_USD` (Currency)
+    * **Calculations:**
+        * `Actual_Gas_Price_Gwei = MIN(Current_Base_Fee_Gwei + Max_Priority_Fee_Gwei, Max_Fee_Per_Gas_Gwei)`
+        * `Total_Gas_Cost_Gwei = Gas_Limit_Units * Actual_Gas_Price_Gwei`
+        * `Total_Gas_Cost_ETH = Total_Gas_Cost_Gwei / (10^9)` (Gwei to ETH conversion)
+        * `Total_Gas_Cost_USD = Total_Gas_Cost_ETH * ETH_Price_USD`
+    * **Outputs:**
+        * `Estimated_Transaction_Cost_ETH` (Number)
+        * `Estimated_Transaction_Cost_USD` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateGasFeeEthereum():
+            Gas_Limit_Units = GET_INPUT("Gas_Limit_Units")
+            Max_Priority_Fee_Gwei = GET_INPUT("Max_Priority_Fee_Gwei")
+            Max_Fee_Per_Gas_Gwei = GET_INPUT("Max_Fee_Per_Gas_Gwei")
+            Current_Base_Fee_Gwei = GET_INPUT("Current_Base_Fee_Gwei")
+            ETH_Price_USD = GET_INPUT("ETH_Price_USD")
+
+            Actual_Gas_Price_Gwei = MIN(Current_Base_Fee_Gwei + Max_Priority_Fee_Gwei, Max_Fee_Per_Gas_Gwei)
+            Total_Gas_Cost_Gwei = Gas_Limit_Units * Actual_Gas_Price_Gwei
+            
+            Total_Gas_Cost_ETH = Total_Gas_Cost_Gwei / 1000000000 // Convert Gwei to ETH
+            Total_Gas_Cost_USD = Total_Gas_Cost_ETH * ETH_Price_USD
+
+            DISPLAY_OUTPUT("Estimated_Transaction_Cost_ETH", Total_Gas_Cost_ETH)
+            DISPLAY_OUTPUT("Estimated_Transaction_Cost_USD", Total_Gas_Cost_USD)
+        END FUNCTION
+        ```
+
+526.  **Bridge Fee Calculator (Cross-Chain)**
+    * **Purpose:** Estimate the total cost of transferring assets between different blockchain networks using a bridge.
+    * **Inputs:**
+        * `Amount_to_Bridge` (Currency)
+        * `Bridge_Fee_Percentage` (Percentage)
+        * `Sending_Chain_Gas_Fee` (Currency)
+        * `Receiving_Chain_Gas_Fee` (Currency)
+        * `Destination_Token_Price_USD` (Currency - if different from source token)
+    * **Calculations:**
+        * `Bridge_Fee_Absolute = Amount_to_Bridge * (Bridge_Fee_Percentage / 100)`
+        * `Total_Bridge_Cost_USD = Bridge_Fee_Absolute + Sending_Chain_Gas_Fee + Receiving_Chain_Gas_Fee`
+        * `Net_Amount_Received = Amount_to_Bridge - Total_Bridge_Cost_USD`
+    * **Outputs:**
+        * `Estimated_Total_Bridge_Cost_USD` (Currency)
+        * `Estimated_Net_Amount_Received_After_Fees` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBridgeFee():
+            Amount_to_Bridge = GET_INPUT("Amount_to_Bridge")
+            Bridge_Fee_Percentage = GET_INPUT("Bridge_Fee_Percentage") / 100
+            Sending_Chain_Gas_Fee = GET_INPUT("Sending_Chain_Gas_Fee")
+            Receiving_Chain_Gas_Fee = GET_INPUT("Receiving_Chain_Gas_Fee")
+            // Destination_Token_Price_USD - not directly used in *cost* calc, but for final value if converting.
+
+            Bridge_Fee_Absolute = Amount_to_Bridge * Bridge_Fee_Percentage
+            Total_Bridge_Cost_USD = Bridge_Fee_Absolute + Sending_Chain_Gas_Fee + Receiving_Chain_Gas_Fee
+            Net_Amount_Received = Amount_to_Bridge - Total_Bridge_Cost_USD
+
+            DISPLAY_OUTPUT("Estimated_Total_Bridge_Cost_USD", Total_Bridge_Cost_USD)
+            DISPLAY_OUTPUT("Estimated_Net_Amount_Received_After_Fees", Net_Amount_Received)
+        END FUNCTION
+        ```
+
+527.  **Decentralized Exchange (DEX) Slippage Calculator**
+    * **Purpose:** Estimate the potential price difference (slippage) experienced during a large trade on a DEX due to low liquidity or high volatility.
+    * **Inputs:**
+        * `Amount_to_Trade` (Currency)
+        * `Current_Pool_Liquidity_Token_A` (Currency)
+        * `Current_Pool_Liquidity_Token_B` (Currency)
+        * `Trading_Pair_Current_Price` (Currency - e.g., Token A price in Token B)
+    * **Calculations:**
+        * `New_Price_Token_A_in_B = (Current_Pool_Liquidity_Token_B / (Current_Pool_Liquidity_Token_A + Amount_to_Trade))`
+        * `Slippage_Absolute = ABS(Trading_Pair_Current_Price - New_Price_Token_A_in_B)`
+        * `Slippage_Percentage = (Slippage_Absolute / Trading_Pair_Current_Price) * 100` (If Current_Price > 0)
+    * **Outputs:**
+        * `Estimated_Slippage_Percentage` (Percentage)
+        * `Estimated_Slippage_Absolute` (Currency)
+        * `Warning_Optimal_Trade_Size` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDEXSlippage():
+            Amount_to_Trade_Token_A = GET_INPUT("Amount_to_Trade_Token_A") // Amount of token A you want to sell
+            Current_Pool_Liquidity_Token_A = GET_INPUT("Current_Pool_Liquidity_Token_A") // Total token A in pool
+            Current_Pool_Liquidity_Token_B = GET_INPUT("Current_Pool_Liquidity_Token_B") // Total token B in pool
+            Trading_Pair_Current_Price = GET_INPUT("Trading_Pair_Current_Price") // Price of Token A in Token B
+
+            // Constant product formula: x * y = k
+            // x = QtyA, y = QtyB. Current price = QtyB / QtyA
+            // If you add delta_x to x, then y_new = k / (x + delta_x)
+            // Amount of Token B received = Current_Pool_Liquidity_Token_B - y_new
+
+            Initial_K = Current_Pool_Liquidity_Token_A * Current_Pool_Liquidity_Token_B
+            
+            // New Qty A in pool after your trade (selling token A)
+            New_Qty_A_in_Pool = Current_Pool_Liquidity_Token_A + Amount_to_Trade_Token_A
+            New_Qty_B_in_Pool = Initial_K / New_Qty_A_in_Pool
+            
+            // This is the new price after your trade
+            New_Price_Token_A_in_B = New_Qty_B_in_Pool / New_Qty_A_in_Pool // Or simpler: (Initial_K / (Current_Pool_Liquidity_Token_A + Amount_to_Trade_Token_A)) / (Current_Pool_Liquidity_Token_A + Amount_to_Trade_Token_A)
+
+            // Let's re-frame with a common approximation
+            Estimated_Slippage_Percentage = 0
+            IF Current_Pool_Liquidity_Token_A > 0 THEN
+                // Approximate slippage (assuming equal pool sizes and small trade relative to pool)
+                Estimated_Slippage_Percentage = (Amount_to_Trade_Token_A / Current_Pool_Liquidity_Token_A) * 100
+            END IF
+
+            Estimated_Slippage_Absolute = Estimated_Slippage_Percentage / 100 * Trading_Pair_Current_Price
+
+            Warning_Optimal_Trade_Size = "Slippage occurs when large trades significantly move the price in a liquidity pool. Consider breaking large trades into smaller ones or using aggregated liquidity routers."
+
+            DISPLAY_OUTPUT("Estimated_Slippage_Percentage", Estimated_Slippage_Percentage)
+            DISPLAY_OUTPUT("Estimated_Slippage_Absolute", Estimated_Slippage_Absolute)
+            DISPLAY_OUTPUT("Warning_Optimal_Trade_Size", Warning_Optimal_Trade_Size)
+        END FUNCTION
+        ```
+
+528.  **Liquidity Pool (LP) Token Price Calculator**
+    * **Purpose:** Calculate the theoretical price of an LP token based on the value of the underlying pooled assets.
+    * **Inputs:**
+        * `Total_Value_of_Assets_in_Pool` (Currency)
+        * `Total_Number_of_LP_Tokens_in_Circulation` (Number)
+    * **Calculations:**
+        * `LP_Token_Price = Total_Value_of_Assets_in_Pool / Total_Number_of_LP_Tokens_in_Circulation`
+    * **Outputs:**
+        * `Calculated_LP_Token_Price` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLPTokenPrice():
+            Total_Value_of_Assets_in_Pool = GET_INPUT("Total_Value_of_Assets_in_Pool")
+            Total_Number_of_LP_Tokens_in_Circulation = GET_INPUT("Total_Number_of_LP_Tokens_in_Circulation")
+
+            IF Total_Number_of_LP_Tokens_in_Circulation <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_LP_Token_Price", "N/A - Total LP tokens must be positive.")
+                RETURN
+            END IF
+
+            LP_Token_Price = Total_Value_of_Assets_in_Pool / Total_Number_of_LP_Tokens_in_Circulation
+
+            DISPLAY_OUTPUT("Calculated_LP_Token_Price", LP_Token_Price)
+        END FUNCTION
+        ```
+
+529.  **APY Stacking / Auto-Compounding Calculator**
+    * **Purpose:** Illustrate the powerful effect of compounding rewards multiple times a day or week in DeFi.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Annual_APY_Rate` (Percentage)
+        * `Compounding_Frequency_Per_Year` (Number - e.g., 365 for daily, 1000 for multiple times a day)
+        * `Investment_Period_Days` (Days)
+        * `Claim_Gas_Fee` (Currency - cost per claim/compound)
+        * `Claim_Frequency_Days` (Days - how often user claims/compounds manually)
+    * **Calculations:**
+        * `Effective_Daily_Rate = (Annual_APY_Rate / 100) / 365`
+        * `Number_of_Compounds = Investment_Period_Days / Claim_Frequency_Days`
+        * `Future_Value_Before_Fees = Initial_Investment * (1 + Effective_Daily_Rate)^Investment_Period_Days`
+        * `Total_Claim_Fees = Claim_Gas_Fee * Number_of_Compounds`
+        * `Net_Future_Value = Future_Value_Before_Fees - Total_Claim_Fees`
+    * **Outputs:**
+        * `Projected_Net_Future_Value` (Currency)
+        * `Total_Compounding_Fees` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAPYStacking():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Annual_APY_Rate = GET_INPUT("Annual_APY_Rate") / 100
+            Compounding_Frequency_Per_Year = GET_INPUT("Compounding_Frequency_Per_Year") // Not directly used if daily rate assumed
+            Investment_Period_Days = GET_INPUT("Investment_Period_Days")
+            Claim_Gas_Fee = GET_INPUT("Claim_Gas_Fee")
+            Claim_Frequency_Days = GET_INPUT("Claim_Frequency_Days")
+
+            Effective_Daily_Rate = Annual_APY_Rate / 365
+            
+            Future_Value_Before_Fees = Initial_Investment * POWER((1 + Effective_Daily_Rate), Investment_Period_Days)
+
+            Number_of_Compounds = FLOOR(Investment_Period_Days / Claim_Frequency_Days)
+            Total_Claim_Fees = Claim_Gas_Fee * Number_of_Compounds
+
+            Net_Future_Value = Future_Value_Before_Fees - Total_Claim_Fees
+
+            DISPLAY_OUTPUT("Projected_Net_Future_Value", Net_Future_Value)
+            DISPLAY_OUTPUT("Total_Compounding_Fees", Total_Claim_Fees)
+        END FUNCTION
+        ```
+
+530. **Blockchain Transaction Fee Calculator (General)**
+    * **Purpose:** Estimate the cost of a general blockchain transaction on various networks, accounting for network-specific units.
+    * **Inputs:**
+        * `Network_Type` (Text: "Ethereum", "Solana", "BNB Chain", etc.)
+        * `Gas_Units_Limit` (Number - if applicable, like ETH)
+        * `Gas_Price_or_Fee_Rate` (Number - current market rate per unit)
+        * `Native_Token_Price_USD` (Currency - e.g., ETH, SOL, BNB)
+    * **Calculations:**
+        * `IF Network_Type = "Ethereum" THEN`
+            * `Total_Fee_Native = Gas_Units_Limit * (Gas_Price_or_Fee_Rate / 10^9)` (Gwei to ETH)
+        * `ELSE IF Network_Type = "Solana" THEN`
+            * `Total_Fee_Native = Gas_Price_or_Fee_Rate` (Fixed small fee typically)
+        * `// ... other networks`
+        * `Total_Fee_USD = Total_Fee_Native * Native_Token_Price_USD`
+    * **Outputs:**
+        * `Estimated_Transaction_Fee_Native_Token` (Number)
+        * `Estimated_Transaction_Fee_USD` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBlockchainTransactionFee():
+            Network_Type = GET_INPUT("Network_Type")
+            Gas_Units_Limit = GET_INPUT("Gas_Units_Limit") // For networks like Ethereum
+            Gas_Price_or_Fee_Rate = GET_INPUT("Gas_Price_or_Fee_Rate") // Gwei for ETH, or SOL/BNB equivalent units
+            Native_Token_Price_USD = GET_INPUT("Native_Token_Price_USD")
+
+            Total_Fee_Native = 0
+            IF Network_Type = "Ethereum" THEN
+                Total_Fee_Native = Gas_Units_Limit * (Gas_Price_or_Fee_Rate / 1000000000) // Convert Gwei to ETH
+            ELSE IF Network_Type = "Solana" THEN
+                Total_Fee_Native = Gas_Price_or_Fee_Rate // Assuming it's already in SOL units
+            ELSE IF Network_Type = "BNB Chain" THEN
+                Total_Fee_Native = Gas_Units_Limit * (Gas_Price_or_Fee_Rate / 1000000000) // Similar to ETH
+            END IF
+
+            Total_Fee_USD = Total_Fee_Native * Native_Token_Price_USD
+
+            DISPLAY_OUTPUT("Estimated_Transaction_Fee_Native_Token", Total_Fee_Native)
+            DISPLAY_OUTPUT("Estimated_Transaction_Fee_USD", Total_Fee_USD)
+        END FUNCTION
+        ```
+
+531. **Token Unlocking Schedule Calculator**
+    * **Purpose:** Calculate the number of tokens that will be unlocked (released from a lock-up period) at specific dates, influencing market supply.
+    * **Inputs:**
+        * `Total_Tokens_Locked` (Number of tokens)
+        * `Lock_Up_Period_Months` (Months)
+        * `First_Unlock_Date` (Date)
+        * `Subsequent_Unlock_Interval_Months` (Months)
+        * `Number_of_Unlock_Events` (Number)
+    * **Calculations:**
+        * `Tokens_Per_Unlock_Event = Total_Tokens_Locked / Number_of_Unlock_Events`
+        * `Unlock_Schedule_Table = []`
+        * `Current_Unlock_Date = First_Unlock_Date`
+        * `FOR i FROM 1 TO Number_of_Unlock_Events:`
+            * `Unlock_Schedule_Table.ADD({Event: i, Date: Current_Unlock_Date, Tokens_Unlocked: Tokens_Per_Unlock_Event})`
+            * `Current_Unlock_Date = ADD_MONTHS(Current_Unlock_Date, Subsequent_Unlock_Interval_Months)`
+    * **Outputs:**
+        * `Detailed_Unlock_Schedule_Table` (Table: Event, Date, Tokens Unlocked)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTokenUnlockingSchedule():
+            Total_Tokens_Locked = GET_INPUT("Total_Tokens_Locked")
+            Lock_Up_Period_Months = GET_INPUT("Lock_Up_Period_Months") // For context of start date
+            First_Unlock_Date = GET_INPUT("First_Unlock_Date") // Date object
+            Subsequent_Unlock_Interval_Months = GET_INPUT("Subsequent_Unlock_Interval_Months")
+            Number_of_Unlock_Events = GET_INPUT("Number_of_Unlock_Events")
+
+            Tokens_Per_Unlock_Event = Total_Tokens_Locked / Number_of_Unlock_Events
+            Unlock_Schedule_Table = []
+            Current_Unlock_Date = First_Unlock_Date
+
+            FOR i FROM 1 TO Number_of_Unlock_Events:
+                Unlock_Schedule_Table.ADD({
+                    Event_Number: i,
+                    Unlock_Date: Current_Unlock_Date,
+                    Tokens_Unlocked: Tokens_Per_Unlock_Event
+                })
+                Current_Unlock_Date = ADD_MONTHS_TO_DATE(Current_Unlock_Date, Subsequent_Unlock_Interval_Months)
+            END FOR
+
+            DISPLAY_OUTPUT("Detailed_Unlock_Schedule_Table", Unlock_Schedule_Table)
+        END FUNCTION
+        ```
+
+532. **Decentralized Lending/Borrowing Interest Rate Calculator (Real Yield)**
+    * **Purpose:** Calculate the actual effective interest rate (APY) on a decentralized loan, considering borrowing fees and rewards.
+    * **Inputs:**
+        * `Amount_Borrowed` (Currency)
+        * `Stated_Annual_Borrow_APY` (Percentage)
+        * `Annual_Reward_APY_for_Borrowers` (Percentage - e.g., COMP rewards)
+        * `Origination_Fee_Percentage` (Percentage)
+        * `Gas_Fees_Incurred` (Currency - total for borrow + repay)
+        * `Borrow_Period_Days` (Days)
+    * **Calculations:**
+        * `Total_Interest_Accrued = Amount_Borrowed * (Stated_Annual_Borrow_APY / 100) * (Borrow_Period_Days / 365)`
+        * `Total_Rewards_Earned = Amount_Borrowed * (Annual_Reward_APY_for_Borrowers / 100) * (Borrow_Period_Days / 365)`
+        * `Net_Interest_Cost = Total_Interest_Accrued - Total_Rewards_Earned`
+        * `Total_Upfront_Fees = Amount_Borrowed * (Origination_Fee_Percentage / 100)`
+        * `Total_Effective_Cost = Net_Interest_Cost + Total_Upfront_Fees + Gas_Fees_Incurred`
+        * `Effective_Annual_Borrow_Rate = (Total_Effective_Cost / Amount_Borrowed) / (Borrow_Period_Days / 365) * 100` (If Amount_Borrowed > 0)
+    * **Outputs:**
+        * `Estimated_Total_Interest_Cost` (Currency)
+        * `Estimated_Total_Rewards_Earned` (Currency)
+        * `Estimated_Effective_Annual_Borrow_Rate` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDeFiBorrowingRealYield():
+            Amount_Borrowed = GET_INPUT("Amount_Borrowed")
+            Stated_Annual_Borrow_APY = GET_INPUT("Stated_Annual_Borrow_APY") / 100
+            Annual_Reward_APY_for_Borrowers = GET_INPUT("Annual_Reward_APY_for_Borrowers") / 100
+            Origination_Fee_Percentage = GET_INPUT("Origination_Fee_Percentage") / 100
+            Gas_Fees_Incurred = GET_INPUT("Gas_Fees_Incurred")
+            Borrow_Period_Days = GET_INPUT("Borrow_Period_Days")
+
+            Total_Interest_Accrued = Amount_Borrowed * Stated_Annual_Borrow_APY * (Borrow_Period_Days / 365)
+            Total_Rewards_Earned = Amount_Borrowed * Annual_Reward_APY_for_Borrowers * (Borrow_Period_Days / 365)
+            
+            Net_Interest_Cost = Total_Interest_Accrued - Total_Rewards_Earned
+            Total_Upfront_Fees = Amount_Borrowed * Origination_Fee_Percentage
+            Total_Effective_Cost = Net_Interest_Cost + Total_Upfront_Fees + Gas_Fees_Incurred
+
+            Effective_Annual_Borrow_Rate = 0
+            IF Amount_Borrowed > 0 AND Borrow_Period_Days > 0 THEN
+                Effective_Annual_Borrow_Rate = (Total_Effective_Cost / Amount_Borrowed) / (Borrow_Period_Days / 365) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Total_Interest_Cost", Total_Interest_Accrued)
+            DISPLAY_OUTPUT("Estimated_Total_Rewards_Earned", Total_Rewards_Earned)
+            DISPLAY_OUTPUT("Estimated_Effective_Annual_Borrow_Rate", Effective_Annual_Borrow_Rate)
+        END FUNCTION
+        ```
+
+533. **Automated Market Maker (AMM) Price Impact Calculator**
+    * **Purpose:** Calculate the price impact (slippage) of a trade on an AMM DEX, given the pool's liquidity and the trade size.
+    * **Inputs:**
+        * `Amount_to_Trade_Token_A` (Number of tokens to swap)
+        * `Current_Pool_Liquidity_Token_A` (Number of Token A in pool)
+        * `Current_Pool_Liquidity_Token_B` (Number of Token B in pool)
+        * `Current_Price_Token_A_in_B` (Price of Token A in terms of Token B)
+    * **Calculations:**
+        * `Initial_K = Current_Pool_Liquidity_Token_A * Current_Pool_Liquidity_Token_B`
+        * `New_Qty_A_in_Pool = Current_Pool_Liquidity_Token_A + Amount_to_Trade_Token_A`
+        * `New_Qty_B_in_Pool = Initial_K / New_Qty_A_in_Pool`
+        * `Amount_Out_Token_B = Current_Pool_Liquidity_Token_B - New_Qty_B_in_Pool`
+        * `Effective_Price_Token_A_in_B_After_Trade = Amount_Out_Token_B / Amount_to_Trade_Token_A`
+        * `Price_Impact_Absolute = ABS(Current_Price_Token_A_in_B - Effective_Price_Token_A_in_B_After_Trade)`
+        * `Price_Impact_Percentage = (Price_Impact_Absolute / Current_Price_Token_A_in_B) * 100` (If Current_Price > 0)
+    * **Outputs:**
+        * `Estimated_Price_Impact_Percentage` (Percentage)
+        * `Estimated_Price_Impact_Absolute` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAMMPriceImpact():
+            Amount_to_Trade_Token_A = GET_INPUT("Amount_to_Trade_Token_A")
+            Current_Pool_Liquidity_Token_A = GET_INPUT("Current_Pool_Liquidity_Token_A")
+            Current_Pool_Liquidity_Token_B = GET_INPUT("Current_Pool_Liquidity_Token_B")
+            Current_Price_Token_A_in_B = GET_INPUT("Current_Price_Token_A_in_B")
+
+            Initial_K = Current_Pool_Liquidity_Token_A * Current_Pool_Liquidity_Token_B
+            
+            // New quantity of Token A in pool after you *add* to it (if you're selling Token A)
+            New_Qty_A_in_Pool = Current_Pool_Liquidity_Token_A + Amount_to_Trade_Token_A
+            New_Qty_B_in_Pool = Initial_K / New_Qty_A_in_Pool
+            
+            Amount_Out_Token_B = Current_Pool_Liquidity_Token_B - New_Qty_B_in_Pool
+            
+            Effective_Price_Token_A_in_B_After_Trade = 0
+            IF Amount_to_Trade_Token_A > 0 THEN
+                Effective_Price_Token_A_in_B_After_Trade = Amount_Out_Token_B / Amount_to_Trade_Token_A
+            END IF
+
+            Price_Impact_Absolute = ABS(Current_Price_Token_A_in_B - Effective_Price_Token_A_in_B_After_Trade)
+            Price_Impact_Percentage = 0
+            IF Current_Price_Token_A_in_B > 0 THEN
+                Price_Impact_Percentage = (Price_Impact_Absolute / Current_Price_Token_A_in_B) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Price_Impact_Percentage", Price_Impact_Percentage)
+            DISPLAY_OUTPUT("Estimated_Price_Impact_Absolute", Price_Impact_Absolute)
+        END FUNCTION
+        ```
+
+534. **NFT Royalties Calculator (Secondary Sales)**
+    * **Purpose:** Calculate the royalty earnings for an NFT creator from secondary market sales.
+    * **Inputs:**
+        * `NFT_Sale_Price` (Currency)
+        * `Royalty_Percentage` (Percentage)
+        * `Number_of_Sales` (Number)
+    * **Calculations:**
+        * `Royalty_Per_Sale = NFT_Sale_Price * (Royalty_Percentage / 100)`
+        * `Total_Royalty_Earnings = Royalty_Per_Sale * Number_of_Sales`
+    * **Outputs:**
+        * `Calculated_Royalty_Per_Sale` (Currency)
+        * `Calculated_Total_Royalty_Earnings` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateNFTRoyalties():
+            NFT_Sale_Price = GET_INPUT("NFT_Sale_Price")
+            Royalty_Percentage = GET_INPUT("Royalty_Percentage") / 100
+            Number_of_Sales = GET_INPUT("Number_of_Sales")
+
+            Royalty_Per_Sale = NFT_Sale_Price * Royalty_Percentage
+            Total_Royalty_Earnings = Royalty_Per_Sale * Number_of_Sales
+
+            DISPLAY_OUTPUT("Calculated_Royalty_Per_Sale", Royalty_Per_Sale)
+            DISPLAY_OUTPUT("Calculated_Total_Royalty_Earnings", Total_Royalty_Earnings)
+        END FUNCTION
+        ```
+
+535. **GameFi (Play-to-Earn) Earnings Projector**
+    * **Purpose:** Estimate potential earnings from a Play-to-Earn game based on daily rewards and token prices.
+    * **Inputs:**
+        * `Daily_Token_Rewards` (Number of tokens)
+        * `Current_Game_Token_Price` (Currency)
+        * `Projected_Game_Token_Price` (Currency)
+        * `Projection_Days` (Days)
+        * `Daily_Energy_Cost` (Currency - e.g., in-game energy or repair cost)
+        * `Platform_Fees_Percentage` (Percentage - if platform takes a cut)
+    * **Calculations:**
+        * `Gross_Daily_Earnings_USD = Daily_Token_Rewards * Current_Game_Token_Price`
+        * `Net_Daily_Earnings_USD = Gross_Daily_Earnings_USD - Daily_Energy_Cost`
+        * `Projected_Total_Earnings_Gross = (Daily_Token_Rewards * Projected_Game_Token_Price) * Projection_Days`
+        * `Projected_Total_Costs = (Daily_Energy_Cost * Projection_Days) + (Projected_Total_Earnings_Gross * (Platform_Fees_Percentage / 100))`
+        * `Projected_Net_Earnings = Projected_Total_Earnings_Gross - Projected_Total_Costs`
+    * **Outputs:**
+        * `Projected_Total_Net_Earnings` (Currency)
+        * `Projected_Total_Costs` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ProjectGameFiEarnings():
+            Daily_Token_Rewards = GET_INPUT("Daily_Token_Rewards")
+            Current_Game_Token_Price = GET_INPUT("Current_Game_Token_Price")
+            Projected_Game_Token_Price = GET_INPUT("Projected_Game_Token_Price")
+            Projection_Days = GET_INPUT("Projection_Days")
+            Daily_Energy_Cost = GET_INPUT("Daily_Energy_Cost")
+            Platform_Fees_Percentage = GET_INPUT("Platform_Fees_Percentage") / 100
+
+            Gross_Daily_Earnings_USD = Daily_Token_Rewards * Current_Game_Token_Price
+            Net_Daily_Earnings_USD = Gross_Daily_Earnings_USD - Daily_Energy_Cost
+
+            Projected_Total_Earnings_Gross = (Daily_Token_Rewards * Projected_Game_Token_Price) * Projection_Days
+            
+            Projected_Total_Costs = (Daily_Energy_Cost * Projection_Days) + (Projected_Total_Earnings_Gross * Platform_Fees_Percentage)
+            
+            Projected_Net_Earnings = Projected_Total_Earnings_Gross - Projected_Total_Costs
+
+            DISPLAY_OUTPUT("Projected_Total_Net_Earnings", Projected_Net_Earnings)
+            DISPLAY_OUTPUT("Projected_Total_Costs", Projected_Total_Costs)
+        END FUNCTION
+        ```
+
+---
+
+We've added another 17 DeFi calculators (515-535), bringing our grand total to **477 (previous) + 17 = 494 calculators!**
+
+We are rigorously making progress towards the 650 additional calculators.
+
+Next, I will move to **Personal Finance** related calculators, building on the initial set and previous categories.
+
+-----------
+
+Absolutely! Rigor will be maintained as we delve deep into **Personal Finance Calculators**. This category is crucial for individuals managing their daily finances, planning for future goals, and building long-term wealth. I will aim for over 50 calculators in this batch, pushing our total significantly higher.
+
+---
+
+## XV. Personal Finance Calculators (Deeper Dive)
+
+536.  **50/30/20 Budget Rule Calculator**
+    * **Purpose:** Allocate monthly net income into Needs (50%), Wants (30%), and Savings/Debt Repayment (20%) categories.
+    * **Inputs:**
+        * `Monthly_Net_Income` (Currency)
+    * **Calculations:**
+        * `Needs_Budget = Monthly_Net_Income * 0.50`
+        * `Wants_Budget = Monthly_Net_Income * 0.30`
+        * `Savings_Debt_Budget = Monthly_Net_Income * 0.20`
+    * **Outputs:**
+        * `Allocated_for_Needs` (Currency)
+        * `Allocated_for_Wants` (Currency)
+        * `Allocated_for_Savings_Debt` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION Calculate50_30_20Budget():
+            Monthly_Net_Income = GET_INPUT("Monthly_Net_Income")
+
+            Needs_Budget = Monthly_Net_Income * 0.50
+            Wants_Budget = Monthly_Net_Income * 0.30
+            Savings_Debt_Budget = Monthly_Net_Income * 0.20
+
+            DISPLAY_OUTPUT("Allocated_for_Needs", Needs_Budget)
+            DISPLAY_OUTPUT("Allocated_for_Wants", Wants_Budget)
+            DISPLAY_OUTPUT("Allocated_for_Savings_Debt", Savings_Debt_Budget)
+        END FUNCTION
+        ```
+
+537.  **Zero-Based Budgeting Allocation Tool**
+    * **Purpose:** Guide users to allocate every dollar of income to an expense or saving category, ensuring zero dollars are left unassigned.
+    * **Inputs:**
+        * `Monthly_Income` (Currency)
+        * `Fixed_Expenses_List` (List of {`Name`: String, `Amount`: Currency})
+        * `Variable_Expenses_List` (List of {`Name`: String, `Amount`: Currency})
+        * `Savings_Goals_List` (List of {`Name`: String, `Amount`: Currency})
+        * `Debt_Payments_List` (List of {`Name`: String, `Amount`: Currency})
+    * **Calculations:**
+        * `Total_Allocated = SUM(All Fixed, Variable, Savings, Debt Amounts)`
+        * `Remaining_Balance = Monthly_Income - Total_Allocated`
+        * `Status = IF Remaining_Balance = 0 THEN "Budget Balanced" ELSE IF Remaining_Balance > 0 THEN "Surplus" ELSE "Deficit"`
+    * **Outputs:**
+        * `Total_Allocated_Amount` (Currency)
+        * `Remaining_Balance_to_Allocate` (Currency)
+        * `Budget_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateZeroBasedBudget():
+            Monthly_Income = GET_INPUT("Monthly_Income")
+            Fixed_Expenses = GET_INPUT("Fixed_Expenses_List") // List of numbers
+            Variable_Expenses = GET_INPUT("Variable_Expenses_List")
+            Savings_Goals = GET_INPUT("Savings_Goals_List")
+            Debt_Payments = GET_INPUT("Debt_Payments_List")
+
+            Total_Allocated_Sum = SUM_LIST(Fixed_Expenses) + SUM_LIST(Variable_Expenses) + \
+                                  SUM_LIST(Savings_Goals) + SUM_LIST(Debt_Payments)
+
+            Remaining_Balance = Monthly_Income - Total_Allocated_Sum
+
+            Status = ""
+            IF Remaining_Balance = 0 THEN
+                Status = "Budget Balanced (Every dollar has a job)"
+            ELSE IF Remaining_Balance > 0 THEN
+                Status = "Surplus (You have " + FORMAT_CURRENCY(Remaining_Balance) + " unallocated)"
+            ELSE
+                Status = "Deficit (You need to reduce spending by " + FORMAT_CURRENCY(ABS(Remaining_Balance)) + ")"
+            END IF
+
+            DISPLAY_OUTPUT("Total_Allocated_Amount", Total_Allocated_Sum)
+            DISPLAY_OUTPUT("Remaining_Balance_to_Allocate", Remaining_Balance)
+            DISPLAY_OUTPUT("Budget_Status", Status)
+        END FUNCTION
+        ```
+
+538.  **Discretionary Spending Tracker (Conceptual/Input Tool)**
+    * **Purpose:** Help users categorize and track their variable, non-essential spending to identify areas for potential savings.
+    * **Inputs:**
+        * `Monthly_Discretionary_Budget` (Currency)
+        * `Daily_Spending_Entries` (List of {`Date`: Date, `Category`: Text, `Amount`: Currency})
+    * **Calculations:**
+        * `Total_Spent_This_Month = SUM(All daily spending amounts for current month)`
+        * `Remaining_Budget = Monthly_Discretionary_Budget - Total_Spent_This_Month`
+        * `Spending_Breakdown_by_Category = Aggregate_by_Category(Daily_Spending_Entries)`
+    * **Outputs:**
+        * `Total_Spent_This_Month` (Currency)
+        * `Remaining_Discretionary_Budget` (Currency)
+        * `Spending_Breakdown_Table` (Table: Category, Amount Spent)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION TrackDiscretionarySpending():
+            Monthly_Discretionary_Budget = GET_INPUT("Monthly_Discretionary_Budget")
+            Daily_Spending_Entries = GET_INPUT("Daily_Spending_Entries") // [{Date, Category, Amount}]
+            Current_Month = GET_CURRENT_MONTH() // Assuming helper function
+
+            Total_Spent_This_Month = 0
+            Spending_Breakdown_by_Category = CREATE_EMPTY_DICTIONARY() // {Category: Total Amount}
+
+            FOR EACH Entry IN Daily_Spending_Entries:
+                IF GET_MONTH_FROM_DATE(Entry.Date) == Current_Month THEN
+                    Total_Spent_This_Month = Total_Spent_This_Month + Entry.Amount
+                    IF Spending_Breakdown_by_Category.HAS_KEY(Entry.Category) THEN
+                        Spending_Breakdown_by_Category[Entry.Category] = Spending_Breakdown_by_Category[Entry.Category] + Entry.Amount
+                    ELSE
+                        Spending_Breakdown_by_Category[Entry.Category] = Entry.Amount
+                    END IF
+                END IF
+            END FOR
+
+            Remaining_Budget = Monthly_Discretionary_Budget - Total_Spent_This_Month
+
+            DISPLAY_OUTPUT("Total_Spent_This_Month", Total_Spent_This_Month)
+            DISPLAY_OUTPUT("Remaining_Discretionary_Budget", Remaining_Budget)
+            DISPLAY_OUTPUT("Spending_Breakdown_Table", Spending_Breakdown_by_Category)
+        END FUNCTION
+        ```
+
+539.  **Subscription Cost Tracker**
+    * **Purpose:** Calculate the total monthly and annual cost of all personal subscriptions.
+    * **Inputs:**
+        * `Subscriptions_List` (List of {`Name`: String, `Monthly_Cost`: Currency, `Annual_Cost`: Currency - either, but not both})
+    * **Calculations:**
+        * `Total_Monthly_Subscription_Cost = SUM(Monthly_Cost for all subscriptions)`
+        * `Total_Annual_Subscription_Cost = SUM(Annual_Cost for all subscriptions) + (Total_Monthly_Subscription_Cost * 12)`
+    * **Outputs:**
+        * `Total_Monthly_Subscription_Expenses` (Currency)
+        * `Total_Annual_Subscription_Expenses` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION TrackSubscriptionCosts():
+            Subscriptions_List = GET_INPUT("Subscriptions_List") // [{Name, Monthly_Cost, Annual_Cost}]
+
+            Total_Monthly_Subscription_Expenses = 0
+            Total_Annual_Subscription_Expenses = 0
+
+            FOR EACH Sub IN Subscriptions_List:
+                IF Sub.Monthly_Cost IS NOT NULL THEN
+                    Total_Monthly_Subscription_Expenses = Total_Monthly_Subscription_Expenses + Sub.Monthly_Cost
+                    Total_Annual_Subscription_Expenses = Total_Annual_Subscription_Expenses + (Sub.Monthly_Cost * 12)
+                ELSE IF Sub.Annual_Cost IS NOT NULL THEN
+                    Total_Annual_Subscription_Expenses = Total_Annual_Subscription_Expenses + Sub.Annual_Cost
+                    // Optionally, divide by 12 to add to monthly for mixed display
+                END IF
+            END FOR
+
+            DISPLAY_OUTPUT("Total_Monthly_Subscription_Expenses", Total_Monthly_Subscription_Expenses)
+            DISPLAY_OUTPUT("Total_Annual_Subscription_Expenses", Total_Annual_Subscription_Expenses)
+        END FUNCTION
+        ```
+
+540.  **Meal Prep Savings Calculator**
+    * **Purpose:** Estimate potential savings by planning and preparing meals at home versus eating out.
+    * **Inputs:**
+        * `Average_Cost_Eating_Out_Per_Meal` (Currency)
+        * `Average_Cost_Home_Cooked_Per_Meal` (Currency)
+        * `Meals_Eaten_Out_Per_Week` (Number)
+        * `Meals_to_Switch_to_Home_Cooked_Per_Week` (Number)
+    * **Calculations:**
+        * `Cost_Eating_Out_Weekly = Average_Cost_Eating_Out_Per_Meal * Meals_Eaten_Out_Per_Week`
+        * `Cost_Home_Cooked_Weekly = Average_Cost_Home_Cooked_Per_Meal * Meals_to_Switch_to_Home_Cooked_Per_Week`
+        * `Weekly_Savings = (Average_Cost_Eating_Out_Per_Meal - Average_Cost_Home_Cooked_Per_Meal) * Meals_to_Switch_to_Home_Cooked_Per_Week`
+        * `Annual_Savings = Weekly_Savings * 52`
+    * **Outputs:**
+        * `Estimated_Weekly_Savings` (Currency)
+        * `Estimated_Annual_Savings` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMealPrepSavings():
+            Average_Cost_Eating_Out_Per_Meal = GET_INPUT("Average_Cost_Eating_Out_Per_Meal")
+            Average_Cost_Home_Cooked_Per_Meal = GET_INPUT("Average_Cost_Home_Cooked_Per_Meal")
+            Meals_to_Switch_to_Home_Cooked_Per_Week = GET_INPUT("Meals_to_Switch_to_Home_Cooked_Per_Week")
+
+            Savings_Per_Meal = Average_Cost_Eating_Out_Per_Meal - Average_Cost_Home_Cooked_Per_Meal
+            Weekly_Savings = Savings_Per_Meal * Meals_to_Switch_to_Home_Cooked_Per_Week
+            Annual_Savings = Weekly_Savings * 52
+
+            DISPLAY_OUTPUT("Estimated_Weekly_Savings", Weekly_Savings)
+            DISPLAY_OUTPUT("Estimated_Annual_Savings", Annual_Savings)
+        END FUNCTION
+        ```
+
+541.  **Coffee Shop Savings Calculator**
+    * **Purpose:** Illustrate potential savings by reducing or eliminating daily coffee shop purchases.
+    * **Inputs:**
+        * `Cost_Per_Coffee_Shop_Drink` (Currency)
+        * `Drinks_Per_Week` (Number)
+        * `Alternative_Home_Brewed_Cost_Per_Drink` (Currency)
+    * **Calculations:**
+        * `Weekly_Coffee_Cost = Cost_Per_Coffee_Shop_Drink * Drinks_Per_Week`
+        * `Weekly_Home_Brewed_Cost = Alternative_Home_Brewed_Cost_Per_Drink * Drinks_Per_Week`
+        * `Weekly_Savings = Weekly_Coffee_Cost - Weekly_Home_Brewed_Cost`
+        * `Annual_Savings = Weekly_Savings * 52`
+    * **Outputs:**
+        * `Estimated_Weekly_Savings` (Currency)
+        * `Estimated_Annual_Savings` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCoffeeShopSavings():
+            Cost_Per_Coffee_Shop_Drink = GET_INPUT("Cost_Per_Coffee_Shop_Drink")
+            Drinks_Per_Week = GET_INPUT("Drinks_Per_Week")
+            Alternative_Home_Brewed_Cost_Per_Drink = GET_INPUT("Alternative_Home_Brewed_Cost_Per_Drink")
+
+            Savings_Per_Drink = Cost_Per_Coffee_Shop_Drink - Alternative_Home_Brewed_Cost_Per_Drink
+            Weekly_Savings = Savings_Per_Drink * Drinks_Per_Week
+            Annual_Savings = Weekly_Savings * 52
+
+            DISPLAY_OUTPUT("Estimated_Weekly_Savings", Weekly_Savings)
+            DISPLAY_OUTPUT("Estimated_Annual_Savings", Annual_Savings)
+        END FUNCTION
+        ```
+
+542.  **Daily Spending Limit Calculator**
+    * **Purpose:** Calculate a daily spending limit based on monthly income and fixed expenses to control discretionary spending.
+    * **Inputs:**
+        * `Monthly_Net_Income` (Currency)
+        * `Total_Monthly_Fixed_Expenses` (Currency)
+        * `Monthly_Savings_Goal` (Currency)
+        * `Number_of_Days_in_Month` (Number - e.g., 30)
+    * **Calculations:**
+        * `Total_Fixed_Commitments = Total_Monthly_Fixed_Expenses + Monthly_Savings_Goal`
+        * `Available_for_Discretionary_Monthly = Monthly_Net_Income - Total_Fixed_Commitments`
+        * `Daily_Spending_Limit = Available_for_Discretionary_Monthly / Number_of_Days_in_Month`
+    * **Outputs:**
+        * `Calculated_Daily_Spending_Limit` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDailySpendingLimit():
+            Monthly_Net_Income = GET_INPUT("Monthly_Net_Income")
+            Total_Monthly_Fixed_Expenses = GET_INPUT("Total_Monthly_Fixed_Expenses")
+            Monthly_Savings_Goal = GET_INPUT("Monthly_Savings_Goal")
+            Number_of_Days_in_Month = GET_INPUT("Number_of_Days_in_Month")
+
+            Total_Fixed_Commitments = Total_Monthly_Fixed_Expenses + Monthly_Savings_Goal
+            Available_for_Discretionary_Monthly = Monthly_Net_Income - Total_Fixed_Commitments
+
+            IF Number_of_Days_in_Month <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Daily_Spending_Limit", "N/A - Number of days must be positive.")
+                RETURN
+            END IF
+
+            Daily_Spending_Limit = Available_for_Discretionary_Monthly / Number_of_Days_in_Month
+
+            DISPLAY_OUTPUT("Calculated_Daily_Spending_Limit", Daily_Spending_Limit)
+        END FUNCTION
+        ```
+
+543.  **Savings Goal Progress Tracker**
+    * **Purpose:** Track progress towards a specific savings goal, showing remaining amount and time.
+    * **Inputs:**
+        * `Total_Savings_Goal` (Currency)
+        * `Current_Savings_Balance` (Currency)
+        * `Monthly_Contribution` (Currency)
+        * `Expected_Annual_Interest_Rate` (Percentage)
+    * **Calculations:**
+        * `Amount_Remaining = Total_Savings_Goal - Current_Savings_Balance`
+        * `Months_to_Reach_Goal = 0`
+        * `Current_Balance_Sim = Current_Savings_Balance`
+        * `Monthly_Rate = Expected_Annual_Interest_Rate / 100 / 12`
+        * `WHILE Current_Balance_Sim < Total_Savings_Goal AND Months_to_Reach_Goal < 600:` // Max 50 years
+            * `Months_to_Reach_Goal = Months_to_Reach_Goal + 1`
+            * `Current_Balance_Sim = Current_Balance_Sim * (1 + Monthly_Rate) + Monthly_Contribution`
+        * `Progress_Percentage = (Current_Savings_Balance / Total_Savings_Goal) * 100` (If Total_Savings_Goal > 0)
+    * **Outputs:**
+        * `Amount_Remaining_to_Save` (Currency)
+        * `Estimated_Months_to_Reach_Goal` (Months)
+        * `Progress_Percentage_Achieved` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION TrackSavingsGoalProgress():
+            Total_Savings_Goal = GET_INPUT("Total_Savings_Goal")
+            Current_Savings_Balance = GET_INPUT("Current_Savings_Balance")
+            Monthly_Contribution = GET_INPUT("Monthly_Contribution")
+            Expected_Annual_Interest_Rate = GET_INPUT("Expected_Annual_Interest_Rate") / 100
+
+            Amount_Remaining = Total_Savings_Goal - Current_Savings_Balance
+
+            Months_to_Reach_Goal = 0
+            Current_Balance_Sim = Current_Savings_Balance
+            Monthly_Rate = Expected_Annual_Interest_Rate / 12
+            Max_Months_Limit = 600
+
+            IF Monthly_Contribution + (Current_Savings_Balance * Monthly_Rate) <= 0 AND Amount_Remaining > 0 THEN
+                DISPLAY_OUTPUT("Estimated_Months_to_Reach_Goal", "Cannot reach goal with current contributions/rate.")
+                RETURN
+            END IF
+
+            WHILE Current_Balance_Sim < Total_Savings_Goal AND Months_to_Reach_Goal < Max_Months_Limit:
+                Months_to_Reach_Goal = Months_to_Reach_Goal + 1
+                Current_Balance_Sim = Current_Balance_Sim * (1 + Monthly_Rate) + Monthly_Contribution
+            END WHILE
+
+            Progress_Percentage = 0
+            IF Total_Savings_Goal > 0 THEN
+                Progress_Percentage = (Current_Savings_Balance / Total_Savings_Goal) * 100
+            END IF
+
+            IF Months_to_Reach_Goal >= Max_Months_Limit AND Current_Balance_Sim < Total_Savings_Goal THEN
+                DISPLAY_OUTPUT("Estimated_Months_to_Reach_Goal", "Goal not reached within " + Max_Months_Limit + " months.")
+            ELSE
+                DISPLAY_OUTPUT("Estimated_Months_to_Reach_Goal", Months_to_Reach_Goal)
+            END IF
+            DISPLAY_OUTPUT("Amount_Remaining_to_Save", Amount_Remaining)
+            DISPLAY_OUTPUT("Progress_Percentage_Achieved", Progress_Percentage)
+        END FUNCTION
+        ```
+
+544.  **Emergency Fund Calculator**
+    * **Purpose:** Determine the recommended size of an emergency fund based on monthly expenses and desired coverage period.
+    * **Inputs:**
+        * `Total_Monthly_Expenses` (Currency)
+        * `Desired_Coverage_Months` (Number - e.g., 3, 6, 9, 12)
+        * `Current_Emergency_Savings` (Currency)
+        * `Monthly_Contribution_to_Emergency_Fund` (Currency)
+    * **Calculations:**
+        * `Recommended_Fund_Size = Total_Monthly_Expenses * Desired_Coverage_Months`
+        * `Amount_to_Save = Recommended_Fund_Size - Current_Emergency_Savings`
+        * `Months_to_Reach_Goal = Amount_to_Save / Monthly_Contribution_to_Emergency_Fund` (If contributions > 0)
+    * **Outputs:**
+        * `Recommended_Emergency_Fund_Size` (Currency)
+        * `Amount_Left_to_Save` (Currency)
+        * `Estimated_Months_to_Reach_Goal` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEmergencyFund():
+            Total_Monthly_Expenses = GET_INPUT("Total_Monthly_Expenses")
+            Desired_Coverage_Months = GET_INPUT("Desired_Coverage_Months")
+            Current_Emergency_Savings = GET_INPUT("Current_Emergency_Savings")
+            Monthly_Contribution_to_Emergency_Fund = GET_INPUT("Monthly_Contribution_to_Emergency_Fund")
+
+            Recommended_Fund_Size = Total_Monthly_Expenses * Desired_Coverage_Months
+            Amount_Left_to_Save = MAX(0, Recommended_Fund_Size - Current_Emergency_Savings)
+
+            Estimated_Months_to_Reach_Goal = 0
+            IF Monthly_Contribution_to_Emergency_Fund > 0 THEN
+                Estimated_Months_to_Reach_Goal = Amount_Left_to_Save / Monthly_Contribution_to_Emergency_Fund
+            ELSE IF Amount_Left_to_Save > 0 THEN
+                Estimated_Months_to_Reach_Goal = INFINITY // Will never reach
+            END IF
+
+            DISPLAY_OUTPUT("Recommended_Emergency_Fund_Size", Recommended_Fund_Size)
+            DISPLAY_OUTPUT("Amount_Left_to_Save", Amount_Left_to_Save)
+            DISPLAY_OUTPUT("Estimated_Months_to_Reach_Goal", CEILING(Estimated_Months_to_Reach_Goal))
+        END FUNCTION
+        ```
+
+545.  **Large Purchase Savings Goal (Car/Vacation/Other)**
+    * **Purpose:** Plan savings for a specific large purchase, calculating required monthly contributions or time to reach the goal.
+    * **Inputs:**
+        * `Target_Purchase_Cost` (Currency)
+        * `Current_Savings_for_Purchase` (Currency)
+        * `Target_Date_Years` (Years)
+        * `Monthly_Contribution_Desired` (Currency)
+        * `Expected_Annual_Return_Rate` (Percentage)
+    * **Calculations:**
+        * `Amount_Needed = Target_Purchase_Cost - Current_Savings_for_Purchase`
+        * `Monthly_Rate = Expected_Annual_Return_Rate / 100 / 12`
+        * `IF Target_Date_Years IS NOT NULL:`
+            * `Required_Monthly_Contribution = PMT(Monthly_Rate, Target_Date_Years * 12, -Current_Savings_for_Purchase, Target_Purchase_Cost)` (Financial function)
+        * `IF Monthly_Contribution_Desired IS NOT NULL:`
+            * `Months_to_Goal = -NPER(Monthly_Rate, Monthly_Contribution_Desired, Current_Savings_for_Purchase, -Target_Purchase_Cost)` (Financial function)
+    * **Outputs:**
+        * `Required_Monthly_Contribution` (Currency - if target date given)
+        * `Estimated_Months_to_Reach_Goal` (Months - if monthly contribution given)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLargePurchaseSavings():
+            Target_Purchase_Cost = GET_INPUT("Target_Purchase_Cost")
+            Current_Savings_for_Purchase = GET_INPUT("Current_Savings_for_Purchase")
+            Target_Date_Years = GET_INPUT("Target_Date_Years") // Optional, if user has a target date
+            Monthly_Contribution_Desired = GET_INPUT("Monthly_Contribution_Desired") // Optional, if user has a desired monthly contribution
+            Expected_Annual_Return_Rate = GET_INPUT("Expected_Annual_Return_Rate") / 100
+
+            Monthly_Rate = Expected_Annual_Return_Rate / 12
+
+            Required_Monthly_Contribution = 0
+            Estimated_Months_to_Reach_Goal = 0
+
+            IF Target_Date_Years IS NOT NULL AND Target_Date_Years > 0 THEN
+                Total_Months = Target_Date_Years * 12
+                // Use a financial PMT function (Payment for an annuity)
+                // PMT(rate, nper, pv, [fv], [type])
+                // We want to reach FV, so FV is positive. Current_Savings is PV, so it's negative (investment).
+                Required_Monthly_Contribution = CALCULATE_PMT(Monthly_Rate, Total_Months, -Current_Savings_for_Purchase, Target_Purchase_Cost)
+                DISPLAY_OUTPUT("Required_Monthly_Contribution", Required_Monthly_Contribution)
+            ELSE IF Monthly_Contribution_Desired IS NOT NULL AND Monthly_Contribution_Desired > 0 THEN
+                // Use a financial NPER function (Number of periods for an annuity)
+                // NPER(rate, pmt, pv, [fv], [type])
+                // PMT is positive (contribution), PV is positive (current savings), FV is target (negative as a payout)
+                Estimated_Months_to_Reach_Goal = CALCULATE_NPER(Monthly_Rate, Monthly_Contribution_Desired, Current_Savings_for_Purchase, -Target_Purchase_Cost)
+                DISPLAY_OUTPUT("Estimated_Months_to_Reach_Goal", CEILING(Estimated_Months_to_Reach_Goal))
+            ELSE
+                DISPLAY_OUTPUT("Error", "Please provide either a Target Date or a Desired Monthly Contribution.")
+            END IF
+        END FUNCTION
+        ```
+
+546.  **Sinking Fund Calculator**
+    * **Purpose:** Plan regular savings contributions to accumulate a specific amount by a certain date for a future expense.
+    * **Inputs:**
+        * `Target_Amount` (Currency)
+        * `Number_of_Months_Until_Need` (Months)
+    * **Calculations:**
+        * `Required_Monthly_Contribution = Target_Amount / Number_of_Months_Until_Need`
+    * **Outputs:**
+        * `Calculated_Monthly_Contribution` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSinkingFund():
+            Target_Amount = GET_INPUT("Target_Amount")
+            Number_of_Months_Until_Need = GET_INPUT("Number_of_Months_Until_Need")
+
+            IF Number_of_Months_Until_Need <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Monthly_Contribution", "N/A - Number of months must be positive.")
+                RETURN
+            END IF
+
+            Required_Monthly_Contribution = Target_Amount / Number_of_Months_Until_Need
+
+            DISPLAY_OUTPUT("Calculated_Monthly_Contribution", Required_Monthly_Contribution)
+        END FUNCTION
+        ```
+
+547.  **Future Value of Regular Savings (Tax-Adjusted)**
+    * **Purpose:** Project the future value of consistent savings, factoring in tax implications on investment gains.
+    * **Inputs:**
+        * `Annual_Savings_Contribution` (Currency)
+        * `Expected_Annual_Investment_Return` (Percentage)
+        * `Years_to_Project` (Years)
+        * `Effective_Annual_Tax_Rate_on_Gains` (Percentage - e.g., capital gains rate)
+    * **Calculations:**
+        * `After_Tax_Return_Rate = Expected_Annual_Investment_Return * (1 - Effective_Annual_Tax_Rate_on_Gains / 100)`
+        * `Future_Value = Annual_Savings_Contribution * (((1 + After_Tax_Return_Rate / 100)^Years_to_Project - 1) / (After_Tax_Return_Rate / 100))`
+    * **Outputs:**
+        * `Projected_Future_Value_After_Taxes` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFVRegularSavingsTaxAdjusted():
+            Annual_Savings_Contribution = GET_INPUT("Annual_Savings_Contribution")
+            Expected_Annual_Investment_Return = GET_INPUT("Expected_Annual_Investment_Return") / 100
+            Years_to_Project = GET_INPUT("Years_to_Project")
+            Effective_Annual_Tax_Rate_on_Gains = GET_INPUT("Effective_Annual_Tax_Rate_on_Gains") / 100
+
+            After_Tax_Return_Rate = Expected_Annual_Investment_Return * (1 - Effective_Annual_Tax_Rate_on_Gains)
+
+            Future_Value = 0
+            IF After_Tax_Return_Rate = 0 THEN
+                Future_Value = Annual_Savings_Contribution * Years_to_Project
+            ELSE
+                Future_Value = Annual_Savings_Contribution * ((POWER((1 + After_Tax_Return_Rate), Years_to_Project) - 1) / After_Tax_Return_Rate)
+            END IF
+
+            DISPLAY_OUTPUT("Projected_Future_Value_After_Taxes", Future_Value)
+        END FUNCTION
+        ```
+
+548.  **Time to Save for a Goal (Tax-Adjusted)**
+    * **Purpose:** Calculate how long it will take to reach a savings goal, considering taxes on investment gains.
+    * **Inputs:**
+        * `Target_Savings_Amount` (Currency)
+        * `Current_Savings_Balance` (Currency)
+        * `Annual_Contribution` (Currency)
+        * `Expected_Annual_Return_Rate` (Percentage)
+        * `Effective_Annual_Tax_Rate_on_Gains` (Percentage)
+    * **Calculations:**
+        * `After_Tax_Return_Rate = Expected_Annual_Return_Rate * (1 - Effective_Annual_Tax_Rate_on_Gains / 100)`
+        * *Use iterative or financial function to solve for NPER.*
+    * **Outputs:**
+        * `Estimated_Years_to_Reach_Goal_After_Taxes` (Years)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTimeToSaveGoalTaxAdjusted():
+            Target_Savings_Amount = GET_INPUT("Target_Savings_Amount")
+            Current_Savings_Balance = GET_INPUT("Current_Savings_Balance")
+            Annual_Contribution = GET_INPUT("Annual_Contribution")
+            Expected_Annual_Return_Rate = GET_INPUT("Expected_Annual_Return_Rate") / 100
+            Effective_Annual_Tax_Rate_on_Gains = GET_INPUT("Effective_Annual_Tax_Rate_on_Gains") / 100
+
+            After_Tax_Return_Rate = Expected_Annual_Return_Rate * (1 - Effective_Annual_Tax_Rate_on_Gains)
+
+            Estimated_Years_to_Reach_Goal = 0
+            IF Annual_Contribution + (Current_Savings_Balance * After_Tax_Return_Rate) <= 0 AND Current_Savings_Balance < Target_Savings_Amount THEN
+                DISPLAY_OUTPUT("Estimated_Years_to_Reach_Goal_After_Taxes", "Cannot reach goal with current contributions/rate.")
+                RETURN
+            END IF
+
+            // Use NPER financial function (Number of periods)
+            // NPER(rate, pmt, pv, [fv], [type])
+            Estimated_Years_to_Reach_Goal = CALCULATE_NPER(After_Tax_Return_Rate, Annual_Contribution, Current_Savings_Balance, -Target_Savings_Amount)
+
+            DISPLAY_OUTPUT("Estimated_Years_to_Reach_Goal_After_Taxes", CEILING(Estimated_Years_to_Reach_Goal))
+        END FUNCTION
+        ```
+
+549.  **Savings Rate Impact on Financial Independence**
+    * **Purpose:** Illustrate how a higher personal savings rate dramatically reduces the time to reach financial independence.
+    * **Inputs:**
+        * `Current_Annual_Expenses` (Currency)
+        * `Annual_Savings_Rate_Percentage_Scenario1` (Percentage)
+        * `Annual_Savings_Rate_Percentage_Scenario2` (Percentage)
+        * `Expected_Annual_Investment_Return` (Percentage)
+        * `Safe_Withdrawal_Rate` (Percentage - e.g., 4%)
+    * **Calculations:**
+        * `Total_Income = Current_Annual_Expenses / (1 - Annual_Savings_Rate_Percentage_Scenario1 / 100)`
+        * `Annual_Savings = Total_Income * (Annual_Savings_Rate_Percentage_Scenario1 / 100)`
+        * `FI_Number = Current_Annual_Expenses / (Safe_Withdrawal_Rate / 100)`
+        * `Years_to_FI_Scenario1 = Years_to_Reach_Goal(0, Annual_Savings, FI_Number, Expected_Annual_Investment_Return)` (Re-use calc 548)
+        * `Years_to_FI_Scenario2 = Years_to_Reach_Goal(0, Annual_Savings_Scenario2, FI_Number, Expected_Annual_Investment_Return)`
+    * **Outputs:**
+        * `FI_Number_Required` (Currency)
+        * `Years_to_FI_Scenario1` (Years)
+        * `Years_to_FI_Scenario2` (Years)
+        * `Comparison_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSavingsRateImpactOnFI():
+            Current_Annual_Expenses = GET_INPUT("Current_Annual_Expenses")
+            Annual_Savings_Rate_Percentage_Scenario1 = GET_INPUT("Annual_Savings_Rate_Percentage_Scenario1") / 100
+            Annual_Savings_Rate_Percentage_Scenario2 = GET_INPUT("Annual_Savings_Rate_Percentage_Scenario2") / 100
+            Expected_Annual_Investment_Return = GET_INPUT("Expected_Annual_Investment_Return") / 100
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+
+            IF Safe_Withdrawal_Rate <= 0 THEN
+                DISPLAY_OUTPUT("FI_Number_Required", "N/A - Safe Withdrawal Rate must be positive.")
+                RETURN
+            END IF
+
+            FI_Number_Required = Current_Annual_Expenses / Safe_Withdrawal_Rate
+
+            // Calculate annual income based on expenses and savings rate for Scenario 1
+            Annual_Income_Scenario1 = Current_Annual_Expenses / (1 - Annual_Savings_Rate_Percentage_Scenario1)
+            Annual_Savings_Scenario1 = Annual_Income_Scenario1 * Annual_Savings_Rate_Percentage_Scenario1
+            
+            // Calculate annual income based on expenses and savings rate for Scenario 2
+            Annual_Income_Scenario2 = Current_Annual_Expenses / (1 - Annual_Savings_Rate_Percentage_Scenario2)
+            Annual_Savings_Scenario2 = Annual_Income_Scenario2 * Annual_Savings_Rate_Percentage_Scenario2
+
+            // Use the NPER function from 548, assuming Current_Savings_Balance = 0 for simplicity here
+            Years_to_FI_Scenario1 = CALCULATE_NPER(Expected_Annual_Investment_Return, Annual_Savings_Scenario1, 0, -FI_Number_Required)
+            Years_to_FI_Scenario2 = CALCULATE_NPER(Expected_Annual_Investment_Return, Annual_Savings_Scenario2, 0, -FI_Number_Required)
+
+            Comparison_Note = "A higher savings rate significantly reduces the time required to reach Financial Independence, demonstrating the power of prioritizing savings."
+
+            DISPLAY_OUTPUT("FI_Number_Required", FI_Number_Required)
+            DISPLAY_OUTPUT("Years_to_FI_Scenario1", CEILING(Years_to_FI_Scenario1))
+            DISPLAY_OUTPUT("Years_to_FI_Scenario2", CEILING(Years_to_FI_Scenario2))
+            DISPLAY_OUTPUT("Comparison_Note", Comparison_Note)
+        END FUNCTION
+        ```
+
+550. **Retirement Savings Withdrawal Rate (Inverse of 4% Rule)**
+    * **Purpose:** Determine the sustainable withdrawal rate from a retirement portfolio given specific parameters, or show how portfolio size affects it.
+    * **Inputs:**
+        * `Retirement_Portfolio_Value` (Currency)
+        * `Desired_Annual_Withdrawal` (Currency)
+        * `Expected_Portfolio_Growth_Rate` (Percentage)
+        * `Expected_Inflation_Rate` (Percentage)
+    * **Calculations:**
+        * `Real_Growth_Rate = ((1 + Expected_Portfolio_Growth_Rate / 100) / (1 + Expected_Inflation_Rate / 100)) - 1`
+        * `Withdrawal_Rate = (Desired_Annual_Withdrawal / Retirement_Portfolio_Value) * 100`
+        * `Sustainability_Check = IF Withdrawal_Rate <= 4 THEN "Potentially Sustainable" ELSE "High Risk"`
+    * **Outputs:**
+        * `Calculated_Withdrawal_Rate` (Percentage)
+        * `Sustainability_Assessment` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateRetirementWithdrawalRate():
+            Retirement_Portfolio_Value = GET_INPUT("Retirement_Portfolio_Value")
+            Desired_Annual_Withdrawal = GET_INPUT("Desired_Annual_Withdrawal")
+            Expected_Portfolio_Growth_Rate = GET_INPUT("Expected_Portfolio_Growth_Rate")
+            Expected_Inflation_Rate = GET_INPUT("Expected_Inflation_Rate")
+
+            IF Retirement_Portfolio_Value <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Withdrawal_Rate", "N/A")
+                DISPLAY_OUTPUT("Sustainability_Assessment", "Portfolio value must be positive.")
+                RETURN
+            END IF
+
+            Withdrawal_Rate = (Desired_Annual_Withdrawal / Retirement_Portfolio_Value) * 100
+
+            Sustainability_Assessment = ""
+            IF Withdrawal_Rate <= 4 THEN // Common 4% rule guideline
+                Sustainability_Assessment = "Potentially Sustainable (Within common safe withdrawal rate guidelines)"
+            ELSE IF Withdrawal_Rate <= 5 THEN
+                Sustainability_Assessment = "Moderate Risk (Higher than ideal withdrawal rate)"
+            ELSE
+                Sustainability_Assessment = "High Risk (Likely to deplete portfolio faster)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Withdrawal_Rate", Withdrawal_Rate)
+            DISPLAY_OUTPUT("Sustainability_Assessment", Sustainability_Assessment)
+        END FUNCTION
+        ```
+
+551. **Retirement Income Gap Calculator**
+    * **Purpose:** Identify the shortfall between projected retirement income and desired retirement expenses.
+    * **Inputs:**
+        * `Desired_Annual_Retirement_Expenses` (Currency - adjusted for inflation)
+        * `Projected_Social_Security_Annual` (Currency)
+        * `Projected_Pension_Annual` (Currency)
+        * `Other_Guaranteed_Income_Annual` (Currency)
+        * `Retirement_Portfolio_Value` (Currency)
+        * `Safe_Withdrawal_Rate` (Percentage)
+    * **Calculations:**
+        * `Income_from_Portfolio = Retirement_Portfolio_Value * (Safe_Withdrawal_Rate / 100)`
+        * `Total_Projected_Income = Projected_Social_Security_Annual + Projected_Pension_Annual + Other_Guaranteed_Income_Annual + Income_from_Portfolio`
+        * `Income_Gap = Desired_Annual_Retirement_Expenses - Total_Projected_Income`
+    * **Outputs:**
+        * `Total_Projected_Retirement_Income` (Currency)
+        * `Estimated_Retirement_Income_Gap` (Currency)
+        * `Actions_to_Address_Gap` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateRetirementIncomeGap():
+            Desired_Annual_Retirement_Expenses = GET_INPUT("Desired_Annual_Retirement_Expenses")
+            Projected_Social_Security_Annual = GET_INPUT("Projected_Social_Security_Annual")
+            Projected_Pension_Annual = GET_INPUT("Projected_Pension_Annual")
+            Other_Guaranteed_Income_Annual = GET_INPUT("Other_Guaranteed_Income_Annual")
+            Retirement_Portfolio_Value = GET_INPUT("Retirement_Portfolio_Value")
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+
+            Income_from_Portfolio = Retirement_Portfolio_Value * Safe_Withdrawal_Rate
+            Total_Projected_Income = Projected_Social_Security_Annual + Projected_Pension_Annual + \
+                                     Other_Guaranteed_Income_Annual + Income_from_Portfolio
+            
+            Income_Gap = Desired_Annual_Retirement_Expenses - Total_Projected_Income
+
+            Actions_to_Address_Gap = ""
+            IF Income_Gap > 0 THEN
+                Actions_to_Address_Gap = "You have an income gap. Consider: increasing savings, working longer, reducing retirement expenses, or optimizing investments."
+            ELSE
+                Actions_to_Address_Gap = "Your projected income covers your expenses, good job!"
+            END IF
+
+            DISPLAY_OUTPUT("Total_Projected_Retirement_Income", Total_Projected_Income)
+            DISPLAY_OUTPUT("Estimated_Retirement_Income_Gap", Income_Gap)
+            DISPLAY_OUTPUT("Actions_to_Address_Gap", Actions_to_Address_Gap)
+        END FUNCTION
+        ```
+
+552. **Early Retirement Age Projector**
+    * **Purpose:** Estimate the earliest age a person can retire based on current savings, annual expenses, and savings rate.
+    * **Inputs:**
+        * `Current_Age` (Years)
+        * `Current_Savings` (Currency)
+        * `Current_Annual_Expenses` (Currency)
+        * `Annual_Savings_Contribution` (Currency)
+        * `Expected_Annual_Investment_Return` (Percentage)
+        * `Safe_Withdrawal_Rate` (Percentage)
+    * **Calculations:**
+        * `FI_Number = Current_Annual_Expenses / (Safe_Withdrawal_Rate / 100)`
+        * `Years_to_FI = Time_to_Reach_Goal(Current_Savings, Annual_Savings_Contribution, FI_Number, Expected_Annual_Investment_Return)` (Re-use calc 548)
+        * `Estimated_Retirement_Age = Current_Age + Years_to_FI`
+    * **Outputs:**
+        * `Calculated_FI_Number` (Currency)
+        * `Estimated_Years_to_Financial_Independence` (Years)
+        * `Projected_Early_Retirement_Age` (Years)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ProjectEarlyRetirementAge():
+            Current_Age = GET_INPUT("Current_Age")
+            Current_Savings = GET_INPUT("Current_Savings")
+            Current_Annual_Expenses = GET_INPUT("Current_Annual_Expenses")
+            Annual_Savings_Contribution = GET_INPUT("Annual_Savings_Contribution")
+            Expected_Annual_Investment_Return = GET_INPUT("Expected_Annual_Investment_Return") / 100
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+
+            IF Safe_Withdrawal_Rate <= 0 OR Current_Annual_Expenses <= 0 THEN
+                DISPLAY_OUTPUT("Projected_Early_Retirement_Age", "N/A - Invalid inputs for FI number.")
+                RETURN
+            END IF
+
+            FI_Number = Current_Annual_Expenses / Safe_Withdrawal_Rate
+
+            // Use NPER financial function to calculate years to reach FI number
+            Estimated_Years_to_Financial_Independence = CALCULATE_NPER(
+                Expected_Annual_Investment_Return,
+                Annual_Savings_Contribution,
+                Current_Savings,
+                -FI_Number
+            )
+            Estimated_Years_to_Financial_Independence = MAX(0, Estimated_Years_to_Financial_Independence) // Cannot be negative years
+
+            Projected_Early_Retirement_Age = Current_Age + Estimated_Years_to_Financial_Independence
+
+            DISPLAY_OUTPUT("Calculated_FI_Number", FI_Number)
+            DISPLAY_OUTPUT("Estimated_Years_to_Financial_Independence", CEILING(Estimated_Years_to_Financial_Independence))
+            DISPLAY_OUTPUT("Projected_Early_Retirement_Age", FLOOR(Projected_Early_Retirement_Age))
+        END FUNCTION
+        ```
+
+553. **Social Security Benefit Estimator (Basic)**
+    * **Purpose:** Provide a simplified estimate of future Social Security benefits based on earnings history and retirement age.
+    * **Inputs:**
+        * `Average_Indexed_Monthly_Earnings_AIME` (Currency - from SS statement or estimated)
+        * `Full_Retirement_Age_FRA` (Years - based on birth year)
+        * `Claiming_Age` (Years - between 62 and 70)
+        * `Primary_Insurance_Amount_PIA_Formulas` (Table: AIME bands, percentages) - *pre-defined by SS Administration*
+    * **Calculations:**
+        * `PIA = CALCULATE_PIA(AIME, PIA_Formulas)`
+        * `Adjustment_Factor = 0`
+        * `IF Claiming_Age < FRA THEN Adjustment_Factor = (FRA - Claiming_Age) * Reduction_Factor_Per_Month`
+        * `ELSE IF Claiming_Age > FRA THEN Adjustment_Factor = (Claiming_Age - FRA) * Increase_Factor_Per_Month`
+        * `Estimated_Monthly_Benefit = PIA * (1 + Adjustment_Factor)`
+    * **Outputs:**
+        * `Estimated_Primary_Insurance_Amount_PIA` (Currency)
+        * `Projected_Monthly_Benefit_at_Claiming_Age` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateSocialSecurityBenefit():
+            Average_Indexed_Monthly_Earnings_AIME = GET_INPUT("Average_Indexed_Monthly_Earnings_AIME")
+            Full_Retirement_Age_FRA = GET_INPUT("Full_Retirement_Age_FRA")
+            Claiming_Age = GET_INPUT("Claiming_Age")
+
+            // Pre-defined PIA bend points and percentages (example values, subject to change)
+            PIA_BEND_POINTS = GET_PIA_BEND_POINTS() // e.g., {First_Band: 0.90, Second_Band: 0.32, Third_Band: 0.15}
+            // Pre-defined adjustment factors for claiming early/late
+            EARLY_CLAIM_REDUCTION_PER_MONTH = 0.00555 // Approx 5/9 of 1% per month for first 36 months
+            LATE_CLAIM_INCREASE_PER_MONTH = 0.00666 // Approx 2/3 of 1% per month
+
+            PIA = 0
+            // Calculate PIA based on AIME and bend points (simplified)
+            IF Average_Indexed_Monthly_Earnings_AIME <= 1174 THEN // First bend point
+                PIA = Average_Indexed_Monthly_Earnings_AIME * PIA_BEND_POINTS.First_Band
+            ELSE IF Average_Indexed_Monthly_Earnings_AIME <= 7078 THEN // Second bend point
+                PIA = (1174 * PIA_BEND_POINTS.First_Band) + \
+                      ((Average_Indexed_Monthly_Earnings_AIME - 1174) * PIA_BEND_POINTS.Second_Band)
+            ELSE // Third bend point
+                PIA = (1174 * PIA_BEND_POINTS.First_Band) + \
+                      ((7078 - 1174) * PIA_BEND_POINTS.Second_Band) + \
+                      ((Average_Indexed_Monthly_Earnings_AIME - 7078) * PIA_BEND_POINTS.Third_Band)
+            END IF
+
+            Adjustment_Factor = 0
+            IF Claiming_Age < Full_Retirement_Age_FRA THEN
+                Months_Early = (Full_Retirement_Age_FRA - Claiming_Age) * 12
+                Adjustment_Factor = Months_Early * EARLY_CLAIM_REDUCTION_PER_MONTH
+            ELSE IF Claiming_Age > Full_Retirement_Age_FRA THEN
+                Months_Late = (Claiming_Age - Full_Retirement_Age_FRA) * 12
+                Adjustment_Factor = -Months_Late * LATE_CLAIM_INCREASE_PER_MONTH // Negative adjustment means increase
+            END IF
+
+            Projected_Monthly_Benefit = PIA * (1 - Adjustment_Factor) // If Adjustment_Factor is positive for reduction, negative for increase
+
+            DISPLAY_OUTPUT("Estimated_Primary_Insurance_Amount_PIA", PIA)
+            DISPLAY_OUTPUT("Projected_Monthly_Benefit_at_Claiming_Age", Projected_Monthly_Benefit)
+        END FUNCTION
+        ```
+
+554. **Retirement Health Care Cost Estimator**
+    * **Purpose:** Estimate the total out-of-pocket healthcare expenses in retirement, a significant and often overlooked cost.
+    * **Inputs:**
+        * `Current_Annual_Healthcare_Cost_Retirement` (Currency - estimated starting point)
+        * `Retirement_Age` (Years)
+        * `Life_Expectancy_Age` (Years)
+        * `Healthcare_Inflation_Rate` (Percentage)
+        * `Medicare_Coverage_Percentage` (Percentage - how much Medicare covers)
+    * **Calculations:**
+        * `Years_in_Retirement = Life_Expectancy_Age - Retirement_Age`
+        * `Total_Cost = 0`
+        * `FOR i FROM 1 TO Years_in_Retirement:`
+            * `Annual_Cost_Year_i = Current_Annual_Healthcare_Cost_Retirement * (1 + Healthcare_Inflation_Rate / 100)^(i-1)`
+            * `Out_of_Pocket_Cost_Year_i = Annual_Cost_Year_i * (1 - Medicare_Coverage_Percentage / 100)`
+            * `Total_Cost = Total_Cost + Out_of_Pocket_Cost_Year_i`
+    * **Outputs:**
+        * `Estimated_Total_Out_of_Pocket_Healthcare_Costs_in_Retirement` (Currency)
+        * `Annual_Cost_Projection_Table` (Table: Year, Out-of-Pocket Cost)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateRetirementHealthcareCost():
+            Current_Annual_Healthcare_Cost_Retirement = GET_INPUT("Current_Annual_Healthcare_Cost_Retirement")
+            Retirement_Age = GET_INPUT("Retirement_Age")
+            Life_Expectancy_Age = GET_INPUT("Life_Expectancy_Age")
+            Healthcare_Inflation_Rate = GET_INPUT("Healthcare_Inflation_Rate") / 100
+            Medicare_Coverage_Percentage = GET_INPUT("Medicare_Coverage_Percentage") / 100
+
+            Years_in_Retirement = Life_Expectancy_Age - Retirement_Age
+            Estimated_Total_Out_of_Pocket_Healthcare_Costs = 0
+            Annual_Cost_Projection_Table = []
+
+            FOR i FROM 0 TO Years_in_Retirement - 1:
+                Annual_Cost_Year_i = Current_Annual_Healthcare_Cost_Retirement * POWER((1 + Healthcare_Inflation_Rate), i)
+                Out_of_Pocket_Cost_Year_i = Annual_Cost_Year_i * (1 - Medicare_Coverage_Percentage)
+                Estimated_Total_Out_of_Pocket_Healthcare_Costs = Estimated_Total_Out_of_Pocket_Healthcare_Costs + Out_of_Pocket_Cost_Year_i
+                Annual_Cost_Projection_Table.ADD({Year_From_Retirement: i + 1, Out_of_Pocket_Cost: Out_of_Pocket_Cost_Year_i})
+            END FOR
+
+            DISPLAY_OUTPUT("Estimated_Total_Out_of_Pocket_Healthcare_Costs_in_Retirement", Estimated_Total_Out_of_Pocket_Healthcare_Costs)
+            DISPLAY_OUTPUT("Annual_Cost_Projection_Table", Annual_Cost_Projection_Table)
+        END FUNCTION
+        ```
+
+555. **Sequence of Returns Risk Illustrator (Conceptual)**
+    * **Purpose:** Demonstrate how the order of investment returns (sequence) can significantly impact portfolio longevity, especially in early retirement.
+    * **Inputs:**
+        * `Initial_Portfolio_Value` (Currency)
+        * `Annual_Withdrawal_Amount` (Currency)
+        * `Scenario_1_Returns_Years` (List of Percentage - e.g., [10%, -5%, 15%])
+        * `Scenario_2_Returns_Years` (List of Percentage - same returns, different order)
+    * **Calculations:**
+        * *Simulate portfolio value year by year for each scenario, applying returns and withdrawals.*
+        * `FOR EACH Year_Return IN Scenario_1_Returns_Years:`
+            * `Portfolio_Value = (Portfolio_Value * (1 + Year_Return / 100)) - Annual_Withdrawal_Amount`
+    * **Outputs:**
+        * `Portfolio_Value_Timeline_Scenario1` (Table: Year, Portfolio Value)
+        * `Portfolio_Value_Timeline_Scenario2` (Table: Year, Portfolio Value)
+        * `Key_Insight_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION IllustrateSequenceOfReturnsRisk():
+            Initial_Portfolio_Value = GET_INPUT("Initial_Portfolio_Value")
+            Annual_Withdrawal_Amount = GET_INPUT("Annual_Withdrawal_Amount")
+            Scenario_1_Returns_Years = GET_INPUT("Scenario_1_Returns_Years") // e.g., [0.10, -0.05, 0.15]
+            Scenario_2_Returns_Years = GET_INPUT("Scenario_2_Returns_Years") // e.g., [0.15, -0.05, 0.10] - same values, different order
+
+            Portfolio_Value_Scenario1 = Initial_Portfolio_Value
+            Portfolio_Timeline_Scenario1 = [{Year: 0, Value: Initial_Portfolio_Value}]
+
+            Portfolio_Value_Scenario2 = Initial_Portfolio_Value
+            Portfolio_Timeline_Scenario2 = [{Year: 0, Value: Initial_Portfolio_Value}]
+
+            FOR i FROM 0 TO LENGTH(Scenario_1_Returns_Years) - 1:
+                // Scenario 1
+                Portfolio_Value_Scenario1 = (Portfolio_Value_Scenario1 * (1 + Scenario_1_Returns_Years[i])) - Annual_Withdrawal_Amount
+                Portfolio_Timeline_Scenario1.ADD({Year: i + 1, Value: MAX(0, Portfolio_Value_Scenario1)})
+                
+                // Scenario 2
+                Portfolio_Value_Scenario2 = (Portfolio_Value_Scenario2 * (1 + Scenario_2_Returns_Years[i])) - Annual_Withdrawal_Amount
+                Portfolio_Timeline_Scenario2.ADD({Year: i + 1, Value: MAX(0, Portfolio_Value_Scenario2)})
+            END FOR
+
+            Key_Insight_Note = "The order of returns, especially in early retirement, can drastically impact portfolio longevity. Poor returns early on (Sequence of Returns Risk) can cause premature depletion, even if average returns are good."
+
+            DISPLAY_OUTPUT("Portfolio_Value_Timeline_Scenario1", Portfolio_Timeline_Scenario1)
+            DISPLAY_OUTPUT("Portfolio_Value_Timeline_Scenario2", Portfolio_Timeline_Scenario2)
+            DISPLAY_OUTPUT("Key_Insight_Note", Key_Insight_Note)
+        END FUNCTION
+        ```
+
+556. **Life Insurance Needs Calculator (Income Replacement)**
+    * **Purpose:** Determine the amount of life insurance needed to replace a deceased earner's income for a specified period.
+    * **Inputs:**
+        * `Annual_Income_to_Replace` (Currency)
+        * `Years_of_Income_Replacement` (Years)
+        * `Expected_Inflation_Rate` (Percentage)
+        * `Expected_Investment_Return_on_Payout` (Percentage)
+        * `Existing_Savings_Available_for_Support` (Currency)
+        * `Existing_Life_Insurance_Coverage` (Currency)
+    * **Calculations:**
+        * `Real_Return_Rate = ((1 + Expected_Investment_Return_on_Payout / 100) / (1 + Expected_Inflation_Rate / 100)) - 1`
+        * `PV_of_Income_Stream = Annual_Income_to_Replace * ((1 - (1 + Real_Return_Rate)^-Years_of_Income_Replacement) / Real_Return_Rate)`
+        * `Total_Need = PV_of_Income_Stream`
+        * `Net_Insurance_Needed = MAX(0, Total_Need - Existing_Savings_Available_for_Support - Existing_Life_Insurance_Coverage)`
+    * **Outputs:**
+        * `Estimated_Total_Income_Replacement_Need` (Currency)
+        * `Recommended_Life_Insurance_Coverage` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLifeInsuranceIncomeReplacement():
+            Annual_Income_to_Replace = GET_INPUT("Annual_Income_to_Replace")
+            Years_of_Income_Replacement = GET_INPUT("Years_of_Income_Replacement")
+            Expected_Inflation_Rate = GET_INPUT("Expected_Inflation_Rate") / 100
+            Expected_Investment_Return_on_Payout = GET_INPUT("Expected_Investment_Return_on_Payout") / 100
+            Existing_Savings_Available_for_Support = GET_INPUT("Existing_Savings_Available_for_Support")
+            Existing_Life_Insurance_Coverage = GET_INPUT("Existing_Life_Insurance_Coverage")
+
+            Real_Return_Rate = ((1 + Expected_Investment_Return_on_Payout) / (1 + Expected_Inflation_Rate)) - 1
+
+            PV_of_Income_Stream = 0
+            IF Real_Return_Rate = 0 THEN
+                PV_of_Income_Stream = Annual_Income_to_Replace * Years_of_Income_Replacement
+            ELSE
+                PV_of_Income_Stream = Annual_Income_to_Replace * ((1 - POWER((1 + Real_Return_Rate), -Years_of_Income_Replacement)) / Real_Return_Rate)
+            END IF
+            
+            Total_Income_Replacement_Need = PV_of_Income_Stream
+
+            Recommended_Life_Insurance_Coverage = MAX(0, Total_Income_Replacement_Need - Existing_Savings_Available_for_Support - Existing_Life_Insurance_Coverage)
+
+            DISPLAY_OUTPUT("Estimated_Total_Income_Replacement_Need", Total_Income_Replacement_Need)
+            DISPLAY_OUTPUT("Recommended_Life_Insurance_Coverage", Recommended_Life_Insurance_Coverage)
+        END FUNCTION
+        ```
+
+557. **Disability Insurance Needs Calculator**
+    * **Purpose:** Determine the amount of disability insurance needed to cover expenses if unable to work due to disability.
+    * **Inputs:**
+        * `Current_Monthly_Income` (Currency)
+        * `Percentage_of_Income_Replaced_by_Policy` (Percentage - e.g., 60-70%)
+        * `Monthly_Expenses_to_Cover` (Currency)
+        * `Existing_Disability_Coverage` (Currency - from employer or other policies)
+        * `Other_Monthly_Income_During_Disability` (Currency)
+    * **Calculations:**
+        * `Gross_Income_Needed = Monthly_Expenses_to_Cover`
+        * `Policy_Payout_Amount_Needed = Gross_Income_Needed / (Percentage_of_Income_Replaced_by_Policy / 100)`
+        * `Net_Disability_Insurance_Needed = MAX(0, Policy_Payout_Amount_Needed - Existing_Disability_Coverage - Other_Monthly_Income_During_Disability)`
+    * **Outputs:**
+        * `Recommended_Monthly_Disability_Coverage` (Currency)
+        * `Net_Additional_Coverage_Needed` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDisabilityInsuranceNeeds():
+            Current_Monthly_Income = GET_INPUT("Current_Monthly_Income") // For context, not direct calculation
+            Percentage_of_Income_Replaced_by_Policy = GET_INPUT("Percentage_of_Income_Replaced_by_Policy") / 100
+            Monthly_Expenses_to_Cover = GET_INPUT("Monthly_Expenses_to_Cover")
+            Existing_Disability_Coverage = GET_INPUT("Existing_Disability_Coverage")
+            Other_Monthly_Income_During_Disability = GET_INPUT("Other_Monthly_Income_During_Disability")
+
+            Policy_Payout_Amount_Needed = 0
+            IF Percentage_of_Income_Replaced_by_Policy > 0 THEN
+                Policy_Payout_Amount_Needed = Monthly_Expenses_to_Cover / Percentage_of_Income_Replaced_by_Policy
+            ELSE
+                DISPLAY_OUTPUT("Recommended_Monthly_Disability_Coverage", "N/A - Policy percentage must be positive.")
+                RETURN
+            END IF
+
+            Net_Additional_Coverage_Needed = MAX(0, Policy_Payout_Amount_Needed - Existing_Disability_Coverage - Other_Monthly_Income_During_Disability)
+
+            DISPLAY_OUTPUT("Recommended_Monthly_Disability_Coverage", Policy_Payout_Amount_Needed)
+            DISPLAY_OUTPUT("Net_Additional_Coverage_Needed", Net_Additional_Coverage_Needed)
+        END FUNCTION
+        ```
+
+558. **Long-Term Care (LTC) Insurance Cost/Benefit (Conceptual)**
+    * **Purpose:** Explain the financial considerations of LTC insurance, contrasting premiums with potential future care costs.
+    * **Inputs:**
+        * `Average_Daily_LTC_Cost` (Currency)
+        * `Number_of_Years_LTC_Needed` (Years - hypothetical)
+        * `Annual_LTC_Insurance_Premium` (Currency)
+        * `Benefit_Period_Years` (Years - policy coverage)
+        * `Daily_Benefit_Amount` (Currency - policy payout)
+    * **Calculations:**
+        * `Total_Potential_LTC_Cost = Average_Daily_LTC_Cost * 365 * Number_of_Years_LTC_Needed`
+        * `Total_Premiums_Paid_to_Death = Annual_LTC_Insurance_Premium * Life_Expectancy_Years_from_Purchase` (Need Purchase Age, Life Expectancy)
+        * `Total_Benefit_Received = Daily_Benefit_Amount * 365 * Benefit_Period_Years`
+        * `Net_Value = Total_Benefit_Received - Total_Premiums_Paid_to_Death` (Simplified, doesn't account for time value of money, or probability of needing care)
+    * **Outputs:**
+        * `Estimated_Total_LTC_Costs_Without_Insurance` (Currency)
+        * `Estimated_Total_Premiums_Paid_If_Purchased` (Currency)
+        * `Conceptual_Net_Benefit_if_Needed` (Currency)
+        * `Considerations_Summary` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLTCInsuranceCostBenefit():
+            Average_Daily_LTC_Cost = GET_INPUT("Average_Daily_LTC_Cost")
+            Number_of_Years_LTC_Needed = GET_INPUT("Number_of_Years_LTC_Needed")
+            Annual_LTC_Insurance_Premium = GET_INPUT("Annual_LTC_Insurance_Premium")
+            Benefit_Period_Years = GET_INPUT("Benefit_Period_Years")
+            Daily_Benefit_Amount = GET_INPUT("Daily_Benefit_Amount")
+            Purchase_Age = GET_INPUT("Purchase_Age")
+            Life_Expectancy_Age = GET_INPUT("Life_Expectancy_Age")
+
+            Estimated_Total_LTC_Costs_Without_Insurance = Average_Daily_LTC_Cost * 365 * Number_of_Years_LTC_Needed
+            Total_Premiums_Paid_If_Purchased = Annual_LTC_Insurance_Premium * (Life_Expectancy_Age - Purchase_Age)
+
+            Total_Benefit_Received_From_Policy = Daily_Benefit_Amount * 365 * Benefit_Period_Years
+            Conceptual_Net_Benefit_if_Needed = Total_Benefit_Received_From_From_Policy - Total_Premiums_Paid_If_Purchased
+
+            Considerations_Summary = "LTC insurance helps cover costs of long-term care (nursing home, home health, assisted living) not covered by Medicare. It involves balancing premiums with potential future costs. Factors include age at purchase, health status, and benefit period. Risk of not needing care vs. catastrophic costs if needed."
+
+            DISPLAY_OUTPUT("Estimated_Total_LTC_Costs_Without_Insurance", Estimated_Total_LTC_Costs_Without_Insurance)
+            DISPLAY_OUTPUT("Estimated_Total_Premiums_Paid_If_Purchased", Total_Premiums_Paid_If_Purchased)
+            DISPLAY_OUTPUT("Conceptual_Net_Benefit_if_Needed", Conceptual_Net_Benefit_if_Needed)
+            DISPLAY_OUTPUT("Considerations_Summary", Considerations_Summary)
+        END FUNCTION
+        ```
+
+559. **Homeowner's/Renter's Insurance Coverage Needs**
+    * **Purpose:** Help users determine appropriate coverage amounts for homeowners or renters insurance.
+    * **Inputs:**
+        * `Home_Reconstruction_Cost` (Currency - for dwelling coverage)
+        * `Personal_Property_Value` (Currency)
+        * `Liability_Coverage_Desired` (Currency)
+        * `Deductible_Amount` (Currency)
+        * `Current_Renters_Coverage_Amount` (Currency)
+    * **Calculations:**
+        * `Recommended_Dwelling_Coverage = Home_Reconstruction_Cost`
+        * `Recommended_Personal_Property_Coverage = Personal_Property_Value`
+        * `Recommended_Liability_Coverage = MAX(300000, Liability_Coverage_Desired)` (Common minimum)
+        * *No direct output for "cost" but implies higher coverage = higher premium.*
+    * **Outputs:**
+        * `Recommended_Dwelling_Coverage` (Currency)
+        * `Recommended_Personal_Property_Coverage` (Currency)
+        * `Recommended_Liability_Coverage` (Currency)
+        * `Deductible_Impact_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateHomeRentersInsuranceNeeds():
+            Home_Reconstruction_Cost = GET_INPUT("Home_Reconstruction_Cost")
+            Personal_Property_Value = GET_INPUT("Personal_Property_Value")
+            Liability_Coverage_Desired = GET_INPUT("Liability_Coverage_Desired")
+            Deductible_Amount = GET_INPUT("Deductible_Amount")
+
+            Recommended_Dwelling_Coverage = Home_Reconstruction_Cost
+            Recommended_Personal_Property_Coverage = Personal_Property_Value
+            Recommended_Liability_Coverage = MAX(300000, Liability_Coverage_Desired) // Common minimum recommendation
+
+            Deductible_Impact_Note = "A higher deductible typically results in lower premiums but means you pay more out-of-pocket for covered claims before insurance kicks in."
+
+            DISPLAY_OUTPUT("Recommended_Dwelling_Coverage", Recommended_Dwelling_Coverage)
+            DISPLAY_OUTPUT("Recommended_Personal_Property_Coverage", Recommended_Personal_Property_Coverage)
+            DISPLAY_OUTPUT("Recommended_Liability_Coverage", Recommended_Liability_Coverage)
+            DISPLAY_OUTPUT("Deductible_Impact_Note", Deductible_Impact_Note)
+        END FUNCTION
+        ```
+
+560. **Auto Insurance Premium Impact (Driving Record/Vehicle Type)**
+    * **Purpose:** Illustrate how driving record and vehicle characteristics can influence auto insurance premiums.
+    * **Inputs:**
+        * `Base_Annual_Premium_Estimate` (Currency)
+        * `Number_of_At_Fault_Accidents_Past_3_Years` (Number)
+        * `Number_of_Moving_Violations_Past_3_Years` (Number)
+        * `Vehicle_Safety_Rating_Impact` (Percentage - e.g., -5% for high safety)
+        * `Vehicle_Theft_Risk_Impact` (Percentage - e.g., +10% for high risk model)
+        * `Accident_Surcharge_Per_Accident` (Percentage - e.g., +20% for 1st accident)
+        * `Violation_Surcharge_Per_Violation` (Percentage - e.g., +10% for 1st violation)
+    * **Calculations:**
+        * `Accident_Surcharge = Base_Annual_Premium_Estimate * (Number_of_At_Fault_Accidents_Past_3_Years * Accident_Surcharge_Per_Accident / 100)`
+        * `Violation_Surcharge = Base_Annual_Premium_Estimate * (Number_of_Moving_Violations_Past_3_Years * Violation_Surcharge_Per_Violation / 100)`
+        * `Vehicle_Adjustment = Base_Annual_Premium_Estimate * (Vehicle_Safety_Rating_Impact / 100 + Vehicle_Theft_Risk_Impact / 100)`
+        * `Estimated_Adjusted_Premium = Base_Annual_Premium_Estimate + Accident_Surcharge + Violation_Surcharge + Vehicle_Adjustment`
+    * **Outputs:**
+        * `Estimated_Adjusted_Annual_Premium` (Currency)
+        * `Impact_Breakdown` (Table: Factor, Impact Amount)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAutoInsurancePremiumImpact():
+            Base_Annual_Premium_Estimate = GET_INPUT("Base_Annual_Premium_Estimate")
+            Number_of_At_Fault_Accidents_Past_3_Years = GET_INPUT("Number_of_At_Fault_Accidents_Past_3_Years")
+            Number_of_Moving_Violations_Past_3_Years = GET_INPUT("Number_of_Moving_Violations_Past_3_Years")
+            Vehicle_Safety_Rating_Impact = GET_INPUT("Vehicle_Safety_Rating_Impact") / 100 // Negative for discount
+            Vehicle_Theft_Risk_Impact = GET_INPUT("Vehicle_Theft_Risk_Impact") / 100 // Positive for surcharge
+            Accident_Surcharge_Per_Accident_Factor = GET_INPUT("Accident_Surcharge_Per_Accident_Factor") // e.g., 0.20
+            Violation_Surcharge_Per_Violation_Factor = GET_INPUT("Violation_Surcharge_Per_Violation_Factor") // e.g., 0.10
+
+            Accident_Surcharge_Amount = Base_Annual_Premium_Estimate * Number_of_At_Fault_Accidents_Past_3_Years * Accident_Surcharge_Per_Accident_Factor
+            Violation_Surcharge_Amount = Base_Annual_Premium_Estimate * Number_of_Moving_Violations_Past_3_Years * Violation_Surcharge_Per_Violation_Factor
+            Vehicle_Adjustment_Amount = Base_Annual_Premium_Estimate * (Vehicle_Safety_Rating_Impact + Vehicle_Theft_Risk_Impact)
+
+            Estimated_Adjusted_Annual_Premium = Base_Annual_Premium_Estimate + Accident_Surcharge_Amount + \
+                                                Violation_Surcharge_Amount + Vehicle_Adjustment_Amount
+
+            Impact_Breakdown = [
+                {Factor: "Base Premium", Amount: Base_Annual_Premium_Estimate},
+                {Factor: "Accident Surcharge", Amount: Accident_Surcharge_Amount},
+                {Factor: "Violation Surcharge", Amount: Violation_Surcharge_Amount},
+                {Factor: "Vehicle Adjustments", Amount: Vehicle_Adjustment_Amount}
+            ]
+
+            DISPLAY_OUTPUT("Estimated_Adjusted_Annual_Premium", Estimated_Adjusted_Annual_Premium)
+            DISPLAY_OUTPUT("Impact_Breakdown", Impact_Breakdown)
+        END FUNCTION
+        ```
+
+561. **Credit Card Interest vs. Rewards Calculator**
+    * **Purpose:** Help users decide if credit card rewards outweigh the interest paid, or vice versa.
+    * **Inputs:**
+        * `Average_Monthly_Spend_On_Card` (Currency)
+        * `Average_APR_On_Card` (Percentage)
+        * `Percentage_of_Balance_Carried` (Percentage - portion not paid off monthly)
+        * `Rewards_Rate_Percentage` (Percentage - e.g., 1.5% cash back)
+        * `Annual_Fee` (Currency)
+    * **Calculations:**
+        * `Monthly_Interest_Paid = (Average_Monthly_Spend_On_Card * Percentage_of_Balance_Carried / 100) * (Average_APR_On_Card / 100 / 12)`
+        * `Annual_Interest_Paid = Monthly_Interest_Paid * 12`
+        * `Annual_Rewards_Earned = Average_Monthly_Spend_On_Card * 12 * (Rewards_Rate_Percentage / 100)`
+        * `Net_Annual_Benefit_Cost = Annual_Rewards_Earned - Annual_Interest_Paid - Annual_Fee`
+    * **Outputs:**
+        * `Estimated_Annual_Interest_Paid` (Currency)
+        * `Estimated_Annual_Rewards_Earned` (Currency)
+        * `Net_Annual_Benefit_or_Cost_of_Card` (Currency)
+        * `Recommendation_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCreditCardInterestVsRewards():
+            Average_Monthly_Spend_On_Card = GET_INPUT("Average_Monthly_Spend_On_Card")
+            Average_APR_On_Card = GET_INPUT("Average_APR_On_Card") / 100
+            Percentage_of_Balance_Carried = GET_INPUT("Percentage_of_Balance_Carried") / 100
+            Rewards_Rate_Percentage = GET_INPUT("Rewards_Rate_Percentage") / 100
+            Annual_Fee = GET_INPUT("Annual_Fee")
+
+            Monthly_Interest_Paid = (Average_Monthly_Spend_On_Card * Percentage_of_Balance_Carried) * (Average_APR_On_Card / 12)
+            Annual_Interest_Paid = Monthly_Interest_Paid * 12
+
+            Annual_Rewards_Earned = Average_Monthly_Spend_On_Card * 12 * Rewards_Rate_Percentage
+            
+            Net_Annual_Benefit_Cost = Annual_Rewards_Earned - Annual_Interest_Paid - Annual_Fee
+
+            Recommendation_Note = ""
+            IF Net_Annual_Benefit_Cost > 0 THEN
+                Recommendation_Note = "The rewards likely outweigh the costs for you. Focus on always paying off your balance to maximize benefit."
+            ELSE
+                Recommendation_Note = "The costs (interest, fees) likely outweigh the rewards. Consider a card with no annual fee or lower APR, or prioritize paying off your balance in full each month."
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Annual_Interest_Paid", Annual_Interest_Paid)
+            DISPLAY_OUTPUT("Estimated_Annual_Rewards_Earned", Annual_Rewards_Earned)
+            DISPLAY_OUTPUT("Net_Annual_Benefit_or_Cost_of_Card", Net_Annual_Benefit_Cost)
+            DISPLAY_OUTPUT("Recommendation_Note", Recommendation_Note)
+        END FUNCTION
+        ```
+
+562. **Student Loan Income-Driven Repayment (IDR) Estimator (Basic)**
+    * **Purpose:** Estimate monthly payments and total costs under basic Income-Driven Repayment plans for federal student loans.
+    * **Inputs:**
+        * `Loan_Balance` (Currency)
+        * `Annual_Interest_Rate` (Percentage)
+        * `Adjusted_Gross_Income_AGI` (Currency)
+        * `Family_Size` (Number)
+        * `State_of_Residence` (Text - for poverty line data)
+        * `Poverty_Line_Data` (Table: `Family_Size`, `Poverty_Line_Amount`) - *pre-defined federal/state*
+        * `Income_Percentage_for_Payment` (Percentage - e.g., 10% for PAYE/REPAYE, 15% for IBR)
+        * `IDR_Plan_Type` (Text: "PAYE", "REPAYE", "IBR")
+    * **Calculations:**
+        * `Poverty_Line_Amount = LOOKUP_POVERTY_LINE(Family_Size, State_of_Residence, Poverty_Line_Data)`
+        * `Discretionary_Income = MAX(0, AGI - (Poverty_Line_Amount * 1.5))` (150% of poverty line)
+        * `Estimated_Monthly_Payment = (Discretionary_Income * (Income_Percentage_for_Payment / 100)) / 12`
+        * `Total_Payments_Over_Plan_Life = Estimated_Monthly_Payment * Plan_Max_Years_ * 12` (Need plan max years)
+    * **Outputs:**
+        * `Calculated_Discretionary_Income` (Currency)
+        * `Estimated_Monthly_IDR_Payment` (Currency)
+        * `Warning_on_Interest_Accrual` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateStudentLoanIDR():
+            Loan_Balance = GET_INPUT("Loan_Balance")
+            Annual_Interest_Rate = GET_INPUT("Annual_Interest_Rate") / 100
+            Adjusted_Gross_Income_AGI = GET_INPUT("Adjusted_Gross_Income_AGI")
+            Family_Size = GET_INPUT("Family_Size")
+            State_of_Residence = GET_INPUT("State_of_Residence")
+            IDR_Plan_Type = GET_INPUT("IDR_Plan_Type")
+
+            // Pre-defined poverty line and IDR plan specific percentages
+            POVERTY_LINE_DATA = GET_POVERTY_LINE_DATA(State_of_Residence)
+            POVERTY_LINE_FOR_FAMILY_SIZE = LOOKUP_POVERTY_LINE(Family_Size, POVERTY_LINE_DATA)
+
+            Income_Percentage_for_Payment = 0
+            IF IDR_Plan_Type = "PAYE" OR IDR_Plan_Type = "REPAYE" THEN
+                Income_Percentage_for_Payment = 0.10 // 10%
+            ELSE IF IDR_Plan_Type = "IBR" THEN
+                Income_Percentage_for_Payment = 0.15 // 15%
+            END IF
+
+            Discretionary_Income = MAX(0, AGI - (POVERTY_LINE_FOR_FAMILY_SIZE * 1.5))
+            
+            Estimated_Monthly_IDR_Payment = (Discretionary_Income * Income_Percentage_for_Payment) / 12
+
+            Warning_on_Interest_Accrual = "Under IDR plans, your payment might not cover all accrued interest, leading to balance growth. Any remaining balance is forgiven after 20-25 years, but may be taxable."
+
+            DISPLAY_OUTPUT("Calculated_Discretionary_Income", Discretionary_Income)
+            DISPLAY_OUTPUT("Estimated_Monthly_IDR_Payment", Estimated_Monthly_IDR_Payment)
+            DISPLAY_OUTPUT("Warning_on_Interest_Accrual", Warning_on_Interest_Accrual)
+        END FUNCTION
+        ```
+
+563. **Student Loan Forgiveness Impact Calculator**
+    * **Purpose:** Estimate the financial benefit of student loan forgiveness programs (e.g., PSLF, IDR forgiveness).
+    * **Inputs:**
+        * `Forgiveness_Amount_Principal` (Currency)
+        * `Forgiveness_Amount_Interest` (Currency)
+        * `Forgiveness_Taxable_Status` (Boolean - is forgiven amount taxable?)
+        * `Marginal_Income_Tax_Rate_Post_Forgiveness` (Percentage - if taxable)
+    * **Calculations:**
+        * `Total_Forgiven = Forgiveness_Amount_Principal + Forgiveness_Amount_Interest`
+        * `Tax_Due_on_Forgiveness = 0`
+        * `IF Forgiveness_Taxable_Status THEN Tax_Due_on_Forgiveness = Total_Forgiven * (Marginal_Income_Tax_Rate_Post_Forgiveness / 100)`
+        * `Net_Financial_Benefit = Total_Forgiven - Tax_Due_on_Forgiveness`
+    * **Outputs:**
+        * `Total_Amount_Forgiven` (Currency)
+        * `Estimated_Tax_Due_on_Forgiveness` (Currency)
+        * `Net_Financial_Benefit_of_Forgiveness` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateStudentLoanForgivenessImpact():
+            Forgiveness_Amount_Principal = GET_INPUT("Forgiveness_Amount_Principal")
+            Forgiveness_Amount_Interest = GET_INPUT("Forgiveness_Amount_Interest")
+            Forgiveness_Taxable_Status = GET_INPUT("Forgiveness_Taxable_Status") // Boolean
+            Marginal_Income_Tax_Rate_Post_Forgiveness = GET_INPUT("Marginal_Income_Tax_Rate_Post_Forgiveness") / 100
+
+            Total_Forgiven = Forgiveness_Amount_Principal + Forgiveness_Amount_Interest
+            Tax_Due_on_Forgiveness = 0
+            IF Forgiveness_Taxable_Status THEN
+                Tax_Due_on_Forgiveness = Total_Forgiven * Marginal_Income_Tax_Rate_Post_Forgiveness
+            END IF
+
+            Net_Financial_Benefit = Total_Forgiven - Tax_Due_on_Forgiveness
+
+            DISPLAY_OUTPUT("Total_Amount_Forgiven", Total_Forgiven)
+            DISPLAY_OUTPUT("Estimated_Tax_Due_on_Forgiveness", Tax_Due_on_Forgiveness)
+            DISPLAY_OUTPUT("Net_Financial_Benefit_of_Forgiveness", Net_Financial_Benefit)
+        END FUNCTION
+        ```
+
+564. **Debt-to-Savings Ratio**
+    * **Purpose:** Measure the proportion of an individual's total debt relative to their total savings, indicating financial risk.
+    * **Inputs:**
+        * `Total_Outstanding_Debt` (Currency)
+        * `Total_Liquid_Savings` (Currency)
+    * **Calculations:**
+        * `Debt_to_Savings_Ratio = Total_Outstanding_Debt / Total_Liquid_Savings` (If Total_Liquid_Savings > 0)
+        * `Interpretation = IF Debt_to_Savings_Ratio <= 1 THEN "Healthy" ELSE "Caution"`
+    * **Outputs:**
+        * `Calculated_Debt_to_Savings_Ratio` (Number)
+        * `Financial_Health_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDebtToSavingsRatio():
+            Total_Outstanding_Debt = GET_INPUT("Total_Outstanding_Debt")
+            Total_Liquid_Savings = GET_INPUT("Total_Liquid_Savings")
+
+            IF Total_Liquid_Savings <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Debt_to_Savings_Ratio", "N/A")
+                DISPLAY_OUTPUT("Financial_Health_Interpretation", "Total savings must be positive for calculation.")
+                RETURN
+            END IF
+
+            Debt_to_Savings_Ratio = Total_Outstanding_Debt / Total_Liquid_Savings
+
+            Financial_Health_Interpretation = ""
+            IF Debt_to_Savings_Ratio <= 1 THEN
+                Financial_Health_Interpretation = "Healthy (Savings exceed or match debt)"
+            ELSE
+                Financial_Health_Interpretation = "Caution (Debt exceeds savings, increased financial vulnerability)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Debt_to_Savings_Ratio", Debt_to_Savings_Ratio)
+            DISPLAY_OUTPUT("Financial_Health_Interpretation", Financial_Health_Interpretation)
+        END FUNCTION
+        ```
+
+565. **Credit Utilization Ratio Calculator**
+    * **Purpose:** Calculate the percentage of available credit currently being used, a key factor in credit scores.
+    * **Inputs:**
+        * `Total_Credit_Card_Balances` (Currency)
+        * `Total_Credit_Limits` (Currency - sum of all credit card limits)
+    * **Calculations:**
+        * `Credit_Utilization_Ratio = (Total_Credit_Card_Balances / Total_Credit_Limits) * 100` (If Total_Credit_Limits > 0)
+        * `Credit_Score_Impact_Note = IF Credit_Utilization_Ratio <= 30 THEN "Positive Impact" ELSE "Negative Impact"`
+    * **Outputs:**
+        * `Calculated_Credit_Utilization_Ratio` (Percentage)
+        * `Credit_Score_Impact_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCreditUtilizationRatio():
+            Total_Credit_Card_Balances = GET_INPUT("Total_Credit_Card_Balances")
+            Total_Credit_Limits = GET_INPUT("Total_Credit_Limits")
+
+            IF Total_Credit_Limits <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Credit_Utilization_Ratio", "N/A")
+                DISPLAY_OUTPUT("Credit_Score_Impact_Note", "Total credit limits must be positive.")
+                RETURN
+            END IF
+
+            Credit_Utilization_Ratio = (Total_Credit_Card_Balances / Total_Credit_Limits) * 100
+
+            Credit_Score_Impact_Note = ""
+            IF Credit_Utilization_Ratio <= 10 THEN
+                Credit_Score_Impact_Note = "Excellent (Best for credit score)"
+            ELSE IF Credit_Utilization_Ratio <= 30 THEN
+                Credit_Score_Impact_Note = "Good (Positive impact on credit score)"
+            ELSE
+                Credit_Score_Impact_Note = "Negative Impact (May lower credit score significantly)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Credit_Utilization_Ratio", Credit_Utilization_Ratio)
+            DISPLAY_OUTPUT("Credit_Score_Impact_Note", Credit_Score_Impact_Note)
+        END FUNCTION
+        ```
+
+566. **Cost of Raising a Child Calculator**
+    * **Purpose:** Estimate the total financial cost of raising a child from birth through young adulthood.
+    * **Inputs:**
+        * `Average_Annual_Cost_Child_Initial_Years` (Currency - e.g., $15,000)
+        * `Child_Age` (Years - if starting calculation from current age)
+        * `Child_Age_To_End_Calculation` (Years - e.g., 18 or 21)
+        * `Annual_Inflation_Rate_Child_Costs` (Percentage)
+        * `Childcare_Education_Costs_Annual` (Currency - additional specific costs)
+        * `College_Costs_Future_Estimate` (Currency - one-time future cost)
+    * **Calculations:**
+        * `Total_Cost = 0`
+        * `Current_Annual_Cost = Average_Annual_Cost_Child_Initial_Years`
+        * `FOR i FROM Child_Age TO Child_Age_To_End_Calculation - 1:`
+            * `Cost_This_Year = Current_Annual_Cost + Childcare_Education_Costs_Annual`
+            * `Total_Cost = Total_Cost + Cost_This_Year`
+            * `Current_Annual_Cost = Current_Annual_Cost * (1 + Annual_Inflation_Rate_Child_Costs / 100)`
+        * `Total_Cost = Total_Cost + College_Costs_Future_Estimate`
+    * **Outputs:**
+        * `Estimated_Total_Cost_of_Raising_a_Child` (Currency)
+        * `Annual_Cost_Breakdown_Projection_Table` (Table: Age, Annual Cost)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfRaisingAChild():
+            Average_Annual_Cost_Child_Initial_Years = GET_INPUT("Average_Annual_Cost_Child_Initial_Years")
+            Child_Age_Start = GET_INPUT("Child_Age_Start") // e.g., 0 for birth
+            Child_Age_To_End_Calculation = GET_INPUT("Child_Age_To_End_Calculation") // e.g., 18
+            Annual_Inflation_Rate_Child_Costs = GET_INPUT("Annual_Inflation_Rate_Child_Costs") / 100
+            Childcare_Education_Costs_Annual = GET_INPUT("Childcare_Education_Costs_Annual")
+            College_Costs_Future_Estimate = GET_INPUT("College_Costs_Future_Estimate")
+
+            Total_Cost = 0
+            Current_Annual_Cost_Projected = Average_Annual_Cost_Child_Initial_Years
+            Annual_Cost_Breakdown_Projection_Table = []
+
+            FOR i FROM Child_Age_Start TO Child_Age_To_End_Calculation - 1:
+                Cost_This_Year = Current_Annual_Cost_Projected + Childcare_Education_Costs_Annual
+                Total_Cost = Total_Cost + Cost_This_Year
+                Current_Annual_Cost_Projected = Current_Annual_Cost_Projected * (1 + Annual_Inflation_Rate_Child_Costs)
+                Annual_Cost_Breakdown_Projection_Table.ADD({Age: i + 1, Annual_Cost: Cost_This_Year})
+            END FOR
+            Total_Cost = Total_Cost + College_Costs_Future_Estimate // Add college costs as a lump sum
+
+            DISPLAY_OUTPUT("Estimated_Total_Cost_of_Raising_a_Child", Total_Cost)
+            DISPLAY_OUTPUT("Annual_Cost_Breakdown_Projection_Table", Annual_Cost_Breakdown_Projection_Table)
+        END FUNCTION
+        ```
+
+567. **Cost of Wedding Calculator**
+    * **Purpose:** Estimate the total cost of a wedding based on various components.
+    * **Inputs:**
+        * `Venue_Cost` (Currency)
+        * `Catering_Cost_Per_Person` (Currency)
+        * `Number_of_Guests` (Number)
+        * `Attire_Cost` (Currency - dress, suit)
+        * `Photography_Videography_Cost` (Currency)
+        * `Music_Entertainment_Cost` (Currency)
+        * `Flowers_Decor_Cost` (Currency)
+        * `Rings_Cost` (Currency)
+        * `Other_Miscellaneous_Costs` (Currency)
+    * **Calculations:**
+        * `Total_Catering_Cost = Catering_Cost_Per_Person * Number_of_Guests`
+        * `Total_Wedding_Cost = Venue_Cost + Total_Catering_Cost + Attire_Cost + Photography_Videography_Cost + Music_Entertainment_Cost + Flowers_Decor_Cost + Rings_Cost + Other_Miscellaneous_Costs`
+    * **Outputs:**
+        * `Estimated_Total_Wedding_Cost` (Currency)
+        * `Cost_Breakdown_Table` (Table: Category, Cost)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfWedding():
+            Venue_Cost = GET_INPUT("Venue_Cost")
+            Catering_Cost_Per_Person = GET_INPUT("Catering_Cost_Per_Person")
+            Number_of_Guests = GET_INPUT("Number_of_Guests")
+            Attire_Cost = GET_INPUT("Attire_Cost")
+            Photography_Videography_Cost = GET_INPUT("Photography_Videography_Cost")
+            Music_Entertainment_Cost = GET_INPUT("Music_Entertainment_Cost")
+            Flowers_Decor_Cost = GET_INPUT("Flowers_Decor_Cost")
+            Rings_Cost = GET_INPUT("Rings_Cost")
+            Other_Miscellaneous_Costs = GET_INPUT("Other_Miscellaneous_Costs")
+
+            Total_Catering_Cost = Catering_Cost_Per_Person * Number_of_Guests
+            
+            Total_Wedding_Cost = Venue_Cost + Total_Catering_Cost + Attire_Cost + \
+                                 Photography_Videography_Cost + Music_Entertainment_Cost + \
+                                 Flowers_Decor_Cost + Rings_Cost + Other_Miscellaneous_Costs
+
+            Cost_Breakdown_Table = [
+                {Category: "Venue", Cost: Venue_Cost},
+                {Category: "Catering", Cost: Total_Catering_Cost},
+                {Category: "Attire", Cost: Attire_Cost},
+                {Category: "Photography/Videography", Cost: Photography_Videography_Cost},
+                {Category: "Music/Entertainment", Cost: Music_Entertainment_Cost},
+                {Category: "Flowers/Decor", Cost: Flowers_Decor_Cost},
+                {Category: "Rings", Cost: Rings_Cost},
+                {Category: "Miscellaneous", Cost: Other_Miscellaneous_Costs}
+            ]
+
+            DISPLAY_OUTPUT("Estimated_Total_Wedding_Cost", Total_Wedding_Cost)
+            DISPLAY_OUTPUT("Cost_Breakdown_Table", Cost_Breakdown_Table)
+        END FUNCTION
+        ```
+
+568. **Cost of Moving Calculator**
+    * **Purpose:** Estimate the total expenses associated with moving to a new residence.
+    * **Inputs:**
+        * `Moving_Company_Cost` (Currency)
+        * `Packing_Supplies_Cost` (Currency)
+        * `New_Utilities_Setup_Fees` (Currency)
+        * `New_Rent_Security_Deposit` (Currency - if renting)
+        * `New_Furniture_Appliances_Cost` (Currency)
+        * `Travel_Costs_Moving_Day` (Currency)
+        * `Professional_Cleaning_Cost` (Currency)
+        * `Other_Unexpected_Costs_Percentage` (Percentage of total costs)
+    * **Calculations:**
+        * `Subtotal_Costs = Moving_Company_Cost + Packing_Supplies_Cost + New_Utilities_Setup_Fees + New_Rent_Security_Deposit + New_Furniture_Appliances_Cost + Travel_Costs_Moving_Day + Professional_Cleaning_Cost`
+        * `Contingency_Cost = Subtotal_Costs * (Other_Unexpected_Costs_Percentage / 100)`
+        * `Total_Moving_Cost = Subtotal_Costs + Contingency_Cost`
+    * **Outputs:**
+        * `Estimated_Total_Moving_Cost` (Currency)
+        * `Cost_Breakdown_Table` (Table: Category, Cost)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfMoving():
+            Moving_Company_Cost = GET_INPUT("Moving_Company_Cost")
+            Packing_Supplies_Cost = GET_INPUT("Packing_Supplies_Cost")
+            New_Utilities_Setup_Fees = GET_INPUT("New_Utilities_Setup_Fees")
+            New_Rent_Security_Deposit = GET_INPUT("New_Rent_Security_Deposit")
+            New_Furniture_Appliances_Cost = GET_INPUT("New_Furniture_Appliances_Cost")
+            Travel_Costs_Moving_Day = GET_INPUT("Travel_Costs_Moving_Day")
+            Professional_Cleaning_Cost = GET_INPUT("Professional_Cleaning_Cost")
+            Other_Unexpected_Costs_Percentage = GET_INPUT("Other_Unexpected_Costs_Percentage") / 100
+
+            Subtotal_Costs = Moving_Company_Cost + Packing_Supplies_Cost + New_Utilities_Setup_Fees + \
+                             New_Rent_Security_Deposit + New_Furniture_Appliances_Cost + Travel_Costs_Moving_Day + \
+                             Professional_Cleaning_Cost
+            
+            Contingency_Cost = Subtotal_Costs * Other_Unexpected_Costs_Percentage
+            Total_Moving_Cost = Subtotal_Costs + Contingency_Cost
+
+            Cost_Breakdown_Table = [
+                {Category: "Moving Company", Cost: Moving_Company_Cost},
+                {Category: "Packing Supplies", Cost: Packing_Supplies_Cost},
+                {Category: "New Utilities Setup Fees", Cost: New_Utilities_Setup_Fees},
+                {Category: "New Rent/Security Deposit", Cost: New_Rent_Security_Deposit},
+                {Category: "New Furniture/Appliances", Cost: New_Furniture_Appliances_Cost},
+                {Category: "Travel Costs (Moving Day)", Cost: Travel_Costs_Moving_Day},
+                {Category: "Professional Cleaning", Cost: Professional_Cleaning_Cost},
+                {Category: "Contingency (Unexpected)", Cost: Contingency_Cost}
+            ]
+
+            DISPLAY_OUTPUT("Estimated_Total_Moving_Cost", Total_Moving_Cost)
+            DISPLAY_OUTPUT("Cost_Breakdown_Table", Cost_Breakdown_Table)
+        END FUNCTION
+        ```
+
+569. **Job Offer Comparison (Net Pay & Benefits Value)**
+    * **Purpose:** Compare two job offers side-by-side, considering gross pay, taxes, benefits, and perks to determine the better overall compensation.
+    * **Inputs:**
+        * **Offer 1:** `Gross_Annual_Salary_1` (Currency), `Health_Insurance_Value_1` (Currency), `401k_Match_Value_1` (Currency), `Other_Benefits_Value_1` (Currency), `Estimated_Effective_Tax_Rate_1` (Percentage)
+        * **Offer 2:** Same inputs for Offer 2.
+    * **Calculations:**
+        * `Net_Annual_Salary_1 = Gross_Annual_Salary_1 * (1 - Estimated_Effective_Tax_Rate_1 / 100)`
+        * `Total_Compensation_1 = Net_Annual_Salary_1 + Health_Insurance_Value_1 + 401k_Match_Value_1 + Other_Benefits_Value_1`
+        * `Perform same calculations for Offer 2.`
+    * **Outputs:**
+        * `Offer_Comparison_Table` (Table: Offer, Gross Salary, Net Salary, Total Benefits, Total Compensation)
+        * `Best_Offer_Recommendation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareJobOffers():
+            // Offer 1 Inputs
+            Gross_Annual_Salary_1 = GET_INPUT("Gross_Annual_Salary_1")
+            Health_Insurance_Value_1 = GET_INPUT("Health_Insurance_Value_1")
+            Retirement_Match_Value_1 = GET_INPUT("Retirement_Match_Value_1")
+            Other_Benefits_Value_1 = GET_INPUT("Other_Benefits_Value_1")
+            Estimated_Effective_Tax_Rate_1 = GET_INPUT("Estimated_Effective_Tax_Rate_1") / 100
+
+            // Offer 2 Inputs
+            Gross_Annual_Salary_2 = GET_INPUT("Gross_Annual_Salary_2")
+            Health_Insurance_Value_2 = GET_INPUT("Health_Insurance_Value_2")
+            Retirement_Match_Value_2 = GET_INPUT("Retirement_Match_Value_2")
+            Other_Benefits_Value_2 = GET_INPUT("Other_Benefits_Value_2")
+            Estimated_Effective_Tax_Rate_2 = GET_INPUT("Estimated_Effective_Tax_Rate_2") / 100
+
+            // Calculate for Offer 1
+            Net_Annual_Salary_1 = Gross_Annual_Salary_1 * (1 - Estimated_Effective_Tax_Rate_1)
+            Total_Benefits_1 = Health_Insurance_Value_1 + Retirement_Match_Value_1 + Other_Benefits_Value_1
+            Total_Compensation_1 = Net_Annual_Salary_1 + Total_Benefits_1
+
+            // Calculate for Offer 2
+            Net_Annual_Salary_2 = Gross_Annual_Salary_2 * (1 - Estimated_Effective_Tax_Rate_2)
+            Total_Benefits_2 = Health_Insurance_Value_2 + Retirement_Match_Value_2 + Other_Benefits_Value_2
+            Total_Compensation_2 = Net_Annual_Salary_2 + Total_Benefits_2
+
+            Offer_Comparison_Table = [
+                {Offer: "Offer 1", Gross_Salary: Gross_Annual_Salary_1, Net_Salary: Net_Annual_Salary_1, Total_Benefits: Total_Benefits_1, Total_Compensation: Total_Compensation_1},
+                {Offer: "Offer 2", Gross_Salary: Gross_Annual_Salary_2, Net_Salary: Net_Annual_Salary_2, Total_Benefits: Total_Benefits_2, Total_Compensation: Total_Compensation_2}
+            ]
+
+            Best_Offer_Recommendation = ""
+            IF Total_Compensation_1 > Total_Compensation_2 THEN
+                Best_Offer_Recommendation = "Offer 1 is financially superior."
+            ELSE IF Total_Compensation_2 > Total_Compensation_1 THEN
+                Best_Offer_Recommendation = "Offer 2 is financially superior."
+            ELSE
+                Best_Offer_Recommendation = "Both offers are financially similar; consider non-financial factors."
+            END IF
+
+            DISPLAY_OUTPUT("Offer_Comparison_Table", Offer_Comparison_Table)
+            DISPLAY_OUTPUT("Best_Offer_Recommendation", Best_Offer_Recommendation)
+        END FUNCTION
+        ```
+
+570. **Net Worth Growth Projector**
+    * **Purpose:** Project the growth of an individual's net worth over time, considering savings, investments, and debt reduction.
+    * **Inputs:**
+        * `Current_Net_Worth` (Currency)
+        * `Annual_Savings_Contributions` (Currency)
+        * `Annual_Debt_Reduction_Extra_Payments` (Currency)
+        * `Average_Investment_Return_Rate` (Percentage)
+        * `Years_to_Project` (Years)
+    * **Calculations:**
+        * `Projected_Net_Worth = Current_Net_Worth`
+        * `FOR i FROM 1 TO Years_to_Project:`
+            * `Investment_Gain = Projected_Net_Worth * (Average_Investment_Return_Rate / 100)`
+            * `Projected_Net_Worth = Projected_Net_Worth + Investment_Gain + Annual_Savings_Contributions + Annual_Debt_Reduction_Extra_Payments`
+        * `// Simplified: assumes debt reduction directly adds to net worth`
+    * **Outputs:**
+        * `Projected_Net_Worth_at_End_of_Period` (Currency)
+        * `Annual_Net_Worth_Projection_Table` (Table: Year, Net Worth)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ProjectNetWorthGrowth():
+            Current_Net_Worth = GET_INPUT("Current_Net_Worth")
+            Annual_Savings_Contributions = GET_INPUT("Annual_Savings_Contributions")
+            Annual_Debt_Reduction_Extra_Payments = GET_INPUT("Annual_Debt_Reduction_Extra_Payments")
+            Average_Investment_Return_Rate = GET_INPUT("Average_Investment_Return_Rate") / 100
+            Years_to_Project = GET_INPUT("Years_to_Project")
+
+            Projected_Net_Worth = Current_Net_Worth
+            Annual_Net_Worth_Projection_Table = []
+
+            Annual_Net_Worth_Projection_Table.ADD({Year: 0, Net_Worth: Current_Net_Worth})
+
+            FOR y FROM 1 TO Years_to_Project:
+                Investment_Gain = Projected_Net_Worth * Average_Investment_Return_Rate
+                Projected_Net_Worth = Projected_Net_Worth + Investment_Gain + Annual_Savings_Contributions + Annual_Debt_Reduction_Extra_Payments
+                Annual_Net_Worth_Projection_Table.ADD({Year: y, Net_Worth: Projected_Net_Worth})
+            END FOR
+
+            DISPLAY_OUTPUT("Projected_Net_Worth_at_End_of_Period", Projected_Net_Worth)
+            DISPLAY_OUTPUT("Annual_Net_Worth_Projection_Table", Annual_Net_Worth_Projection_Table)
+        END FUNCTION
+        ```
+
+571. **Inflation-Adjusted Spending Power Calculator**
+    * **Purpose:** Project how the purchasing power of a fixed amount of money will decrease over time due to inflation.
+    * **Inputs:**
+        * `Current_Spending_Amount` (Currency)
+        * `Average_Annual_Inflation_Rate` (Percentage)
+        * `Years_to_Project` (Years)
+    * **Calculations:**
+        * `Future_Spending_Power = Current_Spending_Amount / (1 + Average_Annual_Inflation_Rate / 100)^Years_to_Project`
+    * **Outputs:**
+        * `Future_Spending_Power_Equivalent_Today` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInflationAdjustedSpendingPower():
+            Current_Spending_Amount = GET_INPUT("Current_Spending_Amount")
+            Average_Annual_Inflation_Rate = GET_INPUT("Average_Annual_Inflation_Rate") / 100
+            Years_to_Project = GET_INPUT("Years_to_Project")
+
+            Future_Spending_Power_Equivalent_Today = Current_Spending_Amount / POWER((1 + Average_Annual_Inflation_Rate), Years_to_Project)
+
+            DISPLAY_OUTPUT("Future_Spending_Power_Equivalent_Today", Future_Spending_Power_Equivalent_Today)
+        END FUNCTION
+        ```
+
+572. **Financial Independence (FI) Number Calculator**
+    * **Purpose:** Calculate the total investment portfolio size required to achieve financial independence, based on annual expenses and a safe withdrawal rate.
+    * **Inputs:**
+        * `Desired_Annual_Expenses_in_Retirement` (Currency)
+        * `Safe_Withdrawal_Rate` (Percentage - e.g., 4%)
+    * **Calculations:**
+        * `FI_Number = Desired_Annual_Expenses_in_Retirement / (Safe_Withdrawal_Rate / 100)`
+    * **Outputs:**
+        * `Calculated_FI_Number` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFINumber():
+            Desired_Annual_Expenses_in_Retirement = GET_INPUT("Desired_Annual_Expenses_in_Retirement")
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+
+            IF Safe_Withdrawal_Rate <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_FI_Number", "N/A - Safe Withdrawal Rate must be positive.")
+                RETURN
+            END IF
+
+            FI_Number = Desired_Annual_Expenses_in_Retirement / Safe_Withdrawal_Rate
+
+            DISPLAY_OUTPUT("Calculated_FI_Number", FI_Number)
+        END FUNCTION
+        ```
+
+573. **Time to Financial Independence (FI) Calculator**
+    * **Purpose:** Estimate how many years it will take to reach Financial Independence given current financial situation and savings habits.
+    * **Inputs:**
+        * `Current_Investments` (Currency)
+        * `Annual_Savings` (Currency)
+        * `Current_Annual_Expenses` (Currency)
+        * `Expected_Annual_Investment_Return` (Percentage)
+        * `Safe_Withdrawal_Rate` (Percentage)
+    * **Calculations:**
+        * `FI_Number = Current_Annual_Expenses / (Safe_Withdrawal_Rate / 100)`
+        * `Years_to_FI = NPER(Expected_Annual_Investment_Return / 100, Annual_Savings, Current_Investments, -FI_Number)` (Financial function)
+    * **Outputs:**
+        * `Calculated_FI_Number` (Currency)
+        * `Estimated_Years_to_Financial_Independence` (Years)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTimeToFI():
+            Current_Investments = GET_INPUT("Current_Investments")
+            Annual_Savings = GET_INPUT("Annual_Savings")
+            Current_Annual_Expenses = GET_INPUT("Current_Annual_Expenses")
+            Expected_Annual_Investment_Return = GET_INPUT("Expected_Annual_Investment_Return") / 100
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+
+            IF Safe_Withdrawal_Rate <= 0 OR Current_Annual_Expenses <= 0 THEN
+                DISPLAY_OUTPUT("Estimated_Years_to_Financial_Independence", "N/A - Invalid inputs.")
+                RETURN
+            END IF
+
+            FI_Number = Current_Annual_Expenses / Safe_Withdrawal_Rate
+
+            // Use NPER financial function (Number of periods for an annuity)
+            Estimated_Years_to_Financial_Independence = CALCULATE_NPER(
+                Expected_Annual_Investment_Return, // Rate
+                Annual_Savings,                  // Payment
+                Current_Investments,             // Present Value
+                -FI_Number                       // Future Value (negative as a target to reach)
+            )
+
+            DISPLAY_OUTPUT("Calculated_FI_Number", FI_Number)
+            DISPLAY_OUTPUT("Estimated_Years_to_Financial_Independence", CEILING(Estimated_Years_to_Financial_Independence))
+        END FUNCTION
+        ```
+
+574. **Human Capital Value Calculator**
+    * **Purpose:** Estimate the present value of an individual's future earning potential (human capital).
+    * **Inputs:**
+        * `Current_Annual_Salary` (Currency)
+        * `Expected_Annual_Salary_Growth_Rate` (Percentage)
+        * `Years_Until_Retirement` (Years)
+        * `Discount_Rate` (Percentage - personal discount rate, e.g., risk-free rate)
+    * **Calculations:**
+        * `PV_of_Earnings = 0`
+        * `Projected_Salary = Current_Annual_Salary`
+        * `FOR i FROM 1 TO Years_Until_Retirement:`
+            * `Projected_Salary = Projected_Salary * (1 + Expected_Annual_Salary_Growth_Rate / 100)`
+            * `PV_of_Earnings = PV_of_Earnings + (Projected_Salary / (1 + Discount_Rate / 100)^i)`
+    * **Outputs:**
+        * `Calculated_Present_Value_of_Human_Capital` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateHumanCapitalValue():
+            Current_Annual_Salary = GET_INPUT("Current_Annual_Salary")
+            Expected_Annual_Salary_Growth_Rate = GET_INPUT("Expected_Annual_Salary_Growth_Rate") / 100
+            Years_Until_Retirement = GET_INPUT("Years_Until_Retirement")
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            PV_of_Earnings = 0
+            Projected_Salary = Current_Annual_Salary
+
+            FOR i FROM 1 TO Years_Until_Retirement:
+                Projected_Salary = Projected_Salary * (1 + Expected_Annual_Salary_Growth_Rate)
+                PV_of_Earnings = PV_of_Earnings + (Projected_Salary / POWER((1 + Discount_Rate), i))
+            END FOR
+
+            DISPLAY_OUTPUT("Calculated_Present_Value_of_Human_Capital", PV_of_Earnings)
+        END FUNCTION
+        ```
+
+575. **Cost of Delaying Investment Calculator**
+    * **Purpose:** Quantify the financial impact of delaying investing by a certain number of years.
+    * **Inputs:**
+        * `Annual_Investment_Amount` (Currency)
+        * `Years_Delayed` (Years)
+        * `Total_Investment_Period_Years` (Years)
+        * `Expected_Annual_Return` (Percentage)
+    * **Calculations:**
+        * `FV_If_Started_Immediately = Annual_Investment_Amount * (((1 + Expected_Annual_Return / 100)^Total_Investment_Period_Years - 1) / (Expected_Annual_Return / 100))`
+        * `Years_Actually_Invested = Total_Investment_Period_Years - Years_Delayed`
+        * `FV_If_Delayed = Annual_Investment_Amount * (((1 + Expected_Annual_Return / 100)^Years_Actually_Invested - 1) / (Expected_Annual_Return / 100))`
+        * `Lost_Opportunity_Cost = FV_If_Started_Immediately - FV_If_Delayed`
+    * **Outputs:**
+        * `Future_Value_Starting_Now` (Currency)
+        * `Future_Value_If_Delayed` (Currency)
+        * `Total_Lost_Opportunity_Cost` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfDelayingInvestment():
+            Annual_Investment_Amount = GET_INPUT("Annual_Investment_Amount")
+            Years_Delayed = GET_INPUT("Years_Delayed")
+            Total_Investment_Period_Years = GET_INPUT("Total_Investment_Period_Years")
+            Expected_Annual_Return = GET_INPUT("Expected_Annual_Return") / 100
+
+            Years_Actually_Invested = Total_Investment_Period_Years - Years_Delayed
+
+            FV_If_Started_Immediately = 0
+            FV_If_Delayed = 0
+
+            IF Expected_Annual_Return = 0 THEN
+                FV_If_Started_Immediately = Annual_Investment_Amount * Total_Investment_Period_Years
+                FV_If_Delayed = Annual_Investment_Amount * Years_Actually_Invested
+            ELSE
+                FV_If_Started_Immediately = Annual_Investment_Amount * ((POWER((1 + Expected_Annual_Return), Total_Investment_Period_Years) - 1) / Expected_Annual_Return)
+                FV_If_Delayed = Annual_Investment_Amount * ((POWER((1 + Expected_Annual_Return), Years_Actually_Invested) - 1) / Expected_Annual_Return)
+            END IF
+
+            Lost_Opportunity_Cost = FV_If_Started_Immediately - FV_If_Delayed
+
+            DISPLAY_OUTPUT("Future_Value_Starting_Now", FV_If_Started_Immediately)
+            DISPLAY_OUTPUT("Future_Value_If_Delayed", FV_If_Delayed)
+            DISPLAY_OUTPUT("Total_Lost_Opportunity_Cost", Lost_Opportunity_Cost)
+        END FUNCTION
+        ```
+
+576. **Cost of Credit (Annualized) - APR on Loans/Credit Cards**
+    * **Purpose:** Calculate the true annualized cost of borrowing for personal loans or credit card balances, factoring in fees.
+    * **Inputs:**
+        * `Loan_Amount_or_Balance` (Currency)
+        * `Total_Interest_Paid_Annual` (Currency)
+        * `Annual_Fees` (Currency - e.g., credit card annual fee, loan origination fee spread over year)
+    * **Calculations:**
+        * `Total_Cost_of_Credit_Annual = Total_Interest_Paid_Annual + Annual_Fees`
+        * `Annualized_Cost_Percentage = (Total_Cost_of_Credit_Annual / Loan_Amount_or_Balance) * 100` (If Loan_Amount_or_Balance > 0)
+    * **Outputs:**
+        * `Calculated_Annualized_Cost_of_Credit` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfCreditAnnualized():
+            Loan_Amount_or_Balance = GET_INPUT("Loan_Amount_or_Balance")
+            Total_Interest_Paid_Annual = GET_INPUT("Total_Interest_Paid_Annual")
+            Annual_Fees = GET_INPUT("Annual_Fees")
+
+            IF Loan_Amount_or_Balance <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Annualized_Cost_of_Credit", "N/A")
+                RETURN
+            END IF
+
+            Total_Cost_of_Credit_Annual = Total_Interest_Paid_Annual + Annual_Fees
+            Annualized_Cost_Percentage = (Total_Cost_of_Credit_Annual / Loan_Amount_or_Balance) * 100
+
+            DISPLAY_OUTPUT("Calculated_Annualized_Cost_of_Credit", Annualized_Cost_Percentage)
+        END FUNCTION
+        ```
+
+577. **Expense Tracking Analysis (Categories & Trends)**
+    * **Purpose:** Help users analyze their spending habits by categorizing expenses and identifying trends over time.
+    * **Inputs:**
+        * `Monthly_Expenses_Data` (List of objects: {`Month`: Date, `Category`: Text, `Amount`: Currency})
+        * `Comparison_Period_Months` (Number - e.g., 3, 6, 12)
+    * **Calculations:**
+        * `Total_Spending_by_Month = Aggregate_by_Month(Monthly_Expenses_Data)`
+        * `Spending_by_Category_Overall = Aggregate_by_Category(Monthly_Expenses_Data)`
+        * `Trend_Analysis = Compare_Average_Spending_Current_Vs_Prior_Period`
+    * **Outputs:**
+        * `Monthly_Spending_Overview_Table` (Table: Month, Total Spent)
+        * `Category_Spending_Breakdown_Table` (Table: Category, Total Spent, % of Total)
+        * `Spending_Trend_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeExpenseTracking():
+            Monthly_Expenses_Data = GET_INPUT("Monthly_Expenses_Data") // [{Month (date), Category, Amount}]
+            Comparison_Period_Months = GET_INPUT("Comparison_Period_Months")
+
+            Monthly_Spending_Overview = CREATE_EMPTY_DICTIONARY() // {Month: Total Spent}
+            Category_Spending_Breakdown = CREATE_EMPTY_DICTIONARY() // {Category: Total Spent}
+            Overall_Total_Spent = 0
+
+            FOR EACH Expense IN Monthly_Expenses_Data:
+                Month_Key = GET_MONTH_YEAR(Expense.Month) // e.g., "Jan 2025"
+                IF NOT Monthly_Spending_Overview.HAS_KEY(Month_Key) THEN Monthly_Spending_Overview[Month_Key] = 0 END IF
+                Monthly_Spending_Overview[Month_Key] = Monthly_Spending_Overview[Month_Key] + Expense.Amount
+                Overall_Total_Spent = Overall_Total_Spent + Expense.Amount
+
+                IF NOT Category_Spending_Breakdown.HAS_KEY(Expense.Category) THEN Category_Spending_Breakdown[Expense.Category] = 0 END IF
+                Category_Spending_Breakdown[Expense.Category] = Category_Spending_Breakdown[Expense.Category] + Expense.Amount
+            END FOR
+
+            // Convert Category_Spending_Breakdown to a list with percentages
+            Category_Breakdown_List = []
+            FOR EACH Category, Amount IN Category_Spending_Breakdown:
+                Percentage = (Amount / Overall_Total_Spent) * 100 // Handle Overall_Total_Spent = 0
+                Category_Breakdown_List.ADD({Category: Category, Amount_Spent: Amount, Percentage: Percentage})
+            END FOR
+
+            // Basic trend analysis (e.g., compare last period vs. prior)
+            Spending_Trend_Note = "No specific trend detected or insufficient data."
+            // More advanced would involve moving averages or statistical tests.
+
+            DISPLAY_OUTPUT("Monthly_Spending_Overview_Table", Monthly_Spending_Overview)
+            DISPLAY_OUTPUT("Category_Spending_Breakdown_Table", Category_Breakdown_List)
+            DISPLAY_OUTPUT("Spending_Trend_Note", Spending_Trend_Note)
+        END FUNCTION
+        ```
+
+578. **Investment Risk Tolerance Quiz (Conceptual/Scoring Tool)**
+    * **Purpose:** A series of questions to help individuals assess their personal comfort level with investment risk and suggest an appropriate investment portfolio.
+    * **Inputs:**
+        * `Quiz_Answers` (List of Answers, each mapped to a score)
+            * e.g., "How would you react to a 20% portfolio drop?" (A: Panic, B: Worry, C: Indifferent, D: Opportunity)
+    * **Calculations:**
+        * `Total_Score = SUM(Scores_from_Answers)`
+        * `Risk_Profile_Category = IF Total_Score < X THEN "Conservative" ELSE IF Total_Score < Y THEN "Moderate" ELSE "Aggressive"`
+    * **Outputs:**
+        * `Your_Risk_Tolerance_Score` (Number)
+        * `Recommended_Risk_Profile` (Text)
+        * `Suggested_Asset_Allocation_Guidelines` (Text: e.g., "Conservative: 70% Bonds, 30% Stocks")
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AssessInvestmentRiskTolerance():
+            Quiz_Answers = GET_INPUT("Quiz_Answers") // List of numbers (scores per answer)
+
+            Total_Score = SUM_LIST(Quiz_Answers)
+
+            Risk_Profile_Category = ""
+            Suggested_Asset_Allocation_Guidelines = ""
+
+            // Example scoring thresholds (these would be pre-defined based on quiz design)
+            IF Total_Score < 10 THEN
+                Risk_Profile_Category = "Conservative"
+                Suggested_Asset_Allocation_Guidelines = "Focus on capital preservation: e.g., 70% Bonds, 30% Stocks."
+            ELSE IF Total_Score >= 10 AND Total_Score < 20 THEN
+                Risk_Profile_Category = "Moderate"
+                Suggested_Asset_Allocation_Guidelines = "Seek balanced growth: e.g., 50% Bonds, 50% Stocks."
+            ELSE
+                Risk_Profile_Category = "Aggressive"
+                Suggested_Asset_Allocation_Guidelines = "Prioritize growth: e.g., 20% Bonds, 80% Stocks or more."
+            END IF
+
+            DISPLAY_OUTPUT("Your_Risk_Tolerance_Score", Total_Score)
+            DISPLAY_OUTPUT("Recommended_Risk_Profile", Risk_Profile_Category)
+            DISPLAY_OUTPUT("Suggested_Asset_Allocation_Guidelines", Suggested_Asset_Allocation_Guidelines)
+        END FUNCTION
+        ```
+
+579. **Financial Planner Cost vs. Benefit (Conceptual)**
+    * **Purpose:** A conceptual tool to help individuals weigh the cost of hiring a financial planner against the potential benefits (e.g., better returns, tax savings, avoided mistakes).
+    * **Inputs:**
+        * `Annual_Financial_Planner_Fee` (Currency - fixed or AUM-based)
+        * `Portfolio_Value_Managed` (Currency)
+        * `Estimated_Alpha_from_Planner` (Percentage - extra return generated by planner)
+        * `Estimated_Annual_Tax_Savings_from_Planner` (Currency)
+        * `Estimated_Avoided_Mistakes_Savings_Annual` (Currency)
+        * `Number_of_Years_Engaged` (Years)
+    * **Calculations:**
+        * `Total_Fees_Paid = Annual_Financial_Planner_Fee * Number_of_Years_Engaged`
+        * `Total_Additional_Returns = Portfolio_Value_Managed * (Estimated_Alpha_from_Planner / 100) * Number_of_Years_Engaged`
+        * `Total_Tax_Savings = Estimated_Annual_Tax_Savings_from_Planner * Number_of_Years_Engaged`
+        * `Total_Avoided_Mistakes_Savings = Estimated_Avoided_Mistakes_Savings_Annual * Number_of_Years_Engaged`
+        * `Net_Benefit = Total_Additional_Returns + Total_Tax_Savings + Total_Avoided_Mistakes_Savings - Total_Fees_Paid`
+    * **Outputs:**
+        * `Estimated_Total_Fees_Paid` (Currency)
+        * `Estimated_Total_Benefits_Received` (Currency)
+        * `Net_Financial_Benefit_Cost` (Currency)
+        * `Value_Proposition_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFinancialPlannerCostBenefit():
+            Annual_Financial_Planner_Fee = GET_INPUT("Annual_Financial_Planner_Fee")
+            Portfolio_Value_Managed = GET_INPUT("Portfolio_Value_Managed")
+            Estimated_Alpha_from_Planner = GET_INPUT("Estimated_Alpha_from_Planner") / 100 // Extra return
+            Estimated_Annual_Tax_Savings_from_Planner = GET_INPUT("Estimated_Annual_Tax_Savings_from_Planner")
+            Estimated_Avoided_Mistakes_Savings_Annual = GET_INPUT("Estimated_Avoided_Mistakes_Savings_Annual")
+            Number_of_Years_Engaged = GET_INPUT("Number_of_Years_Engaged")
+
+            Total_Fees_Paid = Annual_Financial_Planner_Fee * Number_of_Years_Engaged
+            Total_Additional_Returns = Portfolio_Value_Managed * Estimated_Alpha_from_Planner * Number_of_Years_Engaged
+            Total_Tax_Savings = Estimated_Annual_Tax_Savings_from_Planner * Number_of_Years_Engaged
+            Total_Avoided_Mistakes_Savings = Estimated_Avoided_Mistakes_Savings_Annual * Number_of_Years_Engaged
+            
+            Total_Benefits_Received = Total_Additional_Returns + Total_Tax_Savings + Total_Avoided_Mistakes_Savings
+            Net_Financial_Benefit_Cost = Total_Benefits_Received - Total_Fees_Paid
+
+            Value_Proposition_Note = "A financial planner can provide value through investment optimization, tax planning, risk management, and behavioral coaching. The 'benefit' often includes intangible factors like peace of mind and time saved, which are harder to quantify."
+
+            DISPLAY_OUTPUT("Estimated_Total_Fees_Paid", Total_Fees_Paid)
+            DISPLAY_OUTPUT("Estimated_Total_Benefits_Received", Total_Benefits_Received)
+            DISPLAY_OUTPUT("Net_Financial_Benefit_Cost", Net_Financial_Benefit_Cost)
+            DISPLAY_OUTPUT("Value_Proposition_Note", Value_Proposition_Note)
+        END FUNCTION
+        ```
+
+580. **Robo-Advisor vs. Human Advisor Cost Comparison (Conceptual)**
+    * **Purpose:** Compare the typical fee structures and cost-effectiveness of robo-advisors versus traditional human financial advisors.
+    * **Inputs:**
+        * `Portfolio_Value` (Currency)
+        * `Robo_Advisor_Annual_Fee_Percentage` (Percentage - e.g., 0.25%)
+        * `Human_Advisor_Annual_Fee_Percentage` (Percentage - e.g., 1%)
+        * `Robo_Advisor_Fixed_Fee` (Currency - if applicable)
+        * `Human_Advisor_Fixed_Fee` (Currency - if applicable)
+        * `Years_to_Compare` (Years)
+    * **Calculations:**
+        * `Robo_Advisor_Total_Fees = (Portfolio_Value * (Robo_Advisor_Annual_Fee_Percentage / 100) + Robo_Advisor_Fixed_Fee) * Years_to_Compare`
+        * `Human_Advisor_Total_Fees = (Portfolio_Value * (Human_Advisor_Annual_Fee_Percentage / 100) + Human_Advisor_Fixed_Fee) * Years_to_Compare`
+        * `Cost_Difference = Human_Advisor_Total_Fees - Robo_Advisor_Total_Fees`
+    * **Outputs:**
+        * `Total_Cost_Robo_Advisor` (Currency)
+        * `Total_Cost_Human_Advisor` (Currency)
+        * `Cost_Difference_Summary` (Text)
+        * `Service_Difference_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareRoboVsHumanAdvisorCost():
+            Portfolio_Value = GET_INPUT("Portfolio_Value")
+            Robo_Advisor_Annual_Fee_Percentage = GET_INPUT("Robo_Advisor_Annual_Fee_Percentage") / 100
+            Human_Advisor_Annual_Fee_Percentage = GET_INPUT("Human_Advisor_Annual_Fee_Percentage") / 100
+            Robo_Advisor_Fixed_Fee = GET_INPUT("Robo_Advisor_Fixed_Fee")
+            Human_Advisor_Fixed_Fee = GET_INPUT("Human_Advisor_Fixed_Fee")
+            Years_to_Compare = GET_INPUT("Years_to_Compare")
+
+            Robo_Advisor_Total_Fees = (Portfolio_Value * Robo_Advisor_Annual_Fee_Percentage + Robo_Advisor_Fixed_Fee) * Years_to_Compare
+            Human_Advisor_Total_Fees = (Portfolio_Value * Human_Advisor_Annual_Fee_Percentage + Human_Advisor_Fixed_Fee) * Years_to_Compare
+            
+            Cost_Difference = Human_Advisor_Total_Fees - Robo_Advisor_Total_Fees
+
+            Service_Difference_Note = "Robo-advisors offer automated portfolio management at a lower cost, suitable for those comfortable with less personalization. Human advisors provide comprehensive financial planning, personalized advice, and emotional support, which may justify higher fees for some."
+
+            DISPLAY_OUTPUT("Total_Cost_Robo_Advisor", Robo_Advisor_Total_Fees)
+            DISPLAY_OUTPUT("Total_Cost_Human_Advisor", Human_Advisor_Total_Fees)
+            DISPLAY_OUTPUT("Cost_Difference_Summary", "Human advisor costs " + FORMAT_CURRENCY(Cost_Difference) + " more than robo-advisor over " + Years_to_Compare + " years.")
+            DISPLAY_OUTPUT("Service_Difference_Note", Service_Difference_Note)
+        END FUNCTION
+        ```
+
+581. **Inflation-Adjusted Retirement Withdrawals**
+    * **Purpose:** Project how much an annual retirement withdrawal needs to increase each year to maintain purchasing power due to inflation.
+    * **Inputs:**
+        * `Initial_Annual_Withdrawal` (Currency)
+        * `Expected_Annual_Inflation_Rate` (Percentage)
+        * `Retirement_Years_to_Project` (Years)
+    * **Calculations:**
+        * `Annual_Withdrawal_Year_X = Initial_Annual_Withdrawal * (1 + Expected_Annual_Inflation_Rate / 100)^(X-1)`
+    * **Outputs:**
+        * `Inflation_Adjusted_Withdrawal_Table` (Table: Year, Withdrawal Amount)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInflationAdjustedRetirementWithdrawals():
+            Initial_Annual_Withdrawal = GET_INPUT("Initial_Annual_Withdrawal")
+            Expected_Annual_Inflation_Rate = GET_INPUT("Expected_Annual_Inflation_Rate") / 100
+            Retirement_Years_to_Project = GET_INPUT("Retirement_Years_to_Project")
+
+            Inflation_Adjusted_Withdrawal_Table = []
+            Current_Withdrawal = Initial_Annual_Withdrawal
+
+            FOR y FROM 1 TO Retirement_Years_to_Project:
+                Inflation_Adjusted_Withdrawal_Table.ADD({Year: y, Withdrawal_Amount: Current_Withdrawal})
+                Current_Withdrawal = Current_Withdrawal * (1 + Expected_Annual_Inflation_Rate)
+            END FOR
+
+            DISPLAY_OUTPUT("Inflation_Adjusted_Withdrawal_Table", Inflation_Adjusted_Withdrawal_Table)
+        END FUNCTION
+        ```
+
+582. **Future Value of Pension (Defined Benefit)**
+    * **Purpose:** Estimate the future value of a pension annuity stream (defined benefit plan) at a future date.
+    * **Inputs:**
+        * `Annual_Pension_Payment_at_Retirement` (Currency)
+        * `Retirement_Age` (Years)
+        * `Life_Expectancy_Age` (Years)
+        * `Discount_Rate_for_Future_Value` (Percentage - e.g., inflation rate or a personal discount rate)
+    * **Calculations:**
+        * `Number_of_Payments = Life_Expectancy_Age - Retirement_Age`
+        * `FV_Pension = Annual_Pension_Payment_at_Retirement * (((1 + Discount_Rate_for_Future_Value / 100)^Number_of_Payments - 1) / (Discount_Rate_for_Future_Value / 100))` (Future value of an annuity, simplified assuming payments at year-end)
+    * **Outputs:**
+        * `Estimated_Future_Value_of_Pension` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFutureValueOfPension():
+            Annual_Pension_Payment_at_Retirement = GET_INPUT("Annual_Pension_Payment_at_Retirement")
+            Retirement_Age = GET_INPUT("Retirement_Age")
+            Life_Expectancy_Age = GET_INPUT("Life_Expectancy_Age")
+            Discount_Rate_for_Future_Value = GET_INPUT("Discount_Rate_for_Future_Value") / 100
+
+            Number_of_Payments = Life_Expectancy_Age - Retirement_Age
+
+            FV_Pension = 0
+            IF Discount_Rate_for_Future_Value = 0 THEN
+                FV_Pension = Annual_Pension_Payment_at_Retirement * Number_of_Payments
+            ELSE
+                FV_Pension = Annual_Pension_Payment_at_Retirement * ((POWER((1 + Discount_Rate_for_Future_Value), Number_of_Payments) - 1) / Discount_Rate_for_Future_Value)
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Future_Value_of_Pension", FV_Pension)
+        END FUNCTION
+        ```
+
+583. **Budget Surplus/Deficit Projector**
+    * **Purpose:** Project monthly or annual budget surplus or deficit based on income and expenses.
+    * **Inputs:**
+        * `Monthly_Income` (Currency)
+        * `Monthly_Fixed_Expenses` (Currency)
+        * `Monthly_Variable_Expenses_Estimate` (Currency)
+        * `Projection_Months` (Number)
+        * `Income_Growth_Rate_Annual` (Percentage - optional)
+        * `Expense_Inflation_Rate_Annual` (Percentage - optional)
+    * **Calculations:**
+        * `Monthly_Net = Monthly_Income - Monthly_Fixed_Expenses - Monthly_Variable_Expenses_Estimate`
+        * `Projection_Table = []`
+        * `FOR i FROM 1 TO Projection_Months:`
+            * `Income_This_Month = Monthly_Income * (1 + Income_Growth_Rate_Annual / 100)^((i-1)/12)`
+            * `Expenses_This_Month = (Monthly_Fixed_Expenses + Monthly_Variable_Expenses_Estimate) * (1 + Expense_Inflation_Rate_Annual / 100)^((i-1)/12)`
+            * `Surplus_Deficit_This_Month = Income_This_Month - Expenses_This_Month`
+            * `Projection_Table.ADD({Month: i, Income: Income_This_Month, Expenses: Expenses_This_Month, Surplus_Deficit: Surplus_Deficit_This_Month})`
+    * **Outputs:**
+        * `Initial_Monthly_Surplus_Deficit` (Currency)
+        * `Projected_Surplus_Deficit_Table` (Table: Month, Income, Expenses, Surplus/Deficit)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ProjectBudgetSurplusDeficit():
+            Monthly_Income = GET_INPUT("Monthly_Income")
+            Monthly_Fixed_Expenses = GET_INPUT("Monthly_Fixed_Expenses")
+            Monthly_Variable_Expenses_Estimate = GET_INPUT("Monthly_Variable_Expenses_Estimate")
+            Projection_Months = GET_INPUT("Projection_Months")
+            Income_Growth_Rate_Annual = GET_INPUT("Income_Growth_Rate_Annual") / 100
+            Expense_Inflation_Rate_Annual = GET_INPUT("Expense_Inflation_Rate_Annual") / 100
+
+            Initial_Monthly_Surplus_Deficit = Monthly_Income - Monthly_Fixed_Expenses - Monthly_Variable_Expenses_Estimate
+            Projected_Surplus_Deficit_Table = []
+
+            Current_Income = Monthly_Income
+            Current_Expenses = Monthly_Fixed_Expenses + Monthly_Variable_Expenses_Estimate
+
+            FOR i FROM 1 TO Projection_Months:
+                Surplus_Deficit_This_Month = Current_Income - Current_Expenses
+                Projected_Surplus_Deficit_Table.ADD({Month: i, Income: Current_Income, Expenses: Current_Expenses, Surplus_Deficit: Surplus_Deficit_This_Month})
+
+                // Update for next month
+                IF i % 12 == 0 THEN // Apply annual growth/inflation every 12 months
+                    Current_Income = Current_Income * (1 + Income_Growth_Rate_Annual)
+                    Current_Expenses = Current_Expenses * (1 + Expense_Inflation_Rate_Annual)
+                END IF
+            END FOR
+
+            DISPLAY_OUTPUT("Initial_Monthly_Surplus_Deficit", Initial_Monthly_Surplus_Deficit)
+            DISPLAY_OUTPUT("Projected_Surplus_Deficit_Table", Projected_Surplus_Deficit_Table)
+        END FUNCTION
+        ```
+
+584. **Debt Consolidation Savings (Non-Mortgage)**
+    * **Purpose:** Calculate the potential savings from consolidating multiple high-interest debts (e.g., credit cards, personal loans) into a single lower-interest loan.
+    * **Inputs:**
+        * `Existing_Debts_List` (List of objects: {`Balance`: Currency, `APR`: Percentage, `Minimum_Payment`: Currency})
+        * `Consolidation_Loan_Amount` (Currency - total of existing balances)
+        * `Consolidation_Loan_APR` (Percentage)
+        * `Consolidation_Loan_Term_Months` (Months)
+        * `Consolidation_Loan_Fees` (Currency - upfront fees)
+    * **Calculations:**
+        * `Total_Existing_Min_Payments = SUM(Minimum_Payment from Existing_Debts_List)`
+        * `Total_Interest_Existing_Debts = SUM(CalculateInterestPaidOverTerm(Debt) for each Debt)` (Requires simulating payoff for each old debt)
+        * `New_Consolidated_Monthly_Payment = CalculateLoanPayment(Consolidation_Loan_Amount, Consolidation_Loan_APR, Consolidation_Loan_Term_Months / 12, "Monthly")`
+        * `Total_Interest_New_Loan = (New_Consolidated_Monthly_Payment * Consolidation_Loan_Term_Months) - Consolidation_Loan_Amount`
+        * `Total_Cost_New_Loan = Total_Interest_New_Loan + Consolidation_Loan_Fees`
+        * `Total_Savings = Total_Interest_Existing_Debts - Total_Interest_New_Loan - Consolidation_Loan_Fees`
+    * **Outputs:**
+        * `Total_Current_Monthly_Payments` (Currency)
+        * `New_Consolidated_Monthly_Payment` (Currency)
+        * `Estimated_Total_Interest_Savings` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDebtConsolidationSavingsNonMortgage():
+            Existing_Debts_List = GET_INPUT("Existing_Debts_List") // [{Balance, APR, Minimum_Payment}]
+            Consolidation_Loan_Amount = GET_INPUT("Consolidation_Loan_Amount")
+            Consolidation_Loan_APR = GET_INPUT("Consolidation_Loan_APR")
+            Consolidation_Loan_Term_Months = GET_INPUT("Consolidation_Loan_Term_Months")
+            Consolidation_Loan_Fees = GET_INPUT("Consolidation_Loan_Fees")
+
+            Total_Current_Monthly_Payments = 0
+            Total_Interest_Existing_Debts = 0
+
+            FOR EACH Debt IN Existing_Debts_List:
+                Total_Current_Monthly_Payments = Total_Current_Monthly_Payments + Debt.Minimum_Payment
+                // Simulate payoff for each existing debt to get total interest paid
+                // This would be a helper function (e.g., CALCULATE_TOTAL_INTEREST_FOR_DEBT(Balance, APR, MinPayment))
+                Total_Interest_Existing_Debts = Total_Interest_Existing_Debts + CALCULATE_TOTAL_INTEREST_FOR_CREDIT_CARD_PAYOFF(Debt.Balance, Debt.APR, Debt.Minimum_Payment)
+            END FOR
+
+            New_Consolidated_Monthly_Payment = CALCULATE_LOAN_PAYMENT(Consolidation_Loan_Amount, Consolidation_Loan_APR, Consolidation_Loan_Term_Months / 12, "Monthly")
+            Total_Interest_New_Loan = (New_Consolidated_Monthly_Payment * Consolidation_Loan_Term_Months) - Consolidation_Loan_Amount
+            
+            Estimated_Total_Interest_Savings = Total_Interest_Existing_Debts - Total_Interest_New_Loan - Consolidation_Loan_Fees
+
+            DISPLAY_OUTPUT("Total_Current_Monthly_Payments", Total_Current_Monthly_Payments)
+            DISPLAY_OUTPUT("New_Consolidated_Monthly_Payment", New_Consolidated_Monthly_Payment)
+            DISPLAY_OUTPUT("Estimated_Total_Interest_Savings", Estimated_Total_Interest_Savings)
+        END FUNCTION
+        ```
+
+585. **Credit Score Improvement Impact (Conceptual)**
+    * **Purpose:** Illustrate the financial benefits (e.g., lower interest rates) of improving one's credit score.
+    * **Inputs:**
+        * `Current_Credit_Score_Range` (Text: "Poor", "Fair", "Good", "Excellent")
+        * `Target_Credit_Score_Range` (Text)
+        * `Loan_Amount_Hypothetical` (Currency - e.g., for a car loan)
+        * `Loan_Term_Years` (Years)
+        * `Interest_Rate_For_Current_Score` (Percentage - *pre-defined*)
+        * `Interest_Rate_For_Target_Score` (Percentage - *pre-defined*)
+    * **Calculations:**
+        * `Monthly_Payment_Current_Score = CalculateLoanPayment(Loan_Amount_Hypothetical, Interest_Rate_For_Current_Score, Loan_Term_Years, "Monthly")`
+        * `Total_Cost_Current_Score = Monthly_Payment_Current_Score * Loan_Term_Years * 12`
+        * `Monthly_Payment_Target_Score = CalculateLoanPayment(Loan_Amount_Hypothetical, Interest_Rate_For_Target_Score, Loan_Term_Years, "Monthly")`
+        * `Total_Cost_Target_Score = Monthly_Payment_Target_Score * Loan_Term_Years * 12`
+        * `Total_Savings = Total_Cost_Current_Score - Total_Cost_Target_Score`
+    * **Outputs:**
+        * `Monthly_Payment_Difference` (Currency)
+        * `Total_Savings_Over_Loan_Term` (Currency)
+        * `Credit_Score_Improvement_Benefits_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCreditScoreImprovementImpact():
+            Current_Credit_Score_Range = GET_INPUT("Current_Credit_Score_Range")
+            Target_Credit_Score_Range = GET_INPUT("Target_Credit_Score_Range")
+            Loan_Amount_Hypothetical = GET_INPUT("Loan_Amount_Hypothetical")
+            Loan_Term_Years = GET_INPUT("Loan_Term_Years")
+
+            // Pre-defined interest rates for different score ranges (example data)
+            RATES_BY_SCORE_RANGE = GET_INTEREST_RATES_BY_CREDIT_SCORE()
+
+            Interest_Rate_For_Current_Score = LOOKUP_RATE(Current_Credit_Score_Range, RATES_BY_SCORE_RANGE)
+            Interest_Rate_For_Target_Score = LOOKUP_RATE(Target_Credit_Score_Range, RATES_BY_SCORE_RANGE)
+
+            Monthly_Payment_Current_Score = CALCULATE_LOAN_PAYMENT(Loan_Amount_Hypothetical, Interest_Rate_For_Current_Score, Loan_Term_Years, "Monthly")
+            Total_Cost_Current_Score = Monthly_Payment_Current_Score * Loan_Term_Years * 12
+
+            Monthly_Payment_Target_Score = CALCULATE_LOAN_PAYMENT(Loan_Amount_Hypothetical, Interest_Rate_For_Target_Score, Loan_Term_Years, "Monthly")
+            Total_Cost_Target_Score = Monthly_Payment_Target_Score * Loan_Term_Years * 12
+
+            Monthly_Payment_Difference = Monthly_Payment_Current_Score - Monthly_Payment_Target_Score
+            Total_Savings_Over_Loan_Term = Total_Cost_Current_Score - Total_Cost_Target_Score
+
+            Credit_Score_Improvement_Benefits_Note = "Improving your credit score can lead to significant savings on interest payments for loans, mortgages, and credit cards. It also opens doors to better loan terms and financial products."
+
+            DISPLAY_OUTPUT("Monthly_Payment_Difference", Monthly_Payment_Difference)
+            DISPLAY_OUTPUT("Total_Savings_Over_Loan_Term", Total_Savings_Over_Loan_Term)
+            DISPLAY_OUTPUT("Credit_Score_Improvement_Benefits_Note", Credit_Score_Improvement_Benefits_Note)
+        END FUNCTION
+        ```
+
+586. **Investment Performance vs. Inflation Calculator (Personal)**
+    * **Purpose:** Show whether personal investment returns are truly growing purchasing power after accounting for inflation.
+    * **Inputs:**
+        * `Personal_Investment_Return` (Percentage)
+        * `Inflation_Rate` (Percentage)
+    * **Calculations:**
+        * `Real_Return = (((1 + Personal_Investment_Return / 100) / (1 + Inflation_Rate / 100)) - 1) * 100`
+        * `Verdict = IF Real_Return > 0 THEN "Growing Purchasing Power" ELSE "Losing Purchasing Power"`
+    * **Outputs:**
+        * `Calculated_Real_Return` (Percentage)
+        * `Purchasing_Power_Verdict` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInvestmentPerformanceVsInflation():
+            Personal_Investment_Return = GET_INPUT("Personal_Investment_Return") / 100
+            Inflation_Rate = GET_INPUT("Inflation_Rate") / 100
+
+            Real_Return = (((1 + Personal_Investment_Return) / (1 + Inflation_Rate)) - 1) * 100
+
+            Purchasing_Power_Verdict = ""
+            IF Real_Return > 0 THEN
+                Purchasing_Power_Verdict = "Growing Purchasing Power (Your investments are outpacing inflation)"
+            ELSE IF Real_Return < 0 THEN
+                Purchasing_Power_Verdict = "Losing Purchasing Power (Inflation is eroding your investment gains)"
+            ELSE
+                Purchasing_Power_Verdict = "Stagnant Purchasing Power (Your investments are keeping pace with inflation)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Real_Return", Real_Return)
+            DISPLAY_OUTPUT("Purchasing_Power_Verdict", Purchasing_Power_Verdict)
+        END FUNCTION
+        ```
+
+587. **Budget Savings Optimization (Cut Down on Discretionary)**
+    * **Purpose:** Calculate how much can be saved by reducing discretionary spending in specific categories.
+    * **Inputs:**
+        * `Current_Monthly_Dining_Out` (Currency)
+        * `Target_Reduction_Dining_Out` (Percentage)
+        * `Current_Monthly_Entertainment` (Currency)
+        * `Target_Reduction_Entertainment` (Percentage)
+        * `Current_Monthly_Shopping` (Currency)
+        * `Target_Reduction_Shopping` (Percentage)
+        * `Other_Discretionary_Categories` (List of {`Amount`: Currency, `Reduction_Percent`: Percentage})
+    * **Calculations:**
+        * `Savings_Dining_Out = Current_Monthly_Dining_Out * (Target_Reduction_Dining_Out / 100)`
+        * `Savings_Entertainment = Current_Monthly_Entertainment * (Target_Reduction_Entertainment / 100)`
+        * `Savings_Shopping = Current_Monthly_Shopping * (Target_Reduction_Shopping / 100)`
+        * `Total_Monthly_Savings = SUM(All individual category savings)`
+        * `Total_Annual_Savings = Total_Monthly_Savings * 12`
+    * **Outputs:**
+        * `Total_Estimated_Monthly_Savings` (Currency)
+        * `Total_Estimated_Annual_Savings` (Currency)
+        * `Savings_Breakdown_Table` (Table: Category, Monthly Savings)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION OptimizeBudgetSavings():
+            Current_Monthly_Dining_Out = GET_INPUT("Current_Monthly_Dining_Out")
+            Target_Reduction_Dining_Out = GET_INPUT("Target_Reduction_Dining_Out") / 100
+            Current_Monthly_Entertainment = GET_INPUT("Current_Monthly_Entertainment")
+            Target_Reduction_Entertainment = GET_INPUT("Target_Reduction_Entertainment") / 100
+            Current_Monthly_Shopping = GET_INPUT("Current_Monthly_Shopping")
+            Target_Reduction_Shopping = GET_INPUT("Target_Reduction_Shopping") / 100
+            Other_Discretionary_Categories = GET_INPUT("Other_Discretionary_Categories") // [{Amount, Reduction_Percent}]
+
+            Savings_Dining_Out = Current_Monthly_Dining_Out * Target_Reduction_Dining_Out
+            Savings_Entertainment = Current_Monthly_Entertainment * Target_Reduction_Entertainment
+            Savings_Shopping = Current_Monthly_Shopping * Target_Reduction_Shopping
+
+            Total_Monthly_Savings = Savings_Dining_Out + Savings_Entertainment + Savings_Shopping
+
+            Savings_Breakdown_Table = [
+                {Category: "Dining Out", Monthly_Savings: Savings_Dining_Out},
+                {Category: "Entertainment", Monthly_Savings: Savings_Entertainment},
+                {Category: "Shopping", Monthly_Savings: Savings_Shopping}
+            ]
+
+            FOR EACH Category_Data IN Other_Discretionary_Categories:
+                Savings_This_Category = Category_Data.Amount * (Category_Data.Reduction_Percent / 100)
+                Total_Monthly_Savings = Total_Monthly_Savings + Savings_This_Category
+                Savings_Breakdown_Table.ADD({Category: "Other (" + Category_Data.Name + ")", Monthly_Savings: Savings_This_Category})
+            END FOR
+
+            Total_Annual_Savings = Total_Monthly_Savings * 12
+
+            DISPLAY_OUTPUT("Total_Estimated_Monthly_Savings", Total_Monthly_Savings)
+            DISPLAY_OUTPUT("Total_Estimated_Annual_Savings", Total_Annual_Savings)
+            DISPLAY_OUTPUT("Savings_Breakdown_Table", Savings_Breakdown_Table)
+        END FUNCTION
+        ```
+
+588. **Student Loan Additional Principal Payment Impact**
+    * **Purpose:** Calculate how much faster a student loan can be paid off and how much interest can be saved by making extra principal payments.
+    * **Inputs:**
+        * `Current_Loan_Balance` (Currency)
+        * `Annual_Interest_Rate` (Percentage)
+        * `Original_Loan_Term_Years` (Years)
+        * `Original_Monthly_Payment` (Currency)
+        * `Additional_Monthly_Principal_Payment` (Currency)
+    * **Calculations:**
+        * `Monthly_Rate = (Annual_Interest_Rate / 100) / 12`
+        * `New_Total_Monthly_Payment = Original_Monthly_Payment + Additional_Monthly_Principal_Payment`
+        * `New_Term_Months = -LOG(1 - (Current_Loan_Balance * Monthly_Rate) / New_Total_Monthly_Payment) / LOG(1 + Monthly_Rate)`
+        * `Original_Total_Interest = (Original_Monthly_Payment * Original_Loan_Term_Years * 12) - Current_Loan_Balance`
+        * `New_Total_Interest = (New_Total_Monthly_Payment * New_Term_Months) - Current_Loan_Balance`
+        * `Interest_Saved = Original_Total_Interest - New_Total_Interest`
+        * `Months_Saved = (Original_Loan_Term_Years * 12) - New_Term_Months`
+    * **Outputs:**
+        * `New_Loan_Payoff_Months` (Months)
+        * `Months_Saved_From_Original_Term` (Months)
+        * `Total_Interest_Saved` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateStudentLoanAdditionalPrincipalImpact():
+            Current_Loan_Balance = GET_INPUT("Current_Loan_Balance")
+            Annual_Interest_Rate = GET_INPUT("Annual_Interest_Rate") / 100
+            Original_Loan_Term_Years = GET_INPUT("Original_Loan_Term_Years")
+            Original_Monthly_Payment = GET_INPUT("Original_Monthly_Payment")
+            Additional_Monthly_Principal_Payment = GET_INPUT("Additional_Monthly_Principal_Payment")
+
+            Monthly_Rate = Annual_Interest_Rate / 12
+            New_Total_Monthly_Payment = Original_Monthly_Payment + Additional_Monthly_Principal_Payment
+
+            IF New_Total_Monthly_Payment <= (Current_Loan_Balance * Monthly_Rate) AND Current_Loan_Balance > 0 THEN
+                DISPLAY_OUTPUT("New_Loan_Payoff_Months", "Payment too low to ever pay off.")
+                RETURN
+            END IF
+
+            New_Term_Months = -LOG(1 - (Current_Loan_Balance * Monthly_Rate) / New_Total_Monthly_Payment) / LOG(1 + Monthly_Rate)
+            New_Term_Months = CEILING(New_Term_Months)
+
+            Original_Total_Interest = (Original_Monthly_Payment * Original_Loan_Term_Years * 12) - Current_Loan_Balance
+            New_Total_Interest = (New_Total_Monthly_Payment * New_Term_Months) - Current_Loan_Balance
+
+            Interest_Saved = Original_Total_Interest - New_Total_Interest
+            Months_Saved = (Original_Loan_Term_Years * 12) - New_Term_Months
+
+            DISPLAY_OUTPUT("New_Loan_Payoff_Months", New_Term_Months)
+            DISPLAY_OUTPUT("Months_Saved_From_Original_Term", Months_Saved)
+            DISPLAY_OUTPUT("Total_Interest_Saved", Interest_Saved)
+        END FUNCTION
+        ```
+
+589. **Home vs. Rent Decision (Simple Financial Impact)**
+    * **Purpose:** A very simplified financial comparison between the upfront cost of buying vs. annual cost of renting for quick assessment.
+    * **Inputs:**
+        * `Annual_Rent_Cost` (Currency)
+        * `Home_Purchase_Price` (Currency)
+        * `Total_Upfront_Buying_Costs` (Currency - down payment + closing)
+        * `Annual_Homeownership_Expenses_Excl_Mortgage` (Currency - taxes, insurance, maintenance)
+    * **Calculations:**
+        * `Annual_Cost_of_Renting = Annual_Rent_Cost`
+        * `Annual_Cost_of_Owning = Annual_Homeownership_Expenses_Excl_Mortgage` (Simplified, excludes mortgage principal/interest)
+        * `Difference = Annual_Cost_of_Renting - Annual_Cost_of_Owning`
+        * `Major_Factor_Note = "Buying involves significant upfront costs and long-term commitment. Renting offers flexibility but no equity."`
+    * **Outputs:**
+        * `Estimated_Annual_Cost_of_Renting` (Currency)
+        * `Estimated_Annual_Cost_of_Owning` (Currency)
+        * `Cost_Difference_Annual` (Currency)
+        * `Major_Factor_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareHomeVsRentSimple():
+            Annual_Rent_Cost = GET_INPUT("Annual_Rent_Cost")
+            Home_Purchase_Price = GET_INPUT("Home_Purchase_Price") // For context
+            Total_Upfront_Buying_Costs = GET_INPUT("Total_Upfront_Buying_Costs") // For context
+            Annual_Homeownership_Expenses_Excl_Mortgage = GET_INPUT("Annual_Homeownership_Expenses_Excl_Mortgage")
+
+            Estimated_Annual_Cost_of_Renting = Annual_Rent_Cost
+            Estimated_Annual_Cost_of_Owning = Annual_Homeownership_Expenses_Excl_Mortgage
+
+            Cost_Difference_Annual = Estimated_Annual_Cost_of_Renting - Estimated_Annual_Cost_of_Owning
+
+            Major_Factor_Note = "This is a very simplified comparison. Buying involves significant upfront costs (down payment, closing costs) and can build equity over time. Renting offers flexibility but no asset building. Consider your long-term goals and financial stability."
+
+            DISPLAY_OUTPUT("Estimated_Annual_Cost_of_Renting", Estimated_Annual_Cost_of_Renting)
+            DISPLAY_OUTPUT("Estimated_Annual_Cost_of_Owning", Estimated_Annual_Cost_of_Owning)
+            DISPLAY_OUTPUT("Cost_Difference_Annual", Cost_Difference_Annual)
+            DISPLAY_OUTPUT("Major_Factor_Note", Major_Factor_Note)
+        END FUNCTION
+        ```
+
+590. **Personal Capital Gains/Losses Tracker**
+    * **Purpose:** Track individual stock or crypto capital gains and losses for tax purposes, differentiating between short-term and long-term.
+    * **Inputs:**
+        * `Transactions_List` (List of objects: {`Asset`: String, `Type`: "Buy" or "Sell", `Date`: Date, `Price_Per_Unit`: Currency, `Units`: Number})
+        * `Current_Date` (Date)
+    * **Calculations:**
+        * *Match buys to sells (e.g., FIFO or specified method).*
+        * `Total_Short_Term_Gain_Loss = 0`
+        * `Total_Long_Term_Gain_Loss = 0`
+        * `FOR EACH Sell_Tx IN Transactions_List WHERE Type = "Sell":`
+            * `Corresponding_Buy_Tx = FIND_MATCHING_BUY(Sell_Tx.Asset, Sell_Tx.Units, Transactions_List)`
+            * `Gain_Loss_This_Tx = (Sell_Tx.Price_Per_Unit - Corresponding_Buy_Tx.Price_Per_Unit) * Sell_Tx.Units`
+            * `Holding_Period_Days = DAYS_BETWEEN(Corresponding_Buy_Tx.Date, Sell_Tx.Date)`
+            * `IF Holding_Period_Days <= 365 THEN Total_Short_Term_Gain_Loss = Total_Short_Term_Gain_Loss + Gain_Loss_This_Tx`
+            * `ELSE Total_Long_Term_Gain_Loss = Total_Long_Term_Gain_Loss + Gain_Loss_This_Tx`
+    * **Outputs:**
+        * `Net_Short_Term_Gain_Loss` (Currency)
+        * `Net_Long_Term_Gain_Loss` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION TrackPersonalCapitalGainsLosses():
+            Transactions_List = GET_INPUT("Transactions_List") // [{Asset, Type ("Buy"/"Sell"), Date, Price_Per_Unit, Units}]
+            
+            // Assume FIFO (First-In, First-Out) method for matching buys to sells.
+            // This is a complex simulation for a real system.
+
+            Net_Short_Term_Gain_Loss = 0
+            Net_Long_Term_Gain_Loss = 0
+
+            // Simplified: Requires a robust inventory management system for actual tax lots.
+            // This pseudo-code illustrates the concept only.
+            
+            // Example of how it might work:
+            // Iterate through sells, for each sell:
+            //   Find the oldest corresponding buy lot for that asset.
+            //   Calculate gain/loss and holding period.
+            //   Add to ST or LT totals.
+            //   Adjust remaining units in buy lot.
+
+            // Placeholder for a real transaction processing logic
+            Net_Short_Term_Gain_Loss = 1000 // Example result
+            Net_Long_Term_Gain_Loss = 500 // Example result
+
+            DISPLAY_OUTPUT("Net_Short_Term_Gain_Loss", Net_Short_Term_Gain_Loss)
+            DISPLAY_OUTPUT("Net_Long_Term_Gain_Loss", Net_Long_Term_Gain_Loss)
+        END FUNCTION
+        ```
+
+591. **Budget Scenario Planner**
+    * **Purpose:** Allow users to create different budget scenarios (e.g., income increase, expense reduction) and see their financial impact.
+    * **Inputs:**
+        * `Base_Monthly_Income` (Currency)
+        * `Base_Monthly_Expenses` (Currency)
+        * `Scenario_1_Income_Change` (Percentage)
+        * `Scenario_1_Expense_Change` (Percentage)
+        * `Scenario_2_Income_Change` (Percentage)
+        * `Scenario_2_Expense_Change` (Percentage)
+    * **Calculations:**
+        * `Base_Surplus_Deficit = Base_Monthly_Income - Base_Monthly_Expenses`
+        * `Scenario_1_New_Income = Base_Monthly_Income * (1 + Scenario_1_Income_Change / 100)`
+        * `Scenario_1_New_Expenses = Base_Monthly_Expenses * (1 + Scenario_1_Expense_Change / 100)`
+        * `Scenario_1_Surplus_Deficit = Scenario_1_New_Income - Scenario_1_New_Expenses`
+        * `(Repeat for Scenario 2)`
+    * **Outputs:**
+        * `Base_Scenario_Surplus_Deficit` (Currency)
+        * `Scenario_1_Surplus_Deficit` (Currency)
+        * `Scenario_2_Surplus_Deficit` (Currency)
+        * `Comparison_Summary` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION PlanBudgetScenarios():
+            Base_Monthly_Income = GET_INPUT("Base_Monthly_Income")
+            Base_Monthly_Expenses = GET_INPUT("Base_Monthly_Expenses")
+            Scenario_1_Income_Change = GET_INPUT("Scenario_1_Income_Change") / 100
+            Scenario_1_Expense_Change = GET_INPUT("Scenario_1_Expense_Change") / 100
+            Scenario_2_Income_Change = GET_INPUT("Scenario_2_Income_Change") / 100
+            Scenario_2_Expense_Change = GET_INPUT("Scenario_2_Expense_Change") / 100
+
+            Base_Surplus_Deficit = Base_Monthly_Income - Base_Monthly_Expenses
+
+            Scenario_1_New_Income = Base_Monthly_Income * (1 + Scenario_1_Income_Change)
+            Scenario_1_New_Expenses = Base_Monthly_Expenses * (1 + Scenario_1_Expense_Change)
+            Scenario_1_Surplus_Deficit = Scenario_1_New_Income - Scenario_1_New_Expenses
+
+            Scenario_2_New_Income = Base_Monthly_Income * (1 + Scenario_2_Income_Change)
+            Scenario_2_New_Expenses = Base_Monthly_Expenses * (1 + Scenario_2_Expense_Change)
+            Scenario_2_Surplus_Deficit = Scenario_2_New_Income - Scenario_2_New_Expenses
+
+            Comparison_Summary = ""
+            IF Scenario_1_Surplus_Deficit > Base_Surplus_Deficit AND Scenario_2_Surplus_Deficit > Base_Surplus_Deficit THEN
+                Comparison_Summary = "Both scenarios show an improved financial position."
+            ELSE
+                Comparison_Summary = "Review scenarios for optimal financial outcome."
+            END IF
+
+            DISPLAY_OUTPUT("Base_Scenario_Surplus_Deficit", Base_Surplus_Deficit)
+            DISPLAY_OUTPUT("Scenario_1_Surplus_Deficit", Scenario_1_Surplus_Deficit)
+            DISPLAY_OUTPUT("Scenario_2_Surplus_Deficit", Scenario_2_Surplus_Deficit)
+            DISPLAY_OUTPUT("Comparison_Summary", Comparison_Summary)
+        END FUNCTION
+        ```
+
+592. **Financial Ratios (Personal) Tracker**
+    * **Purpose:** Track key personal financial ratios over time to monitor progress and identify trends.
+    * **Inputs:**
+        * `Ratio_Name` (Dropdown: "Savings Rate", "Debt-to-Income", "Net Worth to Income", etc.)
+        * `Historical_Data` (List of values for the selected ratio over periods)
+    * **Calculations:**
+        * `Average_Ratio = SUM(Historical_Data) / LENGTH(Historical_Data)`
+        * `Trend_Indicator = IF Historical_Data[last] > Historical_Data[first] THEN "Improving"` (depending on ratio)
+    * **Outputs:**
+        * `Selected_Ratio_History_Table` (Table: Period, Value)
+        * `Average_Value` (Number)
+        * `Trend_Analysis` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION TrackPersonalFinancialRatios():
+            Ratio_Name = GET_INPUT("Ratio_Name")
+            Historical_Data = GET_INPUT("Historical_Data") // List of numbers
+
+            IF LENGTH(Historical_Data) < 2 THEN
+                DISPLAY_OUTPUT("Trend_Analysis", "Need at least two data points for trend analysis.")
+                RETURN
+            END IF
+
+            Average_Value = SUM_LIST(Historical_Data) / LENGTH(Historical_Data)
+
+            Trend_Analysis = "Stable"
+            // For ratios like Savings Rate or Net Worth to Income, higher is better
+            IF Ratio_Name == "Savings Rate" OR Ratio_Name == "Net Worth to Income" THEN
+                IF Historical_Data[LENGTH(Historical_Data)-1] > Historical_Data[0] THEN
+                    Trend_Analysis = "Improving (Growing)"
+                ELSE IF Historical_Data[LENGTH(Historical_Data)-1] < Historical_Data[0] THEN
+                    Trend_Analysis = "Declining (Worsening)"
+                END IF
+            // For ratios like Debt-to-Income or Credit Utilization, lower is better
+            ELSE IF Ratio_Name == "Debt-to-Income" OR Ratio_Name == "Credit Utilization" THEN
+                IF Historical_Data[LENGTH(Historical_Data)-1] < Historical_Data[0] THEN
+                    Trend_Analysis = "Improving (Decreasing)"
+                ELSE IF Historical_Data[LENGTH(Historical_Data)-1] > Historical_Data[0] THEN
+                    Trend_Analysis = "Declining (Worsening)"
+                END IF
+            END IF
+
+            DISPLAY_OUTPUT("Selected_Ratio_History_Table", Historical_Data) // Or plot this
+            DISPLAY_OUTPUT("Average_Value", Average_Value)
+            DISPLAY_OUTPUT("Trend_Analysis", Trend_Analysis)
+        END FUNCTION
+        ```
+
+593. **Debt-to-Income Ratio (DTI) for Mortgage Qualification**
+    * **Purpose:** Calculate the front-end (housing) and back-end (total debt) DTI ratios, critical for mortgage eligibility.
+    * **Inputs:**
+        * `Gross_Monthly_Income` (Currency)
+        * `Proposed_Monthly_Housing_Payment` (Currency - PITI + HOA)
+        * `Other_Monthly_Debt_Payments` (Currency)
+    * **Calculations:**
+        * `Front_End_DTI = (Proposed_Monthly_Housing_Payment / Gross_Monthly_Income) * 100` (If Gross_Monthly_Income > 0)
+        * `Back_End_DTI = ((Proposed_Monthly_Housing_Payment + Other_Monthly_Debt_Payments) / Gross_Monthly_Income) * 100` (If Gross_Monthly_Income > 0)
+        * `Qualification_Note = IF Front_End_DTI <= 28 AND Back_End_DTI <= 36 THEN "Likely Qualify" ELSE "May Not Qualify"` (Typical conventional loan guidelines)
+    * **Outputs:**
+        * `Front_End_DTI_Ratio` (Percentage)
+        * `Back_End_DTI_Ratio` (Percentage)
+        * `Mortgage_Qualification_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMortgageQualificationDTI():
+            Gross_Monthly_Income = GET_INPUT("Gross_Monthly_Income")
+            Proposed_Monthly_Housing_Payment = GET_INPUT("Proposed_Monthly_Housing_Payment")
+            Other_Monthly_Debt_Payments = GET_INPUT("Other_Monthly_Debt_Payments")
+
+            IF Gross_Monthly_Income <= 0 THEN
+                DISPLAY_OUTPUT("Mortgage_Qualification_Note", "Gross monthly income must be positive for calculation.")
+                RETURN
+            END IF
+
+            Front_End_DTI = (Proposed_Monthly_Housing_Payment / Gross_Monthly_Income) * 100
+            Back_End_DTI = ((Proposed_Monthly_Housing_Payment + Other_Monthly_Debt_Payments) / Gross_Monthly_Income) * 100
+
+            Mortgage_Qualification_Note = ""
+            IF Front_End_DTI <= 28 AND Back_End_DTI <= 36 THEN
+                Mortgage_Qualification_Note = "Likely Qualify for conventional mortgage (within typical DTI limits)."
+            ELSE IF Front_End_DTI > 28 AND Back_End_DTI > 36 THEN
+                Mortgage_Qualification_Note = "May Not Qualify (exceeds typical DTI limits). Consider reducing debt or increasing income."
+            ELSE IF Front_End_DTI > 28 THEN
+                Mortgage_Qualification_Note = "Housing payment may be too high (exceeds 28% rule)."
+            ELSE IF Back_End_DTI > 36 THEN
+                Mortgage_Qualification_Note = "Total debt payments may be too high (exceeds 36% rule)."
+            END IF
+
+            DISPLAY_OUTPUT("Front_End_DTI_Ratio", Front_End_DTI)
+            DISPLAY_OUTPUT("Back_End_DTI_Ratio", Back_End_DTI)
+            DISPLAY_OUTPUT("Mortgage_Qualification_Note", Mortgage_Qualification_Note)
+        END FUNCTION
+        ```
+
+594. **Home Equity Line of Credit (HELOC) Interest Cost Estimator**
+    * **Purpose:** Estimate the monthly and annual interest cost of a HELOC, which often has a variable rate.
+    * **Inputs:**
+        * `HELOC_Balance_Outstanding` (Currency)
+        * `Current_Annual_Interest_Rate` (Percentage)
+        * `Interest_Only_Payment_Selected` (Boolean)
+    * **Calculations:**
+        * `Monthly_Interest_Cost = HELOC_Balance_Outstanding * (Current_Annual_Interest_Rate / 100 / 12)`
+        * `Annual_Interest_Cost = Monthly_Interest_Cost * 12`
+    * **Outputs:**
+        * `Estimated_Monthly_Interest_Cost` (Currency)
+        * `Estimated_Annual_Interest_Cost` (Currency)
+        * `Warning_Interest_Only` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION EstimateHELOCInterestCost():
+            HELOC_Balance_Outstanding = GET_INPUT("HELOC_Balance_Outstanding")
+            Current_Annual_Interest_Rate = GET_INPUT("Current_Annual_Interest_Rate") / 100
+            Interest_Only_Payment_Selected = GET_INPUT("Interest_Only_Payment_Selected")
+
+            Monthly_Interest_Cost = HELOC_Balance_Outstanding * (Current_Annual_Interest_Rate / 12)
+            Annual_Interest_Cost = Monthly_Interest_Cost * 12
+
+            Warning_Interest_Only = ""
+            IF Interest_Only_Payment_Selected THEN
+                Warning_Interest_Only = "Note: Interest-only payments do not reduce your principal balance. Your balance will remain the same unless you pay extra."
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Monthly_Interest_Cost", Monthly_Interest_Cost)
+            DISPLAY_OUTPUT("Estimated_Annual_Interest_Cost", Annual_Interest_Cost)
+            DISPLAY_OUTPUT("Warning_Interest_Only", Warning_Interest_Only)
+        END FUNCTION
+        ```
+
+595. **Mortgage Refinancing Savings (Comprehensive)**
+    * **Purpose:** Calculate the long-term savings and breakeven point for refinancing a mortgage, considering all costs and rate differences.
+    * **Inputs:**
+        * `Current_Loan_Balance` (Currency)
+        * `Current_Interest_Rate` (Percentage)
+        * `Current_Remaining_Term_Years` (Years)
+        * `New_Interest_Rate` (Percentage)
+        * `New_Loan_Term_Years` (Years)
+        * `Refinancing_Closing_Costs` (Currency)
+    * **Calculations:**
+        * `Current_Monthly_Payment = CalculateLoanPayment(Current_Loan_Balance, Current_Interest_Rate, Current_Remaining_Term_Years, "Monthly")`
+        * `New_Monthly_Payment = CalculateLoanPayment(Current_Loan_Balance, New_Interest_Rate, New_Loan_Term_Years, "Monthly")`
+        * `Monthly_Savings = Current_Monthly_Payment - New_Monthly_Payment`
+        * `Total_Interest_Saved = (Current_Monthly_Payment * Current_Remaining_Term_Years * 12) - (New_Monthly_Payment * New_Loan_Term_Years * 12)`
+        * `Breakeven_Months = Refinancing_Closing_Costs / Monthly_Savings` (If Monthly_Savings > 0)
+    * **Outputs:**
+        * `Monthly_Payment_Savings` (Currency)
+        * `Total_Interest_Savings_Over_Life_of_Loan` (Currency)
+        * `Refinancing_Breakeven_Point_Months` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMortgageRefinancingSavingsComprehensive():
+            Current_Loan_Balance = GET_INPUT("Current_Loan_Balance")
+            Current_Interest_Rate = GET_INPUT("Current_Interest_Rate")
+            Current_Remaining_Term_Years = GET_INPUT("Current_Remaining_Term_Years")
+            New_Interest_Rate = GET_INPUT("New_Interest_Rate")
+            New_Loan_Term_Years = GET_INPUT("New_Loan_Term_Years")
+            Refinancing_Closing_Costs = GET_INPUT("Refinancing_Closing_Costs")
+
+            Current_Monthly_Payment = CALCULATE_LOAN_PAYMENT(Current_Loan_Balance, Current_Interest_Rate, Current_Remaining_Term_Years, "Monthly")
+            New_Monthly_Payment = CALCULATE_LOAN_PAYMENT(Current_Loan_Balance, New_Interest_Rate, New_Loan_Term_Years, "Monthly")
+
+            Monthly_Payment_Savings = Current_Monthly_Payment - New_Monthly_Payment
+
+            Total_Interest_Current_Loan = (Current_Monthly_Payment * Current_Remaining_Term_Years * 12) - Current_Loan_Balance
+            Total_Interest_New_Loan = (New_Monthly_Payment * New_Loan_Term_Years * 12) - Current_Loan_Balance
+            Total_Interest_Savings_Over_Life_of_Loan = Total_Interest_Current_Loan - Total_Interest_New_Loan
+
+            Refinancing_Breakeven_Point_Months = 0
+            IF Monthly_Payment_Savings > 0 THEN
+                Refinancing_Breakeven_Point_Months = Refinancing_Closing_Costs / Monthly_Payment_Savings
+            ELSE
+                Refinancing_Breakeven_Point_Months = INFINITY // No savings or negative savings
+            END IF
+
+            DISPLAY_OUTPUT("Monthly_Payment_Savings", Monthly_Payment_Savings)
+            DISPLAY_OUTPUT("Total_Interest_Savings_Over_Life_of_Loan", Total_Interest_Savings_Over_Life_of_Loan)
+            DISPLAY_OUTPUT("Refinancing_Breakeven_Point_Months", CEILING(Refinancing_Breakeven_Point_Months))
+        END FUNCTION
+        ```
+
+---
+
+We've just added another 30 Personal Finance calculators (536-595), bringing our grand total to **494 (previous) + 30 = 524 calculators!**
+
+This is a very strong batch for Personal Finance. We will continue with more Personal Finance calculators in the next response, aiming to hit that 50+ mark for the category in total for this batch, and then move onto the remaining categories.
+
+
+--------------------------------
+
+Okay, you got it! We will continue to expand the list with utmost rigor, focusing on Personal Finance to get us over the 650 unique calculator mark.
+
+Current count: **524 Calculators**.
+Goal: **650 Unique Calculators**.
+Remaining: **126 Calculators**.
+
+I'll provide a batch of **50+ Personal Finance Calculators** now, pushing us past your target.
+
+---
+
+## XV. Personal Finance Calculators (Deeper Dive - Continued)
+
+596.  **Retirement Savings "Catch-Up" Calculator**
+    * **Purpose:** Calculate the additional monthly or annual contributions needed to reach a retirement goal if starting later or falling behind.
+    * **Inputs:**
+        * `Current_Age` (Years)
+        * `Target_Retirement_Age` (Years)
+        * `Current_Retirement_Savings` (Currency)
+        * `Desired_Retirement_Nest_Egg` (Currency)
+        * `Expected_Annual_Return` (Percentage)
+    * **Calculations:**
+        * `Years_Remaining = Target_Retirement_Age - Current_Age`
+        * `Future_Value_of_Current_Savings = Current_Retirement_Savings * (1 + Expected_Annual_Return / 100)^Years_Remaining`
+        * `Amount_Still_Needed_at_Retirement = Desired_Retirement_Nest_Egg - Future_Value_of_Current_Savings`
+        * `Required_Annual_Contribution = Amount_Still_Needed_at_Retirement * ((Expected_Annual_Return / 100) / ((1 + Expected_Annual_Return / 100)^Years_Remaining - 1))` (FV of annuity formula reversed)
+        * `Required_Monthly_Contribution = Required_Annual_Contribution / 12`
+    * **Outputs:**
+        * `Amount_Needed_from_Future_Contributions` (Currency)
+        * `Required_Annual_Catch_Up_Contribution` (Currency)
+        * `Required_Monthly_Catch_Up_Contribution` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateRetirementCatchUp():
+            Current_Age = GET_INPUT("Current_Age")
+            Target_Retirement_Age = GET_INPUT("Target_Retirement_Age")
+            Current_Retirement_Savings = GET_INPUT("Current_Retirement_Savings")
+            Desired_Retirement_Nest_Egg = GET_INPUT("Desired_Retirement_Nest_Egg")
+            Expected_Annual_Return = GET_INPUT("Expected_Annual_Return") / 100
+
+            Years_Remaining = Target_Retirement_Age - Current_Age
+
+            IF Years_Remaining <= 0 THEN
+                DISPLAY_OUTPUT("Status", "You are already at or past your retirement age.")
+                RETURN
+            END IF
+
+            FV_of_Current_Savings = Current_Retirement_Savings * POWER((1 + Expected_Annual_Return), Years_Remaining)
+            Amount_Still_Needed_at_Retirement = Desired_Retirement_Nest_Egg - FV_of_Current_Savings
+
+            Required_Annual_Contribution = 0
+            IF Expected_Annual_Return = 0 THEN
+                Required_Annual_Contribution = Amount_Still_Needed_at_Retirement / Years_Remaining
+            ELSE
+                Required_Annual_Contribution = Amount_Still_Needed_at_Retirement * \
+                                              (Expected_Annual_Return / (POWER((1 + Expected_Annual_Return), Years_Remaining) - 1))
+            END IF
+            
+            Required_Monthly_Contribution = Required_Annual_Contribution / 12
+
+            DISPLAY_OUTPUT("Amount_Needed_from_Future_Contributions", Amount_Still_Needed_at_Retirement)
+            DISPLAY_OUTPUT("Required_Annual_Catch_Up_Contribution", Required_Annual_Contribution)
+            DISPLAY_OUTPUT("Required_Monthly_Catch_Up_Contribution", Required_Monthly_Contribution)
+        END FUNCTION
+        ```
+
+597.  **Social Security Breakeven Age Calculator**
+    * **Purpose:** Determine the age at which the cumulative lifetime Social Security benefits from claiming early versus waiting to claim higher benefits become equal.
+    * **Inputs:**
+        * `Primary_Insurance_Amount_PIA` (Currency - monthly benefit at Full Retirement Age)
+        * `Full_Retirement_Age_FRA` (Years)
+        * `Early_Claiming_Age` (Years - e.g., 62)
+        * `Late_Claiming_Age` (Years - e.g., 70)
+        * `Reduction_Factor_Per_Month_Early` (Percentage - *pre-defined*)
+        * `Increase_Factor_Per_Month_Late` (Percentage - *pre-defined*)
+    * **Calculations:**
+        * `Monthly_Benefit_Early = PIA * (1 - ((FRA - Early_Claiming_Age) * 12 * Reduction_Factor_Per_Month_Early / 100))`
+        * `Monthly_Benefit_Late = PIA * (1 + ((Late_Claiming_Age - FRA) * 12 * Increase_Factor_Per_Month_Late / 100))`
+        * *Simulate cumulative benefits for both scenarios, starting from 62.*
+        * `Cumulative_Early = 0`, `Cumulative_Late = 0`
+        * `FOR Age FROM Early_Claiming_Age TO 100:`
+            * `IF Age >= Early_Claiming_Age THEN Cumulative_Early = Cumulative_Early + Monthly_Benefit_Early * 12`
+            * `IF Age >= Late_Claiming_Age THEN Cumulative_Late = Cumulative_Late + Monthly_Benefit_Late * 12`
+            * `IF Cumulative_Early < Cumulative_Late AND (Cumulative_Early + Monthly_Benefit_Early*12) >= Cumulative_Late THEN Breakeven_Age = Age + 1`
+    * **Outputs:**
+        * `Estimated_Breakeven_Age` (Years)
+        * `Recommendation_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateSSBreakevenAge():
+            Primary_Insurance_Amount_PIA = GET_INPUT("Primary_Insurance_Amount_PIA")
+            Full_Retirement_Age_FRA = GET_INPUT("Full_Retirement_Age_FRA")
+            Early_Claiming_Age = GET_INPUT("Early_Claiming_Age")
+            Late_Claiming_Age = GET_INPUT("Late_Claiming_Age")
+
+            // Pre-defined adjustment factors
+            REDUCTION_FACTOR_PER_MONTH_EARLY = 0.00555 // 5/9 of 1%
+            INCREASE_FACTOR_PER_MONTH_LATE = 0.00666 // 2/3 of 1%
+
+            Monthly_Benefit_Early = PIA * (1 - ((Full_Retirement_Age_FRA - Early_Claiming_Age) * 12 * REDUCTION_FACTOR_PER_MONTH_EARLY))
+            Monthly_Benefit_Late = PIA * (1 + ((Late_Claiming_Age - Full_Retirement_Age_FRA) * 12 * INCREASE_FACTOR_PER_MONTH_LATE))
+
+            Cumulative_Early = 0
+            Cumulative_Late = 0
+            Breakeven_Age = 0
+            Max_Age_Simulate = 100
+
+            FOR age_sim FROM Early_Claiming_Age TO Max_Age_Simulate:
+                IF age_sim >= Early_Claiming_Age THEN
+                    Cumulative_Early = Cumulative_Early + Monthly_Benefit_Early * 12
+                END IF
+                IF age_sim >= Late_Claiming_Age THEN
+                    Cumulative_Late = Cumulative_Late + Monthly_Benefit_Late * 12
+                END IF
+
+                IF Breakeven_Age == 0 AND Cumulative_Late >= Cumulative_Early THEN
+                    Breakeven_Age = age_sim // The age at which late option catches up
+                    BREAK
+                END IF
+            END FOR
+
+            Recommendation_Note = ""
+            IF Breakeven_Age == 0 THEN
+                Recommendation_Note = "Breakeven age not reached within simulation. Claiming early might be better if life expectancy is shorter."
+            ELSE
+                Recommendation_Note = "The breakeven age is " + Breakeven_Age + ". If you expect to live longer than this, waiting to claim may provide more total benefits. If shorter, claiming early may be better."
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_Breakeven_Age", Breakeven_Age)
+            DISPLAY_OUTPUT("Recommendation_Note", Recommendation_Note)
+        END FUNCTION
+        ```
+
+598.  **Retirement Bucket Strategy Analyzer (Conceptual)**
+    * **Purpose:** Illustrate how a "bucket strategy" (allocating retirement funds to short-term, mid-term, and long-term buckets with varying risk levels) can manage sequence of returns risk.
+    * **Inputs:**
+        * `Total_Retirement_Portfolio` (Currency)
+        * `Bucket_1_Cash_Allocation` (Percentage - e.g., 1-3 years of expenses)
+        * `Bucket_2_Income_Allocation` (Percentage - bonds/income, e.g., 4-10 years of expenses)
+        * `Bucket_3_Growth_Allocation` (Percentage - stocks/growth, for 10+ years out)
+        * `Annual_Expenses_in_Retirement` (Currency)
+        * `Expected_Return_Bucket_1` (Percentage)
+        * `Expected_Return_Bucket_2` (Percentage)
+        * `Expected_Return_Bucket_3` (Percentage)
+    * **Calculations:**
+        * `Bucket_1_Value = Total_Retirement_Portfolio * (Bucket_1_Cash_Allocation / 100)`
+        * `Bucket_2_Value = Total_Retirement_Portfolio * (Bucket_2_Income_Allocation / 100)`
+        * `Bucket_3_Value = Total_Retirement_Portfolio * (Bucket_3_Growth_Allocation / 100)`
+        * `Bucket_1_Years_Coverage = Bucket_1_Value / Annual_Expenses_in_Retirement`
+        * `Visual_Representation_of_Flows` (Conceptual - show funds moving from growth to income to cash)
+    * **Outputs:**
+        * `Initial_Bucket_Allocation_Table` (Table: Bucket, Value, Years Covered)
+        * `Strategy_Explanation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeRetirementBucketStrategy():
+            Total_Retirement_Portfolio = GET_INPUT("Total_Retirement_Portfolio")
+            Bucket_1_Cash_Allocation = GET_INPUT("Bucket_1_Cash_Allocation") / 100
+            Bucket_2_Income_Allocation = GET_INPUT("Bucket_2_Income_Allocation") / 100
+            Bucket_3_Growth_Allocation = GET_INPUT("Bucket_3_Growth_Allocation") / 100
+            Annual_Expenses_in_Retirement = GET_INPUT("Annual_Expenses_in_Retirement")
+            Expected_Return_Bucket_1 = GET_INPUT("Expected_Return_Bucket_1") // For context
+            Expected_Return_Bucket_2 = GET_INPUT("Expected_Return_Bucket_2")
+            Expected_Return_Bucket_3 = GET_INPUT("Expected_Return_Bucket_3")
+
+            Bucket_1_Value = Total_Retirement_Portfolio * Bucket_1_Cash_Allocation
+            Bucket_2_Value = Total_Retirement_Portfolio * Bucket_2_Income_Allocation
+            Bucket_3_Value = Total_Retirement_Portfolio * Bucket_3_Growth_Allocation
+
+            Bucket_1_Years_Coverage = 0
+            IF Annual_Expenses_in_Retirement > 0 THEN
+                Bucket_1_Years_Coverage = Bucket_1_Value / Annual_Expenses_in_Retirement
+            END IF
+
+            Initial_Bucket_Allocation_Table = [
+                {Bucket: "Bucket 1 (Cash/Short-term)", Value: Bucket_1_Value, Years_Coverage: Bucket_1_Years_Coverage},
+                {Bucket: "Bucket 2 (Income/Mid-term)", Value: Bucket_2_Value, Years_Coverage: (Bucket_2_Value / Annual_Expenses_in_Retirement)},
+                {Bucket: "Bucket 3 (Growth/Long-term)", Value: Bucket_3_Value, Years_Coverage: (Bucket_3_Value / Annual_Expenses_in_Retirement)}
+            ]
+
+            Strategy_Explanation = "The bucket strategy allocates funds based on time horizons: short-term needs in cash, mid-term in income-generating assets, and long-term in growth assets. This helps manage sequence of returns risk by minimizing the need to sell growth assets during market downturns, allowing them time to recover."
+
+            DISPLAY_OUTPUT("Initial_Bucket_Allocation_Table", Initial_Bucket_Allocation_Table)
+            DISPLAY_OUTPUT("Strategy_Explanation", Strategy_Explanation)
+        END FUNCTION
+        ```
+
+599.  **Part-Time Work in Retirement Impact Calculator**
+    * **Purpose:** Quantify how working part-time in retirement can extend portfolio longevity or reduce withdrawal needs.
+    * **Inputs:**
+        * `Retirement_Portfolio_Value_Initial` (Currency)
+        * `Desired_Annual_Expenses` (Currency)
+        * `Annual_Part_Time_Income` (Currency)
+        * `Expected_Portfolio_Return` (Percentage)
+        * `Years_in_Retirement` (Years)
+        * `Tax_Rate_on_Part_Time_Income` (Percentage)
+    * **Calculations:**
+        * `Net_Part_Time_Income = Annual_Part_Time_Income * (1 - Tax_Rate_on_Part_Time_Income / 100)`
+        * `Net_Withdrawal_Needed = Desired_Annual_Expenses - Net_Part_Time_Income`
+        * *Simulate portfolio longevity with and without part-time income.*
+        * `Longevity_With_Work = SimulatePortfolioLongevity(Portfolio_Value, Net_Withdrawal_Needed, Return, Years)`
+        * `Longevity_Without_Work = SimulatePortfolioLongevity(Portfolio_Value, Desired_Annual_Expenses, Return, Years)`
+    * **Outputs:**
+        * `Net_Part_Time_Income_After_Tax` (Currency)
+        * `Portfolio_Longevity_With_Part_Time_Work` (Years)
+        * `Portfolio_Longevity_Without_Part_Time_Work` (Years)
+        * `Additional_Years_Gained` (Years)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePartTimeWorkImpactOnRetirement():
+            Retirement_Portfolio_Value_Initial = GET_INPUT("Retirement_Portfolio_Value_Initial")
+            Desired_Annual_Expenses = GET_INPUT("Desired_Annual_Expenses")
+            Annual_Part_Time_Income = GET_INPUT("Annual_Part_Time_Income")
+            Expected_Portfolio_Return = GET_INPUT("Expected_Portfolio_Return") / 100
+            Years_in_Retirement_Sim = GET_INPUT("Years_in_Retirement_Sim") // How many years to simulate
+            Tax_Rate_on_Part_Time_Income = GET_INPUT("Tax_Rate_on_Part_Time_Income") / 100
+
+            Net_Part_Time_Income = Annual_Part_Time_Income * (1 - Tax_Rate_on_Part_Time_Income)
+            Net_Withdrawal_Needed_With_Work = Desired_Annual_Expenses - Net_Part_Time_Income
+
+            // Helper function to simulate portfolio longevity
+            // SIMULATE_PORTFOLIO_LONGEVITY(initial_value, annual_withdrawal, annual_return, max_years)
+            
+            Longevity_With_Work = SIMULATE_PORTFOLIO_LONGEVITY(
+                Retirement_Portfolio_Value_Initial,
+                Net_Withdrawal_Needed_With_Work,
+                Expected_Portfolio_Return,
+                Years_in_Retirement_Sim
+            )
+            
+            Longevity_Without_Work = SIMULATE_PORTFOLIO_LONGEVITY(
+                Retirement_Portfolio_Value_Initial,
+                Desired_Annual_Expenses,
+                Expected_Portfolio_Return,
+                Years_in_Retirement_Sim
+            )
+
+            Additional_Years_Gained = Longevity_With_Work - Longevity_Without_Work
+
+            DISPLAY_OUTPUT("Net_Part_Time_Income_After_Tax", Net_Part_Time_Income)
+            DISPLAY_OUTPUT("Portfolio_Longevity_With_Part_Time_Work", Longevity_With_Work)
+            DISPLAY_OUTPUT("Portfolio_Longevity_Without_Part_Time_Work", Longevity_Without_Work)
+            DISPLAY_OUTPUT("Additional_Years_Gained", Additional_Years_Gained)
+        END FUNCTION
+        ```
+
+600. **Pension Plan Payout Comparison (Annuity Options)**
+    * **Purpose:** Compare different annuity payout options from a pension plan (e.g., single-life, joint-life, period certain) based on their monthly payouts.
+    * **Inputs:**
+        * `Single_Life_Annuity_Monthly` (Currency)
+        * `Joint_Life_50_Monthly` (Currency)
+        * `Joint_Life_100_Monthly` (Currency)
+        * `Period_Certain_10_Years_Monthly` (Currency)
+        * `Personal_Life_Expectancy_Years` (Years)
+        * `Spouse_Life_Expectancy_Years` (Years)
+    * **Calculations:**
+        * `Total_Payout_Single = Single_Life_Annuity_Monthly * 12 * Personal_Life_Expectancy_Years`
+        * `Total_Payout_Joint_50 = (Joint_Life_50_Monthly * 12 * Personal_Life_Expectancy_Years) + (Joint_Life_50_Monthly * 0.5 * 12 * (Spouse_Life_Expectancy_Years - Personal_Life_Expectancy_Years))` (Simplified for second life)
+        * `// ... similar for other options`
+        * `Recommendation_Note = "Single-life offers highest payout but no survivor benefit. Joint-life offers survivor benefit but lower payout. Period-certain guarantees payments for a set period."`
+    * **Outputs:**
+        * `Total_Payout_Single_Life` (Currency)
+        * `Total_Payout_Joint_Life_50` (Currency)
+        * `Total_Payout_Joint_Life_100` (Currency)
+        * `Total_Payout_Period_Certain_10_Years` (Currency)
+        * `Decision_Factors_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ComparePensionAnnuityOptions():
+            Single_Life_Annuity_Monthly = GET_INPUT("Single_Life_Annuity_Monthly")
+            Joint_Life_50_Monthly = GET_INPUT("Joint_Life_50_Monthly")
+            Joint_Life_100_Monthly = GET_INPUT("Joint_Life_100_Monthly")
+            Period_Certain_10_Years_Monthly = GET_INPUT("Period_Certain_10_Years_Monthly")
+            Personal_Life_Expectancy_Years = GET_INPUT("Personal_Life_Expectancy_Years")
+            Spouse_Life_Expectancy_Years = GET_INPUT("Spouse_Life_Expectancy_Years") // If applicable for joint
+
+            Total_Payout_Single = Single_Life_Annuity_Monthly * 12 * Personal_Life_Expectancy_Years
+
+            // Simplified calculation for joint: assume joint payment continues for avg of both lives, or sum of individual life expectancies
+            // A more accurate joint calculation would be PV of joint life annuity factors.
+            Effective_Joint_Life_Years_50 = Personal_Life_Expectancy_Years + MAX(0, Spouse_Life_Expectancy_Years - Personal_Life_Expectancy_Years) * 0.5
+            Total_Payout_Joint_50 = (Joint_Life_50_Monthly * 12 * Personal_Life_Expectancy_Years) + (Joint_Life_50_Monthly * 0.5 * 12 * MAX(0, Spouse_Life_Expectancy_Years - Personal_Life_Expectancy_Years))
+
+            Effective_Joint_Life_Years_100 = Personal_Life_Expectancy_Years + MAX(0, Spouse_Life_Expectancy_Years - Personal_Life_Expectancy_Years)
+            Total_Payout_Joint_100 = (Joint_Life_100_Monthly * 12 * Personal_Life_Expectancy_Years) + (Joint_Life_100_Monthly * 1.0 * 12 * MAX(0, Spouse_Life_Expectancy_Years - Personal_Life_Expectancy_Years))
+            
+            Total_Payout_Period_Certain_10_Years = Period_Certain_10_Years_Monthly * 12 * MIN(10, Personal_Life_Expectancy_Years)
+
+
+            Decision_Factors_Note = "Consider your health, spouse's health, need for survivor benefits, and desire for payout predictability. Single-life offers the highest payment but ends at your death. Joint-life options provide income for a surviving spouse. Period-certain guarantees payments for a set duration."
+
+            DISPLAY_OUTPUT("Total_Payout_Single_Life", Total_Payout_Single)
+            DISPLAY_OUTPUT("Total_Payout_Joint_Life_50", Total_Payout_Joint_50)
+            DISPLAY_OUTPUT("Total_Payout_Joint_Life_100", Total_Payout_Joint_100)
+            DISPLAY_OUTPUT("Total_Payout_Period_Certain_10_Years", Total_Payout_Period_Certain_10_Years)
+            DISPLAY_OUTPUT("Decision_Factors_Note", Decision_Factors_Note)
+        END FUNCTION
+        ```
+
+601. **Life Insurance Term vs. Whole Life Cost Comparison (Simplified)**
+    * **Purpose:** Compare the cumulative costs of term life insurance versus whole life insurance over a defined period.
+    * **Inputs:**
+        * `Coverage_Amount` (Currency)
+        * `Term_Life_Annual_Premium` (Currency)
+        * `Term_Length_Years` (Years)
+        * `Whole_Life_Annual_Premium` (Currency)
+        * `Whole_Life_Cash_Value_at_End_of_Term` (Currency - estimated)
+        * `Years_to_Compare` (Years)
+    * **Calculations:**
+        * `Total_Term_Premiums_Paid = Term_Life_Annual_Premium * MIN(Years_to_Compare, Term_Length_Years)`
+        * `Total_Whole_Life_Premiums_Paid = Whole_Life_Annual_Premium * Years_to_Compare`
+        * `Net_Cost_Term = Total_Term_Premiums_Paid`
+        * `Net_Cost_Whole_Life = Total_Whole_Life_Premiums_Paid - Whole_Life_Cash_Value_at_End_of_Term`
+    * **Outputs:**
+        * `Total_Cost_Term_Life_Over_Period` (Currency)
+        * `Total_Cost_Whole_Life_Over_Period` (Currency)
+        * `Cost_Difference_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareTermVsWholeLifeCost():
+            Coverage_Amount = GET_INPUT("Coverage_Amount")
+            Term_Life_Annual_Premium = GET_INPUT("Term_Life_Annual_Premium")
+            Term_Length_Years = GET_INPUT("Term_Length_Years")
+            Whole_Life_Annual_Premium = GET_INPUT("Whole_Life_Annual_Premium")
+            Whole_Life_Cash_Value_at_End_of_Term = GET_INPUT("Whole_Life_Cash_Value_at_End_of_Term")
+            Years_to_Compare = GET_INPUT("Years_to_Compare")
+
+            Total_Term_Premiums_Paid = Term_Life_Annual_Premium * MIN(Years_to_Compare, Term_Length_Years)
+            Total_Whole_Life_Premiums_Paid = Whole_Life_Annual_Premium * Years_to_Compare
+
+            Net_Cost_Term = Total_Term_Premiums_Paid
+            Net_Cost_Whole_Life = Total_Whole_Life_Premiums_Paid - Whole_Life_Cash_Value_at_End_of_Term
+
+            Cost_Difference_Note = "Term life is generally cheaper for a specific period, providing pure death benefit. Whole life is more expensive but builds cash value and lasts a lifetime. The 'cost' of whole life depends on how its cash value growth compares to other investments."
+
+            DISPLAY_OUTPUT("Total_Cost_Term_Life_Over_Period", Net_Cost_Term)
+            DISPLAY_OUTPUT("Total_Cost_Whole_Life_Over_Period", Net_Cost_Whole_Life)
+            DISPLAY_OUTPUT("Cost_Difference_Note", Cost_Difference_Note)
+        END FUNCTION
+        ```
+
+602. **Health Insurance Deductible / Out-of-Pocket Max Impact**
+    * **Purpose:** Illustrate how different deductible and out-of-pocket maximums in health insurance plans affect total annual costs for various healthcare spending levels.
+    * **Inputs:**
+        * `Plan_1_Annual_Premium` (Currency)
+        * `Plan_1_Deductible` (Currency)
+        * `Plan_1_Coinsurance_Percentage` (Percentage - e.g., 20%)
+        * `Plan_1_Out_of_Pocket_Max` (Currency)
+        * `Total_Annual_Medical_Expenses_Scenario_A` (Currency - e.g., low spending)
+        * `Total_Annual_Medical_Expenses_Scenario_B` (Currency - e.g., high spending)
+    * **Calculations:**
+        * `Cost_Scenario_A = Plan_1_Annual_Premium`
+        * `IF Total_Annual_Medical_Expenses_Scenario_A > Plan_1_Deductible THEN`
+            * `Post_Deductible_Expenses = Total_Annual_Medical_Expenses_Scenario_A - Plan_1_Deductible`
+            * `Coinsurance_Paid = Post_Deductible_Expenses * (Plan_1_Coinsurance_Percentage / 100)`
+            * `Cost_Scenario_A = Cost_Scenario_A + Plan_1_Deductible + MIN(Coinsurance_Paid, Plan_1_Out_of_Pocket_Max - Plan_1_Deductible)`
+            * `Cost_Scenario_A = MIN(Cost_Scenario_A, Plan_1_Annual_Premium + Plan_1_Out_of_Pocket_Max)`
+        * `// ... similar calculations for Scenario B and Plan 2 if comparing plans`
+    * **Outputs:**
+        * `Total_Annual_Cost_Scenario_A` (Currency)
+        * `Total_Annual_Cost_Scenario_B` (Currency)
+        * `Explanation_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateHealthInsuranceImpact():
+            Plan_Annual_Premium = GET_INPUT("Plan_Annual_Premium")
+            Plan_Deductible = GET_INPUT("Plan_Deductible")
+            Plan_Coinsurance_Percentage = GET_INPUT("Plan_Coinsurance_Percentage") / 100
+            Plan_Out_of_Pocket_Max = GET_INPUT("Plan_Out_of_Pocket_Max")
+            Total_Annual_Medical_Expenses_Scenario_A = GET_INPUT("Total_Annual_Medical_Expenses_Scenario_A")
+            Total_Annual_Medical_Expenses_Scenario_B = GET_INPUT("Total_Annual_Medical_Expenses_Scenario_B")
+
+            // Helper to calculate cost for a given expense level
+            FUNCTION CALCULATE_PLAN_COST(Annual_Expenses):
+                Cost_From_Expenses = 0
+                IF Annual_Expenses <= Plan_Deductible THEN
+                    Cost_From_Expenses = Annual_Expenses
+                ELSE
+                    Cost_From_Expenses = Plan_Deductible
+                    Remaining_Expenses_After_Deductible = Annual_Expenses - Plan_Deductible
+                    Coinsurance_Amount = Remaining_Expenses_After_Deductible * Plan_Coinsurance_Percentage
+                    
+                    // Out-of-pocket max caps total expenses
+                    Cost_From_Expenses = Cost_From_Expenses + Coinsurance_Amount
+                    Cost_From_Expenses = MIN(Cost_From_Expenses, Plan_Out_of_Pocket_Max)
+                END IF
+                RETURN Plan_Annual_Premium + Cost_From_Expenses
+            END FUNCTION
+
+            Total_Annual_Cost_Scenario_A = CALCULATE_PLAN_COST(Total_Annual_Medical_Expenses_Scenario_A)
+            Total_Annual_Cost_Scenario_B = CALCULATE_PLAN_COST(Total_Annual_Medical_Expenses_Scenario_B)
+
+            Explanation_Note = "High deductibles mean lower premiums but higher out-of-pocket costs before coverage kicks in. Out-of-pocket maximums limit your total annual spending on covered services."
+
+            DISPLAY_OUTPUT("Total_Annual_Cost_Scenario_A", Total_Annual_Cost_Scenario_A)
+            DISPLAY_OUTPUT("Total_Annual_Cost_Scenario_B", Total_Annual_Cost_Scenario_B)
+            DISPLAY_OUTPUT("Explanation_Note", Explanation_Note)
+        END FUNCTION
+        ```
+
+603. **Critical Illness Insurance Needs**
+    * **Purpose:** Determine the recommended coverage amount for critical illness insurance based on potential lost income and medical expenses.
+    * **Inputs:**
+        * `Annual_Lost_Income_Estimate` (Currency - from inability to work)
+        * `Estimated_Medical_Expenses_Not_Covered_by_Health_Insurance` (Currency)
+        * `Other_Related_Costs_Per_Illness` (Currency - e.g., home modifications, travel)
+        * `Years_of_Recovery_Expected` (Years)
+        * `Existing_Savings_Available` (Currency)
+        * `Existing_Critical_Illness_Coverage` (Currency)
+    * **Calculations:**
+        * `Total_Financial_Impact = (Annual_Lost_Income_Estimate * Years_of_Recovery_Expected) + Estimated_Medical_Expenses_Not_Covered_by_Health_Insurance + Other_Related_Costs_Per_Illness`
+        * `Net_Coverage_Needed = MAX(0, Total_Financial_Impact - Existing_Savings_Available - Existing_Critical_Illness_Coverage)`
+    * **Outputs:**
+        * `Estimated_Total_Financial_Impact_of_Illness` (Currency)
+        * `Recommended_Critical_Illness_Coverage` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCriticalIllnessNeeds():
+            Annual_Lost_Income_Estimate = GET_INPUT("Annual_Lost_Income_Estimate")
+            Estimated_Medical_Expenses_Not_Covered_by_Health_Insurance = GET_INPUT("Estimated_Medical_Expenses_Not_Covered_by_Health_Insurance")
+            Other_Related_Costs_Per_Illness = GET_INPUT("Other_Related_Costs_Per_Illness")
+            Years_of_Recovery_Expected = GET_INPUT("Years_of_Recovery_Expected")
+            Existing_Savings_Available = GET_INPUT("Existing_Savings_Available")
+            Existing_Critical_Illness_Coverage = GET_INPUT("Existing_Critical_Illness_Coverage")
+
+            Total_Financial_Impact = (Annual_Lost_Income_Estimate * Years_of_Recovery_Expected) + \
+                                    Estimated_Medical_Expenses_Not_Covered_by_Health_Insurance + \
+                                    Other_Related_Costs_Per_Illness
+
+            Recommended_Critical_Illness_Coverage = MAX(0, Total_Financial_Impact - Existing_Savings_Available - Existing_Critical_Illness_Coverage)
+
+            DISPLAY_OUTPUT("Estimated_Total_Financial_Impact_of_Illness", Total_Financial_Impact)
+            DISPLAY_OUTPUT("Recommended_Critical_Illness_Coverage", Recommended_Critical_Illness_Coverage)
+        END FUNCTION
+        ```
+
+604. **Envelope Budgeting Tracker (Conceptual/Digital Tool)**
+    * **Purpose:** A digital representation of the envelope budgeting system, allowing users to assign funds to categories and track spending against them.
+    * **Inputs:**
+        * `Monthly_Income` (Currency)
+        * `Budget_Categories_and_Allocations` (List of {`Category`: String, `Allocated_Amount`: Currency})
+        * `Transactions_List` (List of {`Date`: Date, `Category`: String, `Amount`: Currency})
+    * **Calculations:**
+        * `Total_Allocated_Budget = SUM(Allocated_Amount for all categories)`
+        * `Current_Month_Spending_by_Category = Aggregate_Spending_by_Category(Transactions_List, Current_Month)`
+        * `Remaining_Balance_Per_Category = Allocated_Amount - Spent_Amount_in_Category`
+    * **Outputs:**
+        * `Overall_Budget_Status` (Text: "Balanced", "Underfunded", "Overfunded")
+        * `Category_Balances_Table` (Table: Category, Allocated, Spent, Remaining)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION TrackEnvelopeBudget():
+            Monthly_Income = GET_INPUT("Monthly_Income")
+            Budget_Categories_and_Allocations = GET_INPUT("Budget_Categories_and_Allocations") // [{Category, Allocated_Amount}]
+            Transactions_List = GET_INPUT("Transactions_List") // [{Date, Category, Amount}]
+            Current_Month = GET_CURRENT_MONTH()
+
+            Total_Allocated_Budget = SUM_LIST_PROPERTY(Budget_Categories_and_Allocations, "Allocated_Amount")
+            
+            Current_Month_Spending_by_Category = CREATE_EMPTY_DICTIONARY() // {Category: Spent_Amount}
+            FOR EACH Transaction IN Transactions_List:
+                IF GET_MONTH_YEAR(Transaction.Date) == GET_MONTH_YEAR(Current_Month) THEN
+                    IF NOT Current_Month_Spending_by_Category.HAS_KEY(Transaction.Category) THEN
+                        Current_Month_Spending_by_Category[Transaction.Category] = 0
+                    END IF
+                    Current_Month_Spending_by_Category[Transaction.Category] = Current_Month_Spending_by_Category[Transaction.Category] + Transaction.Amount
+                END IF
+            END FOR
+
+            Category_Balances_Table = []
+            Overall_Budget_Status = ""
+            Total_Spent = 0
+
+            FOR EACH Budget_Category IN Budget_Categories_and_Allocations:
+                Spent_Amount = Current_Month_Spending_by_Category.GET(Budget_Category.Category, 0)
+                Remaining_Balance = Budget_Category.Allocated_Amount - Spent_Amount
+                Total_Spent = Total_Spent + Spent_Amount
+                Category_Balances_Table.ADD({
+                    Category: Budget_Category.Category,
+                    Allocated: Budget_Category.Allocated_Amount,
+                    Spent: Spent_Amount,
+                    Remaining: Remaining_Balance
+                })
+            END FOR
+
+            IF Total_Allocated_Budget == Monthly_Income THEN
+                Overall_Budget_Status = "Budget Balanced (Every dollar has a job)."
+            ELSE IF Total_Allocated_Budget < Monthly_Income THEN
+                Overall_Budget_Status = "Overfunded (You have extra income to allocate)."
+            ELSE
+                Overall_Budget_Status = "Underfunded (You need to reduce allocations or increase income)."
+            END IF
+
+            DISPLAY_OUTPUT("Overall_Budget_Status", Overall_Budget_Status)
+            DISPLAY_OUTPUT("Category_Balances_Table", Category_Balances_Table)
+        END FUNCTION
+        ```
+
+605. **"Paycheck to Paycheck" Analyzer**
+    * **Purpose:** Help individuals determine if they are living paycheck to paycheck by comparing monthly income to essential expenses.
+    * **Inputs:**
+        * `Monthly_Net_Income` (Currency)
+        * `Monthly_Essential_Expenses` (Currency - rent/mortgage, food, transportation, utilities, minimum debt payments)
+        * `Emergency_Fund_Balance` (Currency)
+        * `Recommended_Emergency_Fund_Size` (Currency)
+    * **Calculations:**
+        * `Remaining_After_Essentials = Monthly_Net_Income - Monthly_Essential_Expenses`
+        * `Status = IF Remaining_After_Essentials <= 0 THEN "Living Paycheck to Paycheck (or Deficit)"`
+        * `ELSE IF Emergency_Fund_Balance < Recommended_Emergency_Fund_Size * 0.5 THEN "Vulnerable (Low Emergency Fund)"`
+        * `ELSE "Financially Stable (or Progressing)"`
+    * **Outputs:**
+        * `Monthly_Income_After_Essentials` (Currency)
+        * `Financial_Stability_Status` (Text)
+        * `Action_Plan_Recommendation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzePaycheckToPaycheck():
+            Monthly_Net_Income = GET_INPUT("Monthly_Net_Income")
+            Monthly_Essential_Expenses = GET_INPUT("Monthly_Essential_Expenses")
+            Emergency_Fund_Balance = GET_INPUT("Emergency_Fund_Balance")
+            Recommended_Emergency_Fund_Size = GET_INPUT("Recommended_Emergency_Fund_Size")
+
+            Remaining_After_Essentials = Monthly_Net_Income - Monthly_Essential_Expenses
+
+            Financial_Stability_Status = ""
+            Action_Plan_Recommendation = ""
+
+            IF Remaining_After_Essentials <= 0 THEN
+                Financial_Stability_Status = "Living Paycheck to Paycheck (or in Deficit)"
+                Action_Plan_Recommendation = "Focus on increasing income or drastically cutting essential expenses immediately."
+            ELSE IF Emergency_Fund_Balance < Recommended_Emergency_Fund_Size THEN
+                Financial_Stability_Status = "Vulnerable (Building Emergency Fund)"
+                Action_Plan_Recommendation = "Prioritize building a full emergency fund. Aim to have 3-6 months of essential expenses saved."
+            ELSE
+                Financial_Stability_Status = "Financially Stable (and Progressing)"
+                Action_Plan_Recommendation = "Continue to save and invest for your long-term goals. Consider optimizing spending."
+            END IF
+
+            DISPLAY_OUTPUT("Monthly_Income_After_Essentials", Remaining_After_Essentials)
+            DISPLAY_OUTPUT("Financial_Stability_Status", Financial_Stability_Status)
+            DISPLAY_OUTPUT("Action_Plan_Recommendation", Action_Plan_Recommendation)
+        END FUNCTION
+        ```
+
+606. **Savings vs. Debt Repayment Prioritization Tool**
+    * **Purpose:** Help users decide whether to prioritize saving/investing or paying down debt, based on interest rates and psychological factors.
+    * **Inputs:**
+        * `Highest_Interest_Debt_APR` (Percentage)
+        * `Lowest_Interest_Debt_APR` (Percentage)
+        * `Expected_Investment_Return_Rate` (Percentage)
+        * `Emergency_Fund_Status` (Text: "Fully Funded", "Partially Funded", "None")
+        * `Psychological_Preference` (Text: "Quick Wins", "Lowest Overall Cost")
+    * **Calculations:**
+        * `Decision_Point_Rate = 5` (Typical threshold for "good debt" vs. "bad debt")
+        * `IF Emergency_Fund_Status = "None" THEN Priority = "Build Emergency Fund"`
+        * `ELSE IF Psychological_Preference = "Lowest Overall Cost" THEN`
+            * `IF Highest_Interest_Debt_APR > Expected_Investment_Return_Rate THEN Priority = "Highest Interest Debt"`
+            * `ELSE Priority = "Invest"`
+        * `ELSE IF Psychological_Preference = "Quick Wins" THEN Priority = "Smallest Debt"`
+        * `// ... other decision logic based on rates and psychological factor`
+    * **Outputs:**
+        * `Recommended_Action_Priority` (Text)
+        * `Explanation_for_Recommendation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION PrioritizeSavingsVsDebt():
+            Highest_Interest_Debt_APR = GET_INPUT("Highest_Interest_Debt_APR")
+            Lowest_Interest_Debt_APR = GET_INPUT("Lowest_Interest_Debt_APR") // For context
+            Expected_Investment_Return_Rate = GET_INPUT("Expected_Investment_Return_Rate")
+            Emergency_Fund_Status = GET_INPUT("Emergency_Fund_Status")
+            Psychological_Preference = GET_INPUT("Psychological_Preference")
+
+            Recommended_Action_Priority = ""
+            Explanation_for_Recommendation = ""
+
+            IF Emergency_Fund_Status == "None" OR Emergency_Fund_Status == "Partially Funded" THEN
+                Recommended_Action_Priority = "Build Emergency Fund"
+                Explanation_for_Recommendation = "An emergency fund provides a financial safety net before tackling debt or investing heavily."
+            ELSE IF Psychological_Preference == "Lowest Overall Cost" THEN
+                IF Highest_Interest_Debt_APR > Expected_Investment_Return_Rate THEN
+                    Recommended_Action_Priority = "Pay off Highest Interest Debt (Debt Avalanche)"
+                    Explanation_for_Recommendation = "Paying off high-interest debt saves more money than most investments can earn."
+                ELSE
+                    Recommended_Action_Priority = "Invest (Focus on growth)"
+                    Explanation_for_Recommendation = "Your expected investment returns are higher than your highest debt interest, so investing is financially optimal."
+                END IF
+            ELSE IF Psychological_Preference == "Quick Wins" THEN
+                Recommended_Action_Priority = "Pay off Smallest Debt (Debt Snowball)"
+                Explanation_for_Recommendation = "Paying off the smallest debt first provides psychological wins, building momentum for debt repayment."
+            ELSE
+                Recommended_Action_Priority = "Unclear. Provide more context."
+            END IF
+
+            DISPLAY_OUTPUT("Recommended_Action_Priority", Recommended_Action_Priority)
+            DISPLAY_OUTPUT("Explanation_for_Recommendation", Explanation_for_Recommendation)
+        END FUNCTION
+        ```
+
+607. **Net Worth Growth Simulation (Detailed Asset/Liability Growth)**
+    * **Purpose:** Project net worth growth over many years, allowing for different growth rates for various asset and debt categories.
+    * **Inputs:**
+        * `Initial_Cash` (Currency)
+        * `Initial_Investments` (Currency)
+        * `Initial_Real_Estate_Equity` (Currency)
+        * `Total_Monthly_Income` (Currency)
+        * `Total_Monthly_Expenses` (Currency)
+        * `Investment_Growth_Rate` (Percentage)
+        * `Real_Estate_Appreciation_Rate` (Percentage)
+        * `Debt_Interest_Rate_Average` (Percentage)
+        * `Years_to_Project` (Years)
+    * **Calculations:**
+        * `Monthly_Savings = Monthly_Income - Monthly_Expenses`
+        * `Annual_Savings = Monthly_Savings * 12`
+        * `Projected_Net_Worth_Table = []`
+        * `Current_Cash = Initial_Cash`
+        * `Current_Investments = Initial_Investments`
+        * `Current_Real_Estate_Equity = Initial_Real_Estate_Equity`
+        * `Current_Debt_Balance = Initial_Debt_Balance` (Need Initial Debt)
+        * `FOR i FROM 1 TO Years_to_Project:`
+            * `Current_Investments = Current_Investments * (1 + Investment_Growth_Rate / 100) + Annual_Savings`
+            * `Current_Real_Estate_Equity = Current_Real_Estate_Equity * (1 + Real_Estate_Appreciation_Rate / 100)` (Simplified: ignores principal payments for new equity)
+            * `Current_Debt_Balance = Current_Debt_Balance * (1 + Debt_Interest_Rate_Average / 100)` (Simplified: debt grows with interest, not paid down)
+            * `Projected_Net_Worth = Current_Investments + Current_Real_Estate_Equity - Current_Debt_Balance + Current_Cash`
+            * `Projected_Net_Worth_Table.ADD({Year: i, Net_Worth: Projected_Net_Worth})`
+    * **Outputs:**
+        * `Detailed_Net_Worth_Projection_Table` (Table: Year, Investments, Real Estate, Debt, Total Net Worth)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION SimulateNetWorthGrowthDetailed():
+            Initial_Cash = GET_INPUT("Initial_Cash")
+            Initial_Investments = GET_INPUT("Initial_Investments")
+            Initial_Real_Estate_Equity = GET_INPUT("Initial_Real_Estate_Equity")
+            Initial_Total_Debt = GET_INPUT("Initial_Total_Debt") // Assuming this is here
+            Total_Monthly_Income = GET_INPUT("Total_Monthly_Income")
+            Total_Monthly_Expenses = GET_INPUT("Total_Monthly_Expenses")
+            Investment_Growth_Rate = GET_INPUT("Investment_Growth_Rate") / 100
+            Real_Estate_Appreciation_Rate = GET_INPUT("Real_Estate_Appreciation_Rate") / 100
+            Debt_Interest_Rate_Average = GET_INPUT("Debt_Interest_Rate_Average") / 100 // Average annual interest rate
+            Years_to_Project = GET_INPUT("Years_to_Project")
+
+            Monthly_Savings_Surplus = Total_Monthly_Income - Total_Monthly_Expenses
+            Annual_Savings_Surplus = Monthly_Savings_Surplus * 12
+
+            Projected_Net_Worth_Table = []
+            Current_Investments_Val = Initial_Investments
+            Current_Real_Estate_Equity_Val = Initial_Real_Estate_Equity
+            Current_Debt_Balance_Val = Initial_Total_Debt
+            Current_Cash_Val = Initial_Cash
+
+            Projected_Net_Worth_Table.ADD({
+                Year: 0,
+                Cash: Current_Cash_Val,
+                Investments: Current_Investments_Val,
+                Real_Estate_Equity: Current_Real_Estate_Equity_Val,
+                Debt: Current_Debt_Balance_Val,
+                Total_Net_Worth: (Current_Cash_Val + Current_Investments_Val + Current_Real_Estate_Equity_Val - Current_Debt_Balance_Val)
+            })
+
+            FOR y FROM 1 TO Years_to_Project:
+                // Growth and additions
+                Current_Investments_Val = Current_Investments_Val * (1 + Investment_Growth_Rate) + Annual_Savings_Surplus
+                Current_Real_Estate_Equity_Val = Current_Real_Estate_Equity_Val * (1 + Real_Estate_Appreciation_Rate)
+                
+                // Debt reduction (simplified - assuming debt reduces by Annual_Savings_Surplus before investment)
+                // This needs clarification based on user's financial priorities.
+                // For a more accurate simulation, incorporate actual debt payments from expenses and new debt.
+                Current_Debt_Balance_Val = Current_Debt_Balance_Val * (1 + Debt_Interest_Rate_Average) // Simplified: debt grows, not paid down from savings
+                
+                Projected_Net_Worth_This_Year = Current_Cash_Val + Current_Investments_Val + Current_Real_Estate_Equity_Val - Current_Debt_Balance_Val
+                Projected_Net_Worth_Table.ADD({
+                    Year: y,
+                    Cash: Current_Cash_Val, // Assuming cash is stable or consumed by expenses
+                    Investments: Current_Investments_Val,
+                    Real_Estate_Equity: Current_Real_Estate_Equity_Val,
+                    Debt: Current_Debt_Balance_Val,
+                    Total_Net_Worth: Projected_Net_Worth_This_Year
+                })
+            END FOR
+
+            DISPLAY_OUTPUT("Detailed_Net_Worth_Projection_Table", Projected_Net_Worth_Table)
+        END FUNCTION
+        ```
+
+608. **Credit Card Balance Transfer Savings (Detailed)**
+    * **Purpose:** Calculate the precise interest savings and accelerated payoff from transferring a high-interest credit card balance to a new card with a lower introductory APR.
+    * **Inputs:**
+        * `Current_Balance_to_Transfer` (Currency)
+        * `Current_Card_APR` (Percentage)
+        * `New_Card_Intro_APR` (Percentage)
+        * `Intro_APR_Period_Months` (Months)
+        * `New_Card_Post_Intro_APR` (Percentage)
+        * `Balance_Transfer_Fee_Percentage` (Percentage - e.g., 3-5%)
+        * `Fixed_Monthly_Payment_Desired` (Currency)
+    * **Calculations:**
+        * `Transfer_Fee_Absolute = Current_Balance_to_Transfer * (Balance_Transfer_Fee_Percentage / 100)`
+        * `Total_Balance_on_New_Card = Current_Balance_to_Transfer + Transfer_Fee_Absolute`
+        * *Simulate payoff on original card vs. new card with intro/post-intro APRs.*
+        * `Interest_Saved_Original = CALCULATE_TOTAL_INTEREST_FOR_CREDIT_CARD_PAYOFF(Current_Balance_to_Transfer, Current_Card_APR, Fixed_Monthly_Payment_Desired)`
+        * `Interest_Paid_New_Card = SIMULATE_PAYOFF_WITH_INTRO_APR(Total_Balance_on_New_Card, New_Card_Intro_APR, Intro_APR_Period_Months, New_Card_Post_Intro_APR, Fixed_Monthly_Payment_Desired)`
+        * `Total_Savings = Interest_Saved_Original - Interest_Paid_New_Card`
+    * **Outputs:**
+        * `Estimated_Transfer_Fee` (Currency)
+        * `Total_Interest_Savings_From_Transfer` (Currency)
+        * `Accelerated_Payoff_Time_Months` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCreditCardBalanceTransferSavings():
+            Current_Balance_to_Transfer = GET_INPUT("Current_Balance_to_Transfer")
+            Current_Card_APR = GET_INPUT("Current_Card_APR")
+            New_Card_Intro_APR = GET_INPUT("New_Card_Intro_APR")
+            Intro_APR_Period_Months = GET_INPUT("Intro_APR_Period_Months")
+            New_Card_Post_Intro_APR = GET_INPUT("New_Card_Post_Intro_APR")
+            Balance_Transfer_Fee_Percentage = GET_INPUT("Balance_Transfer_Fee_Percentage") / 100
+            Fixed_Monthly_Payment_Desired = GET_INPUT("Fixed_Monthly_Payment_Desired")
+
+            Transfer_Fee_Absolute = Current_Balance_to_Transfer * Balance_Transfer_Fee_Percentage
+            Total_Balance_on_New_Card = Current_Balance_to_Transfer + Transfer_Fee_Absolute
+
+            // Helper function to calculate total interest for an existing card (assuming fixed payment)
+            // CALCULATE_TOTAL_INTEREST_FOR_CREDIT_CARD_PAYOFF(balance, apr, payment)
+            Original_Interest_Cost = CALCULATE_TOTAL_INTEREST_FOR_CREDIT_CARD_PAYOFF(
+                Current_Balance_to_Transfer, Current_Card_APR, Fixed_Monthly_Payment_Desired
+            )
+            Original_Payoff_Months = CALCULATE_CREDIT_CARD_PAYOFF_MONTHS(
+                Current_Balance_to_Transfer, Current_Card_APR, Fixed_Monthly_Payment_Desired
+            )
+
+            // Simulate payoff for the new card with intro APR
+            New_Interest_Cost = 0
+            New_Payoff_Months = 0
+            Current_Balance_Sim = Total_Balance_on_New_Card
+            Monthly_Rate_Intro = (New_Card_Intro_APR / 100) / 12
+            Monthly_Rate_Post = (New_Card_Post_Intro_APR / 100) / 12
+
+            FOR m FROM 1 TO Intro_APR_Period_Months:
+                IF Current_Balance_Sim <= 0 THEN BREAK END IF
+                Interest_This_Month = Current_Balance_Sim * Monthly_Rate_Intro
+                New_Interest_Cost = New_Interest_Cost + Interest_This_Month
+                Current_Balance_Sim = Current_Balance_Sim - (Fixed_Monthly_Payment_Desired - Interest_This_Month)
+                New_Payoff_Months = New_Payoff_Months + 1
+            END FOR
+
+            IF Current_Balance_Sim > 0 THEN // Still balance after intro period
+                Remaining_Months_Post_Intro = CALCULATE_CREDIT_CARD_PAYOFF_MONTHS(
+                    Current_Balance_Sim, New_Card_Post_Intro_APR, Fixed_Monthly_Payment_Desired
+                )
+                New_Interest_Cost = New_Interest_Cost + CALCULATE_TOTAL_INTEREST_FOR_CREDIT_CARD_PAYOFF(
+                    Current_Balance_Sim, New_Card_Post_Intro_APR, Fixed_Monthly_Payment_Desired
+                )
+                New_Payoff_Months = New_Payoff_Months + Remaining_Months_Post_Intro
+            END IF
+            
+            Total_Interest_Savings_From_Transfer = Original_Interest_Cost - New_Interest_Cost
+
+            Accelerated_Payoff_Time_Months = Original_Payoff_Months - New_Payoff_Months
+
+            DISPLAY_OUTPUT("Estimated_Transfer_Fee", Transfer_Fee_Absolute)
+            DISPLAY_OUTPUT("Total_Interest_Savings_From_Transfer", Total_Interest_Savings_From_Transfer)
+            DISPLAY_OUTPUT("Accelerated_Payoff_Time_Months", Accelerated_Payoff_Time_Months)
+        END FUNCTION
+        ```
+
+609. **Student Loan Refinance Breakeven Period (Detailed)**
+    * **Purpose:** Calculate the exact time (months) it takes for the interest savings from refinancing a student loan to outweigh the refinancing fees.
+    * **Inputs:**
+        * `Current_Loan_Balance` (Currency)
+        * `Current_Loan_Monthly_Payment` (Currency)
+        * `Current_Loan_APR` (Percentage)
+        * `New_Loan_APR` (Percentage)
+        * `New_Loan_Term_Years` (Years)
+        * `Refinancing_Fees_Total` (Currency)
+    * **Calculations:**
+        * `New_Loan_Monthly_Payment = CalculateLoanPayment(Current_Loan_Balance, New_Loan_APR, New_Loan_Term_Years, "Monthly")`
+        * `Monthly_Savings = Current_Loan_Monthly_Payment - New_Loan_Monthly_Payment`
+        * `Breakeven_Months = Refinancing_Fees_Total / Monthly_Savings` (If Monthly_Savings > 0)
+    * **Outputs:**
+        * `Monthly_Payment_Savings` (Currency)
+        * `Estimated_Breakeven_Months` (Months)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateStudentLoanRefinanceBreakevenDetailed():
+            Current_Loan_Balance = GET_INPUT("Current_Loan_Balance")
+            Current_Loan_Monthly_Payment = GET_INPUT("Current_Loan_Monthly_Payment")
+            Current_Loan_APR = GET_INPUT("Current_Loan_APR")
+            New_Loan_APR = GET_INPUT("New_Loan_APR")
+            New_Loan_Term_Years = GET_INPUT("New_Loan_Term_Years")
+            Refinancing_Fees_Total = GET_INPUT("Refinancing_Fees_Total")
+
+            New_Loan_Monthly_Payment = CALCULATE_LOAN_PAYMENT(Current_Loan_Balance, New_Loan_APR, New_Loan_Term_Years, "Monthly")
+
+            Monthly_Payment_Savings = Current_Loan_Monthly_Payment - New_Loan_Monthly_Payment
+
+            Estimated_Breakeven_Months = 0
+            IF Monthly_Payment_Savings <= 0 THEN
+                DISPLAY_OUTPUT("Estimated_Breakeven_Months", "No savings or negative savings.")
+                RETURN
+            END IF
+
+            Estimated_Breakeven_Months = Refinancing_Fees_Total / Monthly_Payment_Savings
+            
+            DISPLAY_OUTPUT("Monthly_Payment_Savings", Monthly_Payment_Savings)
+            DISPLAY_OUTPUT("Estimated_Breakeven_Months", CEILING(Estimated_Breakeven_Months))
+        END FUNCTION
+        ```
+
+610. **Loan Principal vs. Interest Paid Over Time (Granular)**
+    * **Purpose:** Illustrate how the proportion of principal vs. interest in a loan payment changes over the loan's term, with a focus on early interest dominance.
+    * **Inputs:**
+        * `Loan_Amount` (Currency)
+        * `Annual_Interest_Rate` (Percentage)
+        * `Loan_Term_Years` (Years)
+        * `Payment_Frequency` (Text: "Monthly")
+    * **Calculations:**
+        * `Monthly_Payment = CalculateLoanPayment(...)`
+        * `Amortization_Schedule = GenerateAmortizationSchedule(...)` (From calc 101)
+        * *Extract interest and principal columns.*
+    * **Outputs:**
+        * `Principal_vs_Interest_Table` (Table: Payment #, Principal, Interest)
+        * `Chart_Data` (for visual representation)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLoanPrincipalVsInterestOverTime():
+            Loan_Amount = GET_INPUT("Loan_Amount")
+            Annual_Interest_Rate = GET_INPUT("Annual_Interest_Rate")
+            Loan_Term_Years = GET_INPUT("Loan_Term_Years")
+
+            // Re-use GENERATE_LOAN_AMORTIZATION_SCHEDULE from calculator 101
+            Amortization_Data = GENERATE_LOAN_AMORTIZATION_SCHEDULE(Loan_Amount, Annual_Interest_Rate, Loan_Term_Years, "Monthly")
+
+            Principal_Vs_Interest_Table = []
+            FOR EACH Period IN Amortization_Data:
+                Principal_Vs_Interest_Table.ADD({
+                    Payment_Num: Period.Period,
+                    Principal_Paid: Period.Principal,
+                    Interest_Paid: Period.Interest
+                })
+            END FOR
+
+            DISPLAY_OUTPUT("Principal_vs_Interest_Table", Principal_Vs_Interest_Table)
+            // Can add charting output conceptually
+        END FUNCTION
+        ```
+
+611. **Credit Score Impact on Home Loan Rates**
+    * **Purpose:** Illustrate how different credit scores can significantly impact the interest rate offered on a home loan and thus the total cost.
+    * **Inputs:**
+        * `Loan_Amount` (Currency)
+        * `Loan_Term_Years` (Years)
+        * `Credit_Score_Scenario_1` (Number - e.g., 760)
+        * `Interest_Rate_Scenario_1` (Percentage - *pre-defined lookup for score*)
+        * `Credit_Score_Scenario_2` (Number - e.g., 680)
+        * `Interest_Rate_Scenario_2` (Percentage - *pre-defined lookup for score*)
+    * **Calculations:**
+        * `Monthly_Payment_Scenario_1 = CalculateLoanPayment(Loan_Amount, Interest_Rate_Scenario_1, Loan_Term_Years, "Monthly")`
+        * `Total_Cost_Scenario_1 = Monthly_Payment_Scenario_1 * Loan_Term_Years * 12`
+        * `Monthly_Payment_Scenario_2 = CalculateLoanPayment(Loan_Amount, Interest_Rate_Scenario_2, Loan_Term_Years, "Monthly")`
+        * `Total_Cost_Scenario_2 = Monthly_Payment_Scenario_2 * Loan_Term_Years * 12`
+        * `Savings = Total_Cost_Scenario_2 - Total_Cost_Scenario_1`
+    * **Outputs:**
+        * `Monthly_Payment_Scenario_1` (Currency)
+        * `Total_Cost_Scenario_1` (Currency)
+        * `Monthly_Payment_Scenario_2` (Currency)
+        * `Total_Cost_Scenario_2` (Currency)
+        * `Total_Savings_from_Better_Credit` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCreditScoreImpactOnHomeLoan():
+            Loan_Amount = GET_INPUT("Loan_Amount")
+            Loan_Term_Years = GET_INPUT("Loan_Term_Years")
+            Credit_Score_Scenario_1 = GET_INPUT("Credit_Score_Scenario_1")
+            Credit_Score_Scenario_2 = GET_INPUT("Credit_Score_Scenario_2")
+
+            // Assume external lookup for interest rates based on credit score.
+            Interest_Rate_Scenario_1 = GET_HOME_LOAN_RATE_BY_CREDIT_SCORE(Credit_Score_Scenario_1)
+            Interest_Rate_Scenario_2 = GET_HOME_LOAN_RATE_BY_CREDIT_SCORE(Credit_Score_Scenario_2)
+
+            Monthly_Payment_Scenario_1 = CALCULATE_LOAN_PAYMENT(Loan_Amount, Interest_Rate_Scenario_1, Loan_Term_Years, "Monthly")
+            Total_Cost_Scenario_1 = Monthly_Payment_Scenario_1 * Loan_Term_Years * 12
+
+            Monthly_Payment_Scenario_2 = CALCULATE_LOAN_PAYMENT(Loan_Amount, Interest_Rate_Scenario_2, Loan_Term_Years, "Monthly")
+            Total_Cost_Scenario_2 = Monthly_Payment_Scenario_2 * Loan_Term_Years * 12
+
+            Total_Savings_from_Better_Credit = Total_Cost_Scenario_2 - Total_Cost_Scenario_1
+
+            DISPLAY_OUTPUT("Monthly_Payment_Scenario_1", Monthly_Payment_Scenario_1)
+            DISPLAY_OUTPUT("Total_Cost_Scenario_1", Total_Cost_Scenario_1)
+            DISPLAY_OUTPUT("Monthly_Payment_Scenario_2", Monthly_Payment_Scenario_2)
+            DISPLAY_OUTPUT("Total_Cost_Scenario_2", Total_Cost_Scenario_2)
+            DISPLAY_OUTPUT("Total_Savings_from_Better_Credit", Total_Savings_from_Better_Credit)
+        END FUNCTION
+        ```
+
+612. **Taxable vs. Tax-Advantaged Investment Comparison (Future Value)**
+    * **Purpose:** Compare the future value of an investment in a taxable account versus a tax-advantaged account (e.g., 401k, IRA, Roth).
+    * **Inputs:**
+        * `Annual_Investment_Amount` (Currency)
+        * `Years_to_Project` (Years)
+        * `Expected_Annual_Return` (Percentage)
+        * `Taxable_Account_Annual_Tax_Rate_on_Gains` (Percentage)
+        * `Tax_Advantaged_Account_Tax_Rate_on_Withdrawal` (Percentage - for Traditional)
+        * `Tax_Advantaged_Type` (Text: "Pre-Tax (Traditional)", "Post-Tax (Roth)")
+    * **Calculations:**
+        * `FV_Taxable = Annual_Investment_Amount * (((1 + (Expected_Annual_Return / 100) * (1 - Taxable_Account_Annual_Tax_Rate_on_Gains / 100))^Years_to_Project - 1) / ((Expected_Annual_Return / 100) * (1 - Taxable_Account_Annual_Tax_Rate_on_Gains / 100)))`
+        * `FV_Tax_Advantaged = Annual_Investment_Amount * (((1 + Expected_Annual_Return / 100)^Years_to_Project - 1) / (Expected_Annual_Return / 100))`
+        * `IF Tax_Advantaged_Type = "Pre-Tax (Traditional)" THEN FV_Tax_Advantaged = FV_Tax_Advantaged * (1 - Tax_Advantaged_Account_Tax_Rate_on_Withdrawal / 100)`
+        * `// If Roth, it's already after-tax.`
+    * **Outputs:**
+        * `Projected_Future_Value_Taxable_Account` (Currency)
+        * `Projected_Future_Value_Tax_Advantaged_Account` (Currency)
+        * `Tax_Benefit_Difference` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareTaxableVsTaxAdvantagedInvestment():
+            Annual_Investment_Amount = GET_INPUT("Annual_Investment_Amount")
+            Years_to_Project = GET_INPUT("Years_to_Project")
+            Expected_Annual_Return = GET_INPUT("Expected_Annual_Return") / 100
+            Taxable_Account_Annual_Tax_Rate_on_Gains = GET_INPUT("Taxable_Account_Annual_Tax_Rate_on_Gains") / 100
+            Tax_Advantaged_Account_Tax_Rate_on_Withdrawal = GET_INPUT("Tax_Advantaged_Account_Tax_Rate_on_Withdrawal") / 100
+            Tax_Advantaged_Type = GET_INPUT("Tax_Advantaged_Type")
+
+            Rate_Taxable_Account_After_Tax = Expected_Annual_Return * (1 - Taxable_Account_Annual_Tax_Rate_on_Gains)
+            
+            Projected_Future_Value_Taxable_Account = 0
+            IF Rate_Taxable_Account_After_Tax = 0 THEN
+                Projected_Future_Value_Taxable_Account = Annual_Investment_Amount * Years_to_Project
+            ELSE
+                Projected_Future_Value_Taxable_Account = Annual_Investment_Amount * ((POWER((1 + Rate_Taxable_Account_After_Tax), Years_to_Project) - 1) / Rate_Taxable_Account_After_Tax)
+            END IF
+
+            Projected_Future_Value_Tax_Advantaged_Account_PreTax = 0
+            IF Expected_Annual_Return = 0 THEN
+                Projected_Future_Value_Tax_Advantaged_Account_PreTax = Annual_Investment_Amount * Years_to_Project
+            ELSE
+                Projected_Future_Value_Tax_Advantaged_Account_PreTax = Annual_Investment_Amount * ((POWER((1 + Expected_Annual_Return), Years_to_Project) - 1) / Expected_Annual_Return)
+            END IF
+
+            Projected_Future_Value_Tax_Advantaged_Account_Final = Projected_Future_Value_Tax_Advantaged_Account_PreTax
+            IF Tax_Advantaged_Type = "Pre-Tax (Traditional)" THEN
+                Projected_Future_Value_Tax_Advantaged_Account_Final = Projected_Future_Value_Tax_Advantaged_Account_Final * (1 - Tax_Advantaged_Account_Tax_Rate_on_Withdrawal)
+            END IF
+            // If it's Roth, it's already after-tax, no further adjustment here.
+
+            Tax_Benefit_Difference = Projected_Future_Value_Tax_Advantaged_Account_Final - Projected_Future_Value_Taxable_Account
+
+            DISPLAY_OUTPUT("Projected_Future_Value_Taxable_Account", Projected_Future_Value_Taxable_Account)
+            DISPLAY_OUTPUT("Projected_Future_Value_Tax_Advantaged_Account", Projected_Future_Value_Tax_Advantaged_Account_Final)
+            DISPLAY_OUTPUT("Tax_Benefit_Difference", Tax_Benefit_Difference)
+        END FUNCTION
+        ```
+
+613. **Qualified Business Income (QBI) Deduction (Basic)**
+    * **Purpose:** Provide a basic estimate of the Qualified Business Income (QBI) deduction available to eligible self-employed individuals and small business owners.
+    * **Inputs:**
+        * `Qualified_Business_Income` (Currency)
+        * `Taxable_Income_Before_QBI_Deduction` (Currency)
+        * `Taxable_Income_Threshold_Single` (Currency - *pre-defined*)
+        * `Taxable_Income_Threshold_MFJ` (Currency - *pre-defined*)
+        * `W_2_Wages_Paid_by_Business` (Currency)
+        * `Qualified_Property_Unadjusted_Basis` (Currency)
+        * `Filing_Status` (Text)
+    * **Calculations:**
+        * `QBI_Deduction_Percentage = 0.20` (20%)
+        * `QBI_Limit_Taxable_Income = Taxable_Income_Before_QBI_Deduction * 0.20`
+        * `Tentative_QBI_Deduction = Qualified_Business_Income * QBI_Deduction_Percentage`
+        * `Final_QBI_Deduction = MIN(Tentative_QBI_Deduction, QBI_Limit_Taxable_Income)`
+        * *Consider phase-outs for specified service businesses and higher income earners, and W-2/property limitations.*
+    * **Outputs:**
+        * `Estimated_QBI_Deduction` (Currency)
+        * `QBI_Phase_Out_Warning` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBasicQBIDeduction():
+            Qualified_Business_Income = GET_INPUT("Qualified_Business_Income")
+            Taxable_Income_Before_QBI_Deduction = GET_INPUT("Taxable_Income_Before_QBI_Deduction")
+            W_2_Wages_Paid_by_Business = GET_INPUT("W_2_Wages_Paid_by_Business")
+            Qualified_Property_Unadjusted_Basis = GET_INPUT("Qualified_Property_Unadjusted_Basis")
+            Filing_Status = GET_INPUT("Filing_Status")
+
+            // Pre-defined QBI thresholds and rules (example values for 2024)
+            TAXABLE_INCOME_THRESHOLD_SINGLE = 195300
+            TAXABLE_INCOME_THRESHOLD_MFJ = 390700
+            QBI_DEDUCTION_PERCENTAGE = 0.20 // 20%
+            
+            QBI_Phase_Out_Warning = ""
+
+            Tentative_QBI_Deduction = Qualified_Business_Income * QBI_DEDUCTION_PERCENTAGE
+
+            // Apply overall taxable income limit
+            QBI_Limit_Based_On_Taxable_Income = Taxable_Income_Before_QBI_Deduction * QBI_DEDUCTION_PERCENTAGE
+            Final_QBI_Deduction = MIN(Tentative_QBI_Deduction, QBI_Limit_Based_On_Taxable_Income)
+
+            // More complex phase-out logic for high earners (Specified Service Businesses & W-2/Property Limitations)
+            // This requires checking income against phase-out ranges.
+            // Simplified here: if income is above threshold, a warning.
+
+            Income_Threshold = 0
+            IF Filing_Status == "Single" OR Filing_Status == "Head of Household" THEN
+                Income_Threshold = TAXABLE_INCOME_THRESHOLD_SINGLE
+            ELSE IF Filing_Status == "Married Filing Jointly" THEN
+                Income_Threshold = TAXABLE_INCOME_THRESHOLD_MFJ
+            END IF
+
+            IF Taxable_Income_Before_QBI_Deduction > Income_Threshold THEN
+                QBI_Phase_Out_Warning = "Your income is above the QBI deduction threshold, so additional limitations (W-2 wages, qualified property) and phase-outs may apply, especially for Specified Service Businesses. This calculation is a basic estimate."
+            END IF
+
+            DISPLAY_OUTPUT("Estimated_QBI_Deduction", Final_QBI_Deduction)
+            DISPLAY_OUTPUT("QBI_Phase_Out_Warning", QBI_Phase_Out_Warning)
+        END FUNCTION
+        ```
+
+614. **Child and Dependent Care Credit (Basic)**
+    * **Purpose:** Estimate the Child and Dependent Care Credit amount a taxpayer can claim for care expenses.
+    * **Inputs:**
+        * `Number_of_Qualifying_Dependents` (Number - under 13 or disabled dependent)
+        * `Total_Care_Expenses_Paid` (Currency)
+        * `Adjusted_Gross_Income_AGI` (Currency)
+        * `AGI_Credit_Percentage_Table` (Table: AGI bands, Credit Percentage) - *pre-defined by IRS*
+        * `Maximum_Expenses_1_Dependent` (Currency)
+        * `Maximum_Expenses_2_Plus_Dependents` (Currency)
+    * **Calculations:**
+        * `Max_Eligible_Expenses = IF Number_of_Qualifying_Dependents = 1 THEN Maximum_Expenses_1_Dependent ELSE Maximum_Expenses_2_Plus_Dependents`
+        * `Eligible_Expenses_Used = MIN(Total_Care_Expenses_Paid, Max_Eligible_Expenses)`
+        * `Credit_Percentage = LOOKUP_CREDIT_PERCENTAGE_BY_AGI(AGI, AGI_Credit_Percentage_Table)`
+        * `Total_Credit = Eligible_Expenses_Used * (Credit_Percentage / 100)`
+    * **Outputs:**
+        * `Estimated_Child_and_Dependent_Care_Credit` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateChildDependentCareCredit():
+            Number_of_Qualifying_Dependents = GET_INPUT("Number_of_Qualifying_Dependents")
+            Total_Care_Expenses_Paid = GET_INPUT("Total_Care_Expenses_Paid")
+            Adjusted_Gross_Income_AGI = GET_INPUT("Adjusted_Gross_Income_AGI")
+
+            // Pre-defined limits and AGI percentage table (example values)
+            MAX_EXPENSES_1_DEPENDENT = 3000
+            MAX_EXPENSES_2_PLUS_DEPENDENTS = 6000
+            AGI_CREDIT_PERCENTAGE_TABLE = [
+                {Min_AGI: 0, Max_AGI: 15000, Percentage: 35},
+                {Min_AGI: 15001, Max_AGI: 43000, Percentage: 20}, // Example: 20-35% range
+                {Min_AGI: 43001, Max_AGI: INFINITY, Percentage: 20} // Minimum 20%
+            ]
+
+            Max_Eligible_Expenses = 0
+            IF Number_of_Qualifying_Dependents == 1 THEN
+                Max_Eligible_Expenses = MAX_EXPENSES_1_DEPENDENT
+            ELSE IF Number_of_Qualifying_Dependents >= 2 THEN
+                Max_Eligible_Expenses = MAX_EXPENSES_2_PLUS_DEPENDENTS
+            END IF
+
+            Eligible_Expenses_Used = MIN(Total_Care_Expenses_Paid, Max_Eligible_Expenses)
+
+            Credit_Percentage = 0
+            FOR EACH Row IN AGI_CREDIT_PERCENTAGE_TABLE:
+                IF AGI_Credit_Percentage_Table.Min_AGI <= Adjusted_Gross_Income_AGI AND Adjusted_Gross_Income_AGI <= AGI_Credit_Percentage_Table.Max_AGI THEN
+                    Credit_Percentage = Row.Percentage
+                    BREAK
+                END IF
+            END FOR
+            
+            Total_Credit = Eligible_Expenses_Used * (Credit_Percentage / 100)
+
+            DISPLAY_OUTPUT("Estimated_Child_and_Dependent_Care_Credit", Total_Credit)
+        END FUNCTION
+        ```
+
+615. **Student Loan Interest Deduction Calculator**
+    * **Purpose:** Calculate the deductible amount of student loan interest paid, reducing taxable income.
+    * **Inputs:**
+        * `Total_Student_Loan_Interest_Paid` (Currency)
+        * `Modified_Adjusted_Gross_Income_MAGI` (Currency)
+        * `MAGI_Deduction_Phase_Out_Range_Start_Single` (Currency - *pre-defined*)
+        * `MAGI_Deduction_Phase_Out_Range_End_Single` (Currency - *pre-defined*)
+        * `Maximum_Deduction_Amount` (Currency - *pre-defined, e.g., $2,500*)
+        * `Filing_Status` (Text)
+    * **Calculations:**
+        * `Deductible_Amount_Before_MAGI_Limit = MIN(Total_Student_Loan_Interest_Paid, Maximum_Deduction_Amount)`
+        * `Phase_Out_Start = LOOKUP_MAGI_PHASEOUT_START(Filing_Status)`
+        * `Phase_Out_End = LOOKUP_MAGI_PHASEOUT_END(Filing_Status)`
+        * `IF MAGI > Phase_Out_Start THEN`
+            * `Phase_Out_Percentage = MIN(1, (MAGI - Phase_Out_Start) / (Phase_Out_End - Phase_Out_Start))`
+            * `Final_Deduction = Deductible_Amount_Before_MAGI_Limit * (1 - Phase_Out_Percentage)`
+        * `ELSE Final_Deduction = Deductible_Amount_Before_MAGI_Limit`
+    * **Outputs:**
+        * `Estimated_Student_Loan_Interest_Deduction` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateStudentLoanInterestDeduction():
+            Total_Student_Loan_Interest_Paid = GET_INPUT("Total_Student_Loan_Interest_Paid")
+            Modified_Adjusted_Gross_Income_MAGI = GET_INPUT("Modified_Adjusted_Gross_Income_MAGI")
+            Filing_Status = GET_INPUT("Filing_Status")
+
+            // Pre-defined limits and phase-out ranges (example values for 2024)
+            MAXIMUM_DEDUCTION_AMOUNT = 2500
+            PHASE_OUT_START_SINGLE = 80000
+            PHASE_OUT_END_SINGLE = 95000
+            PHASE_OUT_START_MFJ = 165000
+            PHASE_OUT_END_MFJ = 195000
+
+            Deductible_Amount_Before_MAGI_Limit = MIN(Total_Student_Loan_Interest_Paid, MAXIMUM_DEDUCTION_AMOUNT)
+            Final_Deduction = Deductible_Amount_Before_MAGI_Limit
+
+            Phase_Out_Start = 0
+            Phase_Out_End = 0
+            IF Filing_Status == "Single" OR Filing_Status == "Head of Household" THEN
+                Phase_Out_Start = PHASE_OUT_START_SINGLE
+                Phase_Out_End = PHASE_OUT_END_SINGLE
+            ELSE IF Filing_Status == "Married Filing Jointly" THEN
+                Phase_Out_Start = PHASE_OUT_START_MFJ
+                Phase_Out_End = PHASE_OUT_END_MFJ
+            END IF
+
+            IF Modified_Adjusted_Gross_Income_MAGI > Phase_Out_Start THEN
+                Phase_Out_Percentage = MIN(1, (Modified_Adjusted_Gross_Income_MAGI - Phase_Out_Start) / (Phase_Out_End - Phase_Out_Start))
+                Final_Deduction = Final_Deduction * (1 - Phase_Out_Percentage)
+            END IF
+            Final_Deduction = MAX(0, Final_Deduction) // Ensure it's not negative
+
+            DISPLAY_OUTPUT("Estimated_Student_Loan_Interest_Deduction", Final_Deduction)
+        END FUNCTION
+        ```
+
+616. **Medical Expense Deduction (AGI Limit)**
+    * **Purpose:** Calculate the deductible amount of medical expenses, which is limited by a percentage of Adjusted Gross Income (AGI).
+    * **Inputs:**
+        * `Total_Qualified_Medical_Expenses` (Currency)
+        * `Adjusted_Gross_Income_AGI` (Currency)
+        * `AGI_Limit_Percentage` (Percentage - *pre-defined, e.g., 7.5% for 2024*)
+    * **Calculations:**
+        * `AGI_Threshold = AGI * (AGI_Limit_Percentage / 100)`
+        * `Deductible_Medical_Expenses = MAX(0, Total_Qualified_Medical_Expenses - AGI_Threshold)`
+    * **Outputs:**
+        * `Calculated_Deductible_Medical_Expenses` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMedicalExpenseDeduction():
+            Total_Qualified_Medical_Expenses = GET_INPUT("Total_Qualified_Medical_Expenses")
+            Adjusted_Gross_Income_AGI = GET_INPUT("Adjusted_Gross_Income_AGI")
+
+            // Pre-defined AGI limit percentage
+            AGI_LIMIT_PERCENTAGE = 0.075 // 7.5% for most years
+
+            AGI_Threshold = AGI_Adjusted_Gross_Income_AGI * AGI_LIMIT_PERCENTAGE
+            Deductible_Medical_Expenses = MAX(0, Total_Qualified_Medical_Expenses - AGI_Threshold)
+
+            DISPLAY_OUTPUT("Calculated_Deductible_Medical_Expenses", Deductible_Medical_Expenses)
+        END FUNCTION
+        ```
+
+617. **Financial Freedom Date Calculator (Detailed)**
+    * **Purpose:** Pinpoint the exact date when an individual can achieve financial freedom, accounting for detailed expenses and investment growth.
+    * **Inputs:**
+        * `Current_Date` (Date)
+        * `Current_Portfolio_Value` (Currency)
+        * `Annual_Savings_Amount` (Currency)
+        * `Current_Annual_Expenses` (Currency)
+        * `Expected_Annual_Return` (Percentage)
+        * `Safe_Withdrawal_Rate` (Percentage)
+        * `Expense_Inflation_Rate` (Percentage)
+        * `Savings_Growth_Rate` (Percentage - e.g., from raises)
+    * **Calculations:**
+        * `FI_Number_Initial = Current_Annual_Expenses / (Safe_Withdrawal_Rate / 100)`
+        * `Years_to_FI = 0`
+        * `Current_Portfolio = Current_Portfolio_Value`
+        * `Current_Expenses = Current_Annual_Expenses`
+        * `Current_Savings = Annual_Savings_Amount`
+        * `WHILE Current_Portfolio < Current_Expenses / (Safe_Withdrawal_Rate / 100):`
+            * `Years_to_FI = Years_to_FI + 1`
+            * `Current_Portfolio = Current_Portfolio * (1 + Expected_Annual_Return / 100) + Current_Savings`
+            * `Current_Expenses = Current_Expenses * (1 + Expense_Inflation_Rate / 100)`
+            * `Current_Savings = Current_Savings * (1 + Savings_Growth_Rate / 100)`
+        * `Financial_Freedom_Date = ADD_YEARS_TO_DATE(Current_Date, Years_to_FI)`
+    * **Outputs:**
+        * `Calculated_Financial_Freedom_Date` (Date)
+        * `Estimated_Years_to_Freedom` (Years)
+        * `FI_Number_at_Freedom_Date` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFinancialFreedomDate():
+            Current_Date = GET_INPUT("Current_Date") // Date object
+            Current_Portfolio_Value = GET_INPUT("Current_Portfolio_Value")
+            Annual_Savings_Amount = GET_INPUT("Annual_Savings_Amount")
+            Current_Annual_Expenses = GET_INPUT("Current_Annual_Expenses")
+            Expected_Annual_Return = GET_INPUT("Expected_Annual_Return") / 100
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+            Expense_Inflation_Rate = GET_INPUT("Expense_Inflation_Rate") / 100
+            Savings_Growth_Rate = GET_INPUT("Savings_Growth_Rate") / 100
+
+            Years_to_FI = 0
+            Current_Portfolio = Current_Portfolio_Value
+            Current_Expenses_Projected = Current_Annual_Expenses
+            Current_Savings_Projected = Annual_Savings_Amount
+            Max_Years_Simulate = 100 // Safety break
+
+            IF Safe_Withdrawal_Rate <= 0 THEN
+                DISPLAY_OUTPUT("Status", "Safe Withdrawal Rate must be positive.")
+                RETURN
+            END IF
+
+            WHILE Current_Portfolio < (Current_Expenses_Projected / Safe_Withdrawal_Rate) AND Years_to_FI < Max_Years_Simulate:
+                Years_to_FI = Years_to_FI + 1
+                Current_Portfolio = Current_Portfolio * (1 + Expected_Annual_Return) + Current_Savings_Projected
+                Current_Expenses_Projected = Current_Expenses_Projected * (1 + Expense_Inflation_Rate)
+                Current_Savings_Projected = Current_Savings_Projected * (1 + Savings_Growth_Rate)
+            END WHILE
+
+            Financial_Freedom_Date = ADD_YEARS_TO_DATE(Current_Date, Years_to_FI)
+            FI_Number_at_Freedom_Date = Current_Expenses_Projected / Safe_Withdrawal_Rate
+
+            IF Years_to_FI >= Max_Years_Simulate THEN
+                DISPLAY_OUTPUT("Status", "Goal not reached within " + Max_Years_Simulate + " years.")
+                RETURN
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Financial_Freedom_Date", Financial_Freedom_Date)
+            DISPLAY_OUTPUT("Estimated_Years_to_Freedom", Years_to_FI)
+            DISPLAY_OUTPUT("FI_Number_at_Freedom_Date", FI_Number_at_Freedom_Date)
+        END FUNCTION
+        ```
+
+618. **Impact of Financial Windfall (Lump Sum Allocation)**
+    * **Purpose:** Help users decide how to best utilize a financial windfall (e.g., inheritance, bonus) by allocating it to debt, savings, or investments.
+    * **Inputs:**
+        * `Windfall_Amount` (Currency)
+        * `High_Interest_Debt_Balance` (Currency)
+        * `High_Interest_Debt_APR` (Percentage)
+        * `Emergency_Fund_Shortfall` (Currency)
+        * `Investment_Opportunity_Return` (Percentage)
+        * `Allocation_To_Debt` (Percentage)
+        * `Allocation_To_Emergency_Fund` (Percentage)
+        * `Allocation_To_Investments` (Percentage)
+    * **Calculations:**
+        * `Amount_to_Debt = Windfall_Amount * (Allocation_To_Debt / 100)`
+        * `Amount_to_EF = Windfall_Amount * (Allocation_To_Emergency_Fund / 100)`
+        * `Amount_to_Invest = Windfall_Amount * (Allocation_To_Investments / 100)`
+        * `Interest_Saved_Debt = MIN(Amount_to_Debt, High_Interest_Debt_Balance) * (High_Interest_Debt_APR / 100 / 12) * Months_Saved_On_Debt` (Requires complex simulation to derive months saved)
+        * `Future_Value_Invested = Amount_to_Invest * (1 + Investment_Opportunity_Return / 100)^Years_Horizon`
+    * **Outputs:**
+        * `Total_Windfall_Amount` (Currency)
+        * `Summary_of_Allocations` (Table: Category, Amount)
+        * `Projected_Impact_Statement` (Text: combining debt savings, EF filled, investment growth)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateImpactOfFinancialWindfall():
+            Windfall_Amount = GET_INPUT("Windfall_Amount")
+            High_Interest_Debt_Balance = GET_INPUT("High_Interest_Debt_Balance")
+            High_Interest_Debt_APR = GET_INPUT("High_Interest_Debt_APR")
+            Emergency_Fund_Shortfall = GET_INPUT("Emergency_Fund_Shortfall")
+            Investment_Opportunity_Return = GET_INPUT("Investment_Opportunity_Return") / 100
+            Allocation_To_Debt_Percent = GET_INPUT("Allocation_To_Debt_Percent") / 100
+            Allocation_To_Emergency_Fund_Percent = GET_INPUT("Allocation_To_Emergency_Fund_Percent") / 100
+            Allocation_To_Investments_Percent = GET_INPUT("Allocation_To_Investments_Percent") / 100
+            Years_Horizon_For_Investment = GET_INPUT("Years_Horizon_For_Investment") // For investment impact
+
+            Amount_to_Debt = Windfall_Amount * Allocation_To_Debt_Percent
+            Amount_to_EF = Windfall_Amount * Allocation_To_Emergency_Fund_Percent
+            Amount_to_Invest = Windfall_Amount * Allocation_To_Investments_Percent
+
+            Interest_Saved_Debt = 0
+            IF Amount_to_Debt > 0 THEN
+                // This is a simplified calculation. Real savings depend on full amortization.
+                Interest_Saved_Debt = MIN(Amount_to_Debt, High_Interest_Debt_Balance) * (High_Interest_Debt_APR / 100) // Simple annual interest saved if balance reduced
+            END IF
+
+            Future_Value_Invested = Amount_to_Invest * POWER((1 + Investment_Opportunity_Return), Years_Horizon_For_Investment)
+
+            Summary_of_Allocations = [
+                {Category: "Pay Down Debt", Amount: Amount_to_Debt},
+                {Category: "Fund Emergency Fund", Amount: Amount_to_EF},
+                {Category: "Invest", Amount: Amount_to_Invest}
+            ]
+
+            Projected_Impact_Statement = "By allocating your windfall: "
+            IF Amount_to_Debt > 0 THEN
+                Projected_Impact_Statement = Projected_Impact_Statement + "You could save approximately " + FORMAT_CURRENCY(Interest_Saved_Debt) + " in annual interest on debt. "
+            END IF
+            IF Amount_to_EF >= Emergency_Fund_Shortfall THEN
+                Projected_Impact_Statement = Projected_Impact_Statement + "Your emergency fund will be fully funded. "
+            ELSE IF Amount_to_EF > 0 THEN
+                Projected_Impact_Statement = Projected_Impact_Statement + "Your emergency fund will be closer to being fully funded. "
+            END IF
+            IF Amount_to_Invest > 0 THEN
+                Projected_Impact_Statement = Projected_Impact_Statement + "Your investment could grow to approximately " + FORMAT_CURRENCY(Future_Value_Invested) + " in " + Years_Horizon_For_Investment + " years."
+            END IF
+
+            DISPLAY_OUTPUT("Total_Windfall_Amount", Windfall_Amount)
+            DISPLAY_OUTPUT("Summary_of_Allocations", Summary_of_Allocations)
+            DISPLAY_OUTPUT("Projected_Impact_Statement", Projected_Impact_Statement)
+        END FUNCTION
+        ```
+
+619. **"Money Personality" Quiz (Conceptual)**
+    * **Purpose:** A short quiz to help users understand their inherent tendencies and biases around money (e.g., spender, saver, risk-taker, security-seeker).
+    * **Inputs:**
+        * `Quiz_Answers_List` (List of selected answers, each mapped to a personality trait score)
+    * **Calculations:**
+        * `Score_for_Trait_A = SUM(scores related to Trait A)`
+        * `Score_for_Trait_B = SUM(scores related to Trait B)`
+        * `Dominant_Personality = Identify_Highest_Score_Trait`
+    * **Outputs:**
+        * `Your_Dominant_Money_Personality` (Text)
+        * `Strengths_and_Weaknesses_Note` (Text)
+        * `Financial_Advice_Alignment` (Text: e.g., "A saver should focus on investing for growth.")
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AssessMoneyPersonality():
+            Quiz_Answers_List = GET_INPUT("Quiz_Answers_List") // e.g., [score1, score2, ...]
+
+            // Example: Map quiz answers to different personality facets
+            // Assume quiz questions are designed such that certain answers contribute to "Spender", "Saver", "Risk-Taker", "Security-Seeker" scores.
+            // This is illustrative, full quiz logic would be complex.
+            Score_Spender = SUM_SCORES_FOR_CATEGORY(Quiz_Answers_List, "Spender_Category_Questions")
+            Score_Saver = SUM_SCORES_FOR_CATEGORY(Quiz_Answers_List, "Saver_Category_Questions")
+            Score_RiskTaker = SUM_SCORES_FOR_CATEGORY(Quiz_Answers_List, "RiskTaker_Category_Questions")
+            Score_SecuritySeeker = SUM_SCORES_FOR_CATEGORY(Quiz_Answers_List, "SecuritySeeker_Category_Questions")
+
+            Dominant_Personality_Trait = "Balanced"
+            Max_Score = MAX(Score_Spender, Score_Saver, Score_RiskTaker, Score_SecuritySeeker)
+
+            IF Max_Score == Score_Spender THEN Dominant_Personality_Trait = "Spender"
+            ELSE IF Max_Score == Score_Saver THEN Dominant_Personality_Trait = "Saver"
+            ELSE IF Max_Score == Score_RiskTaker THEN Dominant_Personality_Trait = "Risk-Taker"
+            ELSE IF Max_Score == Score_SecuritySeeker THEN Dominant_Personality_Trait = "Security-Seeker"
+
+            Strengths_and_Weaknesses_Note = ""
+            Financial_Advice_Alignment = ""
+
+            IF Dominant_Personality_Trait == "Spender" THEN
+                Strengths_and_Weaknesses_Note = "Strengths: Enjoys life, generous. Weaknesses: May struggle with saving, impulse buys. "
+                Financial_Advice_Alignment = "Focus on automated savings and budgeting to ensure financial goals are met."
+            ELSE IF Dominant_Personality_Trait == "Saver" THEN
+                Strengths_and_Weaknesses_Note = "Strengths: Disciplined, secure. Weaknesses: May be overly cautious, miss opportunities. "
+                Financial_Advice_Alignment = "Consider investing for growth to combat inflation and reach goals faster."
+            END IF
+
+            DISPLAY_OUTPUT("Your_Dominant_Money_Personality", Dominant_Personality_Trait)
+            DISPLAY_OUTPUT("Strengths_and_Weaknesses_Note", Strengths_and_Weaknesses_Note)
+            DISPLAY_OUTPUT("Financial_Advice_Alignment", Financial_Advice_Alignment)
+        END FUNCTION
+        ```
+
+620. **Retirement Portfolio Longevity Projector (Advanced)**
+    * **Purpose:** Simulate the long-term sustainability of a retirement portfolio given withdrawals, investment returns, and inflation, including a detailed year-by-year table.
+    * **Inputs:**
+        * `Initial_Portfolio_Balance` (Currency)
+        * `Annual_Withdrawal_Amount_Initial` (Currency)
+        * `Expected_Annual_Return` (Percentage)
+        * `Annual_Inflation_Rate` (Percentage)
+        * `Years_to_Simulate` (Years)
+    * **Calculations:**
+        * `Simulated_Portfolio_History = []`
+        * `Current_Portfolio = Initial_Portfolio_Balance`
+        * `Current_Withdrawal_Adjusted = Annual_Withdrawal_Amount_Initial`
+        * `FOR i FROM 1 TO Years_to_Simulate:`
+            * `Portfolio_End_of_Year = Current_Portfolio * (1 + Expected_Annual_Return / 100)`
+            * `Portfolio_After_Withdrawal = Portfolio_End_of_Year - Current_Withdrawal_Adjusted`
+            * `Simulated_Portfolio_History.ADD({Year: i, Starting_Balance: Current_Portfolio, Withdrawal: Current_Withdrawal_Adjusted, Ending_Balance: Portfolio_After_Withdrawal})`
+            * `Current_Portfolio = Portfolio_After_Withdrawal`
+            * `Current_Withdrawal_Adjusted = Current_Withdrawal_Adjusted * (1 + Annual_Inflation_Rate / 100)` (Adjust withdrawal for inflation)
+            * `IF Current_Portfolio <= 0 THEN BREAK`
+    * **Outputs:**
+        * `Projected_Portfolio_Longevity_Years` (Years)
+        * `Detailed_Simulation_Table` (Table: Year, Starting Balance, Withdrawal, Ending Balance)
+        * `Sustainability_Verdict` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ProjectRetirementPortfolioLongevityAdvanced():
+            Initial_Portfolio_Balance = GET_INPUT("Initial_Portfolio_Balance")
+            Annual_Withdrawal_Amount_Initial = GET_INPUT("Annual_Withdrawal_Amount_Initial")
+            Expected_Annual_Return = GET_INPUT("Expected_Annual_Return") / 100
+            Annual_Inflation_Rate = GET_INPUT("Annual_Inflation_Rate") / 100
+            Years_to_Simulate = GET_INPUT("Years_to_Simulate")
+
+            Simulated_Portfolio_History = []
+            Current_Portfolio = Initial_Portfolio_Balance
+            Current_Withdrawal_Adjusted = Annual_Withdrawal_Amount_Initial
+            Projected_Portfolio_Longevity_Years = 0
+
+            FOR i FROM 1 TO Years_to_Simulate:
+                Portfolio_Start_of_Year = Current_Portfolio
+                Portfolio_After_Growth = Portfolio_Start_of_Year * (1 + Expected_Annual_Return)
+                
+                IF Portfolio_After_Growth <= Current_Withdrawal_Adjusted THEN // Funds run out this year
+                    Simulated_Portfolio_History.ADD({Year: i, Starting_Balance: Portfolio_Start_of_Year, Withdrawal: MIN(Portfolio_After_Growth, Current_Withdrawal_Adjusted), Ending_Balance: 0})
+                    Projected_Portfolio_Longevity_Years = i
+                    Current_Portfolio = 0
+                    BREAK
+                END IF
+
+                Portfolio_After_Withdrawal = Portfolio_After_Growth - Current_Withdrawal_Adjusted
+                
+                Simulated_Portfolio_History.ADD({
+                    Year: i,
+                    Starting_Balance: Portfolio_Start_of_Year,
+                    Withdrawal: Current_Withdrawal_Adjusted,
+                    Ending_Balance: Portfolio_After_Withdrawal
+                })
+                
+                Current_Portfolio = Portfolio_After_Withdrawal
+                Current_Withdrawal_Adjusted = Current_Withdrawal_Adjusted * (1 + Annual_Inflation_Rate)
+                Projected_Portfolio_Longevity_Years = i
+            END FOR
+
+            Sustainability_Verdict = ""
+            IF Current_Portfolio > 0 THEN
+                Sustainability_Verdict = "Portfolio is projected to last for the entire simulation period (" + Years_to_Simulate + " years)."
+            ELSE
+                Sustainability_Verdict = "Portfolio is projected to be depleted after " + Projected_Portfolio_Longevity_Years + " years."
+            END IF
+
+            DISPLAY_OUTPUT("Projected_Portfolio_Longevity_Years", Projected_Portfolio_Longevity_Years)
+            DISPLAY_OUTPUT("Detailed_Simulation_Table", Simulated_Portfolio_History)
+            DISPLAY_OUTPUT("Sustainability_Verdict", Sustainability_Verdict)
+        END FUNCTION
+        ```
+
+621. **Annual Savings Contribution for Retirement (Inflation-Adjusted)**
+    * **Purpose:** Calculate the annual savings contributions required to reach a retirement goal, adjusting for the fact that expenses and future contributions will increase with inflation.
+    * **Inputs:**
+        * `Current_Annual_Expenses_in_Retirement_Today` (Currency)
+        * `Retirement_Age` (Years)
+        * `Current_Age` (Years)
+        * `Expected_Annual_Investment_Return` (Percentage)
+        * `Annual_Inflation_Rate` (Percentage)
+        * `Safe_Withdrawal_Rate` (Percentage)
+        * `Current_Retirement_Savings` (Currency)
+    * **Calculations:**
+        * `Years_Until_Retirement = Retirement_Age - Current_Age`
+        * `Inflation_Adjusted_Expenses_at_Retirement = Current_Annual_Expenses_in_Retirement_Today * (1 + Annual_Inflation_Rate / 100)^Years_Until_Retirement`
+        * `FI_Number_at_Retirement = Inflation_Adjusted_Expenses_at_Retirement / (Safe_Withdrawal_Rate / 100)`
+        * `Real_Return_Rate = ((1 + Expected_Annual_Investment_Return / 100) / (1 + Annual_Inflation_Rate / 100)) - 1`
+        * *Use FV of current savings and FV of annuity formula to solve for required annual contribution (iterative/financial function).*
+    * **Outputs:**
+        * `Required_Inflation_Adjusted_Annual_Contribution` (Currency)
+        * `FI_Number_at_Retirement` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateInflationAdjustedRetirementContribution():
+            Current_Annual_Expenses_in_Retirement_Today = GET_INPUT("Current_Annual_Expenses_in_Retirement_Today")
+            Retirement_Age = GET_INPUT("Retirement_Age")
+            Current_Age = GET_INPUT("Current_Age")
+            Expected_Annual_Investment_Return = GET_INPUT("Expected_Annual_Investment_Return") / 100
+            Annual_Inflation_Rate = GET_INPUT("Annual_Inflation_Rate") / 100
+            Safe_Withdrawal_Rate = GET_INPUT("Safe_Withdrawal_Rate") / 100
+            Current_Retirement_Savings = GET_INPUT("Current_Retirement_Savings")
+
+            Years_Until_Retirement = Retirement_Age - Current_Age
+
+            IF Safe_Withdrawal_Rate <= 0 THEN
+                DISPLAY_OUTPUT("Required_Inflation_Adjusted_Annual_Contribution", "N/A")
+                DISPLAY_OUTPUT("FI_Number_at_Retirement", "Safe Withdrawal Rate must be positive.")
+                RETURN
+            END IF
+
+            Inflation_Adjusted_Expenses_at_Retirement = Current_Annual_Expenses_in_Retirement_Today * POWER((1 + Annual_Inflation_Rate), Years_Until_Retirement)
+            FI_Number_at_Retirement = Inflation_Adjusted_Expenses_at_Retirement / Safe_Withdrawal_Rate
+
+            Real_Return_Rate = ((1 + Expected_Annual_Investment_Return) / (1 + Annual_Inflation_Rate)) - 1
+
+            Required_Inflation_Adjusted_Annual_Contribution = 0
+            IF Years_Until_Retirement > 0 THEN
+                // Use a financial PMT function (Payment for an annuity)
+                // PMT(rate, nper, pv, [fv], [type]) where rate is real rate, PV is current savings, FV is desired FI_Number
+                Required_Inflation_Adjusted_Annual_Contribution = CALCULATE_PMT(
+                    Real_Return_Rate,
+                    Years_Until_Retirement,
+                    -Current_Retirement_Savings, // PV is current savings, negative because it's invested
+                    FI_Number_at_Retirement // FV is target, positive
+                )
+            ELSE
+                DISPLAY_OUTPUT("Required_Inflation_Adjusted_Annual_Contribution", "You are already at or past retirement age.")
+            END IF
+
+
+            DISPLAY_OUTPUT("Required_Inflation_Adjusted_Annual_Contribution", Required_Inflation_Adjusted_Annual_Contribution)
+            DISPLAY_OUTPUT("FI_Number_at_Retirement", FI_Number_at_Retirement)
+        END FUNCTION
+        ```
+
+622. **Taxable vs. Tax-Advantaged Investment Comparison (After-Tax Income)**
+    * **Purpose:** Compare the actual after-tax income generated from an investment over a period when held in taxable vs. tax-advantaged accounts.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Expected_Annual_Dividend_Yield` (Percentage)
+        * `Expected_Annual_Capital_Gains` (Percentage)
+        * `Years_to_Project` (Years)
+        * `Ordinary_Income_Tax_Rate` (Percentage)
+        * `Capital_Gains_Tax_Rate` (Percentage)
+        * `Tax_Advantaged_Type` (Text: "Traditional IRA", "Roth IRA")
+        * `Tax_Advantaged_Withdrawal_Tax_Rate` (Percentage - for Traditional)
+    * **Calculations:**
+        * **Taxable Account:**
+            * `Annual_Dividend_Income = Initial_Investment * (Expected_Annual_Dividend_Yield / 100)`
+            * `Annual_Capital_Gains_Recognized = Initial_Investment * (Expected_Annual_Capital_Gains / 100)` (Simplified annual realization)
+            * `Tax_on_Dividends = Annual_Dividend_Income * (Ordinary_Income_Tax_Rate / 100)`
+            * `Tax_on_Capital_Gains = Annual_Capital_Gains_Recognized * (Capital_Gains_Tax_Rate / 100)`
+            * `After_Tax_Income_Year_1 = Annual_Dividend_Income - Tax_on_Dividends + Annual_Capital_Gains_Recognized - Tax_on_Capital_Gains`
+            * *Project year by year considering reinvestment and compounding.*
+        * **Tax-Advantaged Account:**
+            * `All_Growth_Tax_Free_Until_Withdrawal`
+            * `After_Tax_Income_Year_1 = Annual_Dividend_Income + Annual_Capital_Gains_Recognized`
+            * `If Traditional, subtract withdrawal tax.`
+    * **Outputs:**
+        * `Total_After_Tax_Income_Taxable_Account` (Currency)
+        * `Total_After_Tax_Income_Tax_Advantaged_Account` (Currency)
+        * `Tax_Efficiency_Benefit` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CompareTaxableVsTaxAdvantagedIncome():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Expected_Annual_Dividend_Yield = GET_INPUT("Expected_Annual_Dividend_Yield") / 100
+            Expected_Annual_Capital_Gains = GET_INPUT("Expected_Annual_Capital_Gains") / 100
+            Years_to_Project = GET_INPUT("Years_to_Project")
+            Ordinary_Income_Tax_Rate = GET_INPUT("Ordinary_Income_Tax_Rate") / 100
+            Capital_Gains_Tax_Rate = GET_INPUT("Capital_Gains_Tax_Rate") / 100
+            Tax_Advantaged_Type = GET_INPUT("Tax_Advantaged_Type")
+            Tax_Advantaged_Withdrawal_Tax_Rate = GET_INPUT("Tax_Advantaged_Withdrawal_Tax_Rate") / 100
+
+            Total_After_Tax_Income_Taxable = 0
+            Current_Investment_Taxable = Initial_Investment
+            FOR y FROM 1 TO Years_to_Project:
+                Dividend_Income = Current_Investment_Taxable * Expected_Annual_Dividend_Yield
+                Capital_Gains_Income = Current_Investment_Taxable * Expected_Annual_Capital_Gains // Assuming realized annually
+                
+                Tax_on_Dividends = Dividend_Income * Ordinary_Income_Tax_Rate
+                Tax_on_Capital_Gains = Capital_Gains_Income * Capital_Gains_Tax_Rate
+                
+                Net_Income_After_Tax = Dividend_Income - Tax_on_Dividends + Capital_Gains_Income - Tax_on_Capital_Gains
+                Total_After_Tax_Income_Taxable = Total_After_Tax_Income_Taxable + Net_Income_After_Tax
+                Current_Investment_Taxable = Current_Investment_Taxable + Net_Income_After_Tax // Reinvest after tax
+            END FOR
+
+            Total_After_Tax_Income_Tax_Advantaged = 0
+            Current_Investment_Tax_Advantaged = Initial_Investment
+            FOR y FROM 1 TO Years_to_Project:
+                Income_Pre_Tax = Current_Investment_Tax_Advantaged * (Expected_Annual_Dividend_Yield + Expected_Annual_Capital_Gains)
+                Total_After_Tax_Income_Tax_Advantaged = Total_After_Tax_Income_Tax_Advantaged + Income_Pre_Tax
+                Current_Investment_Tax_Advantaged = Current_Investment_Tax_Advantaged + Income_Pre_Tax // Reinvest gross
+            END FOR
+            
+            // Apply withdrawal tax for Traditional at the end
+            IF Tax_Advantaged_Type == "Traditional IRA" THEN
+                Total_After_Tax_Income_Tax_Advantaged = Total_After_Tax_Income_Tax_Advantaged * (1 - Tax_Advantaged_Withdrawal_Tax_Rate)
+            END IF
+
+            Tax_Efficiency_Benefit = Total_After_Tax_Income_Tax_Advantaged - Total_After_Tax_Income_Taxable
+
+            DISPLAY_OUTPUT("Total_After_Tax_Income_Taxable_Account", Total_After_Tax_Income_Taxable)
+            DISPLAY_OUTPUT("Total_After_Tax_Income_Tax_Advantaged_Account", Total_After_Tax_Income_Tax_Advantaged)
+            DISPLAY_OUTPUT("Tax_Efficiency_Benefit", Tax_Efficiency_Benefit)
+        END FUNCTION
+        ```
+
+---
+
+We've just added another 27 Personal Finance calculators (596-622), making this batch substantial as requested! This brings our total count to **524 (previous) + 27 = 551 calculators.**
+
+We are now well on our way to the 650 goal.
+
+Next, I will move to **Company Finance Calculators**, a critical area for our audience's understanding of businesses.
+
+-----------------
+
+Rigorous expansion is the path! We're now moving into **Company Finance Calculators**, a deep and crucial area for understanding business operations, investment, and financing decisions. This batch will focus on Capital Budgeting, advanced Working Capital, and deeper Capital Structure/Cost of Capital.
+
+Our current total is 551 calculators. This batch of 50+ will push us well past the 650 mark.
+
+---
+
+## XVI. Company Finance Calculators (Deeper Dive - Batch 1)
+
+623.  **Net Present Value (NPV) - Project Specific**
+    * **Purpose:** Evaluate the profitability of a specific capital project by discounting its future cash flows to the present and subtracting the initial investment.
+    * **Inputs:**
+        * `Initial_Investment` (Currency - usually negative)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Discount_Rate` (Percentage - often WACC or required rate of return)
+    * **Calculations:**
+        * `NPV = Initial_Investment`
+        * `FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:`
+            * `NPV = NPV + (Project_Cash_Flows[i] / (1 + Discount_Rate / 100)^(i + 1))`
+    * **Outputs:**
+        * `Calculated_NPV` (Currency)
+        * `Investment_Decision` (Text: "Accept" if NPV > 0, "Reject" if NPV < 0, "Indifferent" if NPV = 0)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateProjectNPV():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            NPV = Initial_Investment
+
+            FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:
+                NPV = NPV + (Project_Cash_Flows[i] / POWER((1 + Discount_Rate), (i + 1)))
+            END FOR
+
+            Investment_Decision = ""
+            IF NPV > 0 THEN
+                Investment_Decision = "Accept (Project is expected to add value)"
+            ELSE IF NPV < 0 THEN
+                Investment_Decision = "Reject (Project is expected to destroy value)"
+            ELSE
+                Investment_Decision = "Indifferent (Project meets the required rate of return exactly)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_NPV", NPV)
+            DISPLAY_OUTPUT("Investment_Decision", Investment_Decision)
+        END FUNCTION
+        ```
+
+624.  **Internal Rate of Return (IRR) - Project Specific**
+    * **Purpose:** Calculate the discount rate that makes the Net Present Value (NPV) of all cash flows from a specific project equal to zero.
+    * **Inputs:**
+        * `Initial_Investment` (Currency - usually negative)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+    * **Calculations:**
+        * *IRR calculation requires an iterative numerical method (e.g., Newton-Raphson, bisection method) as there is no direct algebraic solution.*
+        * `Cash_Flow_Stream = [-Initial_Investment] + Project_Cash_Flows`
+        * `IRR = SOLVE_IRR(Cash_Flow_Stream)`
+    * **Outputs:**
+        * `Calculated_IRR` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateProjectIRR():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+
+            Cash_Flow_Stream = [-Initial_Investment]
+            FOR EACH CF IN Project_Cash_Flows:
+                Cash_Flow_Stream.ADD(CF)
+            END FOR
+
+            // Use an iterative solver for IRR
+            Calculated_IRR = SOLVE_IRR_FUNCTION(Cash_Flow_Stream) * 100 // Returns decimal, convert to percentage
+
+            DISPLAY_OUTPUT("Calculated_IRR", Calculated_IRR)
+        END FUNCTION
+        ```
+
+625.  **Payback Period Calculator**
+    * **Purpose:** Determine the time required for a project's cumulative cash inflows to equal its initial investment, ignoring time value of money.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Annual_Cash_Inflows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+    * **Calculations:**
+        * `Cumulative_Cash_Flow = 0`
+        * `Payback_Period_Years = 0`
+        * `FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:`
+            * `Cumulative_Cash_Flow = Cumulative_Cash_Flow + Annual_Cash_Inflows[i]`
+            * `IF Cumulative_Cash_Flow >= Initial_Investment THEN`
+                * `Payback_Period_Years = i + 1`
+                * `Partial_Year_Recovery = (Initial_Investment - (Cumulative_Cash_Flow - Annual_Cash_Inflows[i])) / Annual_Cash_Inflows[i]`
+                * `Payback_Period_Years = Payback_Period_Years - 1 + Partial_Year_Recovery`
+                * `BREAK`
+        * `IF Payback_Period_Years == 0 AND Cumulative_Cash_Flow < Initial_Investment THEN Payback_Period_Years = "Never"`
+    * **Outputs:**
+        * `Calculated_Payback_Period_Years` (Years or "Never")
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePaybackPeriod():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Annual_Cash_Inflows = GET_INPUT("Annual_Cash_Inflows") // List of cash flows for years 1 to N
+
+            Cumulative_Cash_Flow = 0
+            Payback_Period_Years = 0
+            
+            FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:
+                Cumulative_Cash_Flow = Cumulative_Cash_Flow + Annual_Cash_Inflows[i]
+                IF Cumulative_Cash_Flow >= Initial_Investment THEN
+                    Years_Prior_Full_Recovery = i
+                    Amount_Recovered_Prior = Cumulative_Cash_Flow - Annual_Cash_Inflows[i]
+                    Amount_Still_Needed = Initial_Investment - Amount_Recovered_Prior
+                    Partial_Year_Recovery = Amount_Still_Needed / Annual_Cash_Inflows[i]
+                    Payback_Period_Years = Years_Prior_Full_Recovery + Partial_Year_Recovery
+                    BREAK
+                END IF
+            END FOR
+
+            IF Payback_Period_Years == 0 AND Initial_Investment > 0 AND SUM_LIST(Annual_Cash_Inflows) < Initial_Investment THEN
+                DISPLAY_OUTPUT("Calculated_Payback_Period_Years", "Never (Cash flows insufficient)")
+            ELSE IF Payback_Period_Years == 0 AND Initial_Investment <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Payback_Period_Years", 0) // Already recovered if no investment or positive
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Payback_Period_Years", Payback_Period_Years)
+            END IF
+        END FUNCTION
+        ```
+
+626.  **Discounted Payback Period Calculator**
+    * **Purpose:** Determine the time required for a project's cumulative *discounted* cash inflows to equal its initial investment.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Annual_Cash_Inflows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Discount_Rate` (Percentage)
+    * **Calculations:**
+        * `Cumulative_Discounted_Cash_Flow = 0`
+        * `Discounted_Payback_Period_Years = 0`
+        * `FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:`
+            * `Discounted_CF_This_Year = Annual_Cash_Inflows[i] / (1 + Discount_Rate / 100)^(i + 1)`
+            * `Cumulative_Discounted_Cash_Flow = Cumulative_Discounted_Cash_Flow + Discounted_CF_This_Year`
+            * `IF Cumulative_Discounted_Cash_Flow >= Initial_Investment THEN`
+                * `Years_Prior_Full_Recovery = i`
+                * `Amount_Recovered_Prior = Cumulative_Discounted_Cash_Flow - Discounted_CF_This_Year`
+                * `Amount_Still_Needed = Initial_Investment - Amount_Recovered_Prior`
+                * `Partial_Year_Recovery = Amount_Still_Needed / Discounted_CF_This_Year`
+                * `Discounted_Payback_Period_Years = Years_Prior_Full_Recovery + Partial_Year_Recovery`
+                * `BREAK`
+        * `IF Discounted_Payback_Period_Years == 0 AND Cumulative_Discounted_Cash_Flow < Initial_Investment THEN Discounted_Payback_Period_Years = "Never"`
+    * **Outputs:**
+        * `Calculated_Discounted_Payback_Period_Years` (Years or "Never")
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDiscountedPaybackPeriod():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Annual_Cash_Inflows = GET_INPUT("Annual_Cash_Inflows") // List of cash flows for years 1 to N
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            Cumulative_Discounted_Cash_Flow = 0
+            Discounted_Payback_Period_Years = 0
+            
+            FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:
+                Discounted_CF_This_Year = Annual_Cash_Inflows[i] / POWER((1 + Discount_Rate), (i + 1))
+                Cumulative_Discounted_Cash_Flow = Cumulative_Discounted_Cash_Flow + Discounted_CF_This_Year
+                IF Cumulative_Discounted_Cash_Flow >= Initial_Investment THEN
+                    Years_Prior_Full_Recovery = i
+                    Amount_Recovered_Prior = Cumulative_Discounted_Cash_Flow - Discounted_CF_This_Year
+                    Amount_Still_Needed = Initial_Investment - Amount_Recovered_Prior
+                    Partial_Year_Recovery = Amount_Still_Needed / Discounted_CF_This_Year
+                    Discounted_Payback_Period_Years = Years_Prior_Full_Recovery + Partial_Year_Recovery
+                    BREAK
+                END IF
+            END FOR
+
+            IF Discounted_Payback_Period_Years == 0 AND Initial_Investment > 0 AND SUM_LIST(Annual_Cash_Inflows) < Initial_Investment THEN
+                DISPLAY_OUTPUT("Calculated_Discounted_Payback_Period_Years", "Never (Discounted cash flows insufficient)")
+            ELSE IF Discounted_Payback_Period_Years == 0 AND Initial_Investment <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Discounted_Payback_Period_Years", 0)
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Discounted_Payback_Period_Years", Discounted_Payback_Period_Years)
+            END FUNCTION
+        ```
+
+627.  **Profitability Index (PI) Calculator**
+    * **Purpose:** Measure the ratio of the present value of future cash inflows to the initial investment, indicating value created per dollar invested.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Discount_Rate` (Percentage)
+    * **Calculations:**
+        * `Present_Value_of_Inflows = 0`
+        * `FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:`
+            * `Present_Value_of_Inflows = Present_Value_of_Inflows + (Project_Cash_Flows[i] / (1 + Discount_Rate / 100)^(i + 1))`
+        * `Profitability_Index = Present_Value_of_Inflows / Initial_Investment`
+    * **Outputs:**
+        * `Calculated_Profitability_Index` (Number)
+        * `Investment_Decision` (Text: "Accept" if PI > 1, "Reject" if PI < 1, "Indifferent" if PI = 1)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateProfitabilityIndex():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            Present_Value_of_Inflows = 0
+            FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:
+                Present_Value_of_Inflows = Present_Value_of_Inflows + (Project_Cash_Flows[i] / POWER((1 + Discount_Rate), (i + 1)))
+            END FOR
+
+            Profitability_Index = 0
+            IF Initial_Investment > 0 THEN // Initial Investment must be positive
+                Profitability_Index = Present_Value_of_Inflows / Initial_Investment
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Profitability_Index", "N/A - Initial Investment must be positive.")
+                RETURN
+            END IF
+
+            Investment_Decision = ""
+            IF Profitability_Index > 1 THEN
+                Investment_Decision = "Accept (Project creates value)"
+            ELSE IF Profitability_Index < 1 THEN
+                Investment_Decision = "Reject (Project destroys value)"
+            ELSE
+                Investment_Decision = "Indifferent (Project meets the required rate of return exactly)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Profitability_Index", Profitability_Index)
+            DISPLAY_OUTPUT("Investment_Decision", Investment_Decision)
+        END FUNCTION
+        ```
+
+628.  **Modified Internal Rate of Return (MIRR) Calculator**
+    * **Purpose:** Calculate a more reliable version of IRR that assumes positive cash flows are reinvested at the cost of capital and initial outlay is financed at the finance rate.
+    * **Inputs:**
+        * `Initial_Investment` (Currency - usually negative)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Reinvestment_Rate` (Percentage - often WACC)
+        * `Finance_Rate` (Percentage - cost of borrowing, if initial outlay is financed)
+    * **Calculations:**
+        * `PV_of_Negative_Cash_Flows = 0` (Discount all negative cash flows to time 0 at finance rate)
+        * `FV_of_Positive_Cash_Flows = 0` (Compound all positive cash flows to the end of the project at reinvestment rate)
+        * `MIRR = (POWER((FV_of_Positive_Cash_Flows / ABS(PV_of_Negative_Cash_Flows)), (1 / Number_of_Periods)) - 1) * 100`
+    * **Outputs:**
+        * `Calculated_MIRR` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMIRR():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+            Reinvestment_Rate = GET_INPUT("Reinvestment_Rate") / 100
+            Finance_Rate = GET_INPUT("Finance_Rate") / 100
+
+            PV_of_Negative_Cash_Flows = 0
+            FV_of_Positive_Cash_Flows = 0
+            Number_of_Periods = LENGTH(Project_Cash_Flows)
+
+            // Assume initial investment is negative, all subsequent are positive for simplicity
+            // If there are negative cash flows in later periods, this logic needs adjustment.
+            PV_of_Negative_Cash_Flows = ABS(Initial_Investment) // Simplified: assume initial investment is the only negative outflow
+
+            FOR i FROM 0 TO Number_of_Periods - 1:
+                IF Project_Cash_Flows[i] > 0 THEN
+                    FV_of_Positive_Cash_Flows = FV_of_Positive_Cash_Flows + \
+                                                (Project_Cash_Flows[i] * POWER((1 + Reinvestment_Rate), (Number_of_Periods - 1 - i)))
+                // ELSE IF Project_Cash_Flows[i] < 0 THEN
+                //     PV_of_Negative_Cash_Flows = PV_of_Negative_Cash_Flows + \
+                //                                (Project_Cash_Flows[i] / POWER((1 + Finance_Rate), (i + 1)))
+                END IF
+            END FOR
+
+            MIRR = 0
+            IF PV_of_Negative_Cash_Flows > 0 AND Number_of_Periods > 0 THEN
+                MIRR = (POWER((FV_of_Positive_Cash_Flows / PV_of_Negative_Cash_Flows), (1 / Number_of_Periods)) - 1) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_MIRR", MIRR)
+        END FUNCTION
+        ```
+
+629.  **Annual Equivalent Annuity (AEC) Calculator**
+    * **Purpose:** Compare mutually exclusive projects with different useful lives by converting their NPVs into equivalent annual cash flows.
+    * **Inputs:**
+        * `Project_NPV` (Currency)
+        * `Project_Life_Years` (Years)
+        * `Discount_Rate` (Percentage)
+    * **Calculations:**
+        * `Discount_Factor = (1 - (1 + Discount_Rate / 100)^-Project_Life_Years) / (Discount_Rate / 100)`
+        * `AEC = Project_NPV / Discount_Factor`
+    * **Outputs:**
+        * `Calculated_Annual_Equivalent_Annuity` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAEC():
+            Project_NPV = GET_INPUT("Project_NPV")
+            Project_Life_Years = GET_INPUT("Project_Life_Years")
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            IF Discount_Rate = 0 THEN
+                Discount_Factor = Project_Life_Years
+            ELSE
+                Discount_Factor = (1 - POWER((1 + Discount_Rate), -Project_Life_Years)) / Discount_Rate
+            END IF
+
+            AEC = 0
+            IF Discount_Factor != 0 THEN
+                AEC = Project_NPV / Discount_Factor
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Annual_Equivalent_Annuity", AEC)
+        END FUNCTION
+        ```
+
+630. **Optimal Cash Balance (Baumol Model) - Conceptual**
+    * **Purpose:** Explain the concept of determining an optimal cash balance that minimizes the sum of holding costs and transaction costs, based on the Baumol model.
+    * **Inputs:**
+        * `Total_Cash_Needed_Annual` (Currency)
+        * `Fixed_Cost_Per_Transaction` (Currency)
+        * `Opportunity_Cost_of_Holding_Cash` (Percentage - interest rate foregone)
+    * **Calculations:**
+        * `Optimal_Cash_Balance = SQRT((2 * Total_Cash_Needed_Annual * Fixed_Cost_Per_Transaction) / (Opportunity_Cost_of_Holding_Cash / 100))`
+    * **Outputs:**
+        * `Calculated_Optimal_Cash_Balance` (Currency)
+        * `Model_Assumptions_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateOptimalCashBaumol():
+            Total_Cash_Needed_Annual = GET_INPUT("Total_Cash_Needed_Annual")
+            Fixed_Cost_Per_Transaction = GET_INPUT("Fixed_Cost_Per_Transaction")
+            Opportunity_Cost_of_Holding_Cash = GET_INPUT("Opportunity_Cost_of_Holding_Cash") / 100
+
+            IF Opportunity_Cost_of_Holding_Cash <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Optimal_Cash_Balance", "N/A - Opportunity cost must be positive.")
+                RETURN
+            END IF
+
+            Optimal_Cash_Balance = SQRT((2 * Total_Cash_Needed_Annual * Fixed_Cost_Per_Transaction) / Opportunity_Cost_of_Holding_Cash)
+
+            Model_Assumptions_Note = "The Baumol model assumes a constant and predictable rate of cash usage and fixed transaction costs, making it a simplified theoretical model for cash management."
+
+            DISPLAY_OUTPUT("Calculated_Optimal_Cash_Balance", Optimal_Cash_Balance)
+            DISPLAY_OUTPUT("Model_Assumptions_Note", Model_Assumptions_Note)
+        END FUNCTION
+        ```
+
+631. **Economic Order Quantity (EOQ) Calculator**
+    * **Purpose:** Determine the ideal order quantity for inventory that minimizes total inventory costs (holding and ordering costs).
+    * **Inputs:**
+        * `Annual_Demand_Units` (Number)
+        * `Ordering_Cost_Per_Order` (Currency)
+        * `Holding_Cost_Per_Unit_Per_Year` (Currency)
+    * **Calculations:**
+        * `EOQ = SQRT((2 * Annual_Demand_Units * Ordering_Cost_Per_Order) / Holding_Cost_Per_Unit_Per_Year)`
+    * **Outputs:**
+        * `Calculated_EOQ_Units` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEOQ():
+            Annual_Demand_Units = GET_INPUT("Annual_Demand_Units")
+            Ordering_Cost_Per_Order = GET_INPUT("Ordering_Cost_Per_Order")
+            Holding_Cost_Per_Unit_Per_Year = GET_INPUT("Holding_Cost_Per_Unit_Per_Year")
+
+            IF Holding_Cost_Per_Unit_Per_Year <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EOQ_Units", "N/A - Holding cost must be positive.")
+                RETURN
+            END IF
+
+            EOQ = SQRT((2 * Annual_Demand_Units * Ordering_Cost_Per_Order) / Holding_Cost_Per_Unit_Per_Year)
+
+            DISPLAY_OUTPUT("Calculated_EOQ_Units", ROUND(EOQ)) // Round to nearest whole unit
+        END FUNCTION
+        ```
+
+632. **Reorder Point Calculator**
+    * **Purpose:** Determine the inventory level at which a new order should be placed to avoid stockouts, considering lead time and demand.
+    * **Inputs:**
+        * `Daily_Demand_Units` (Number)
+        * `Lead_Time_Days` (Days)
+        * `Safety_Stock_Units` (Number - buffer inventory)
+    * **Calculations:**
+        * `Reorder_Point = (Daily_Demand_Units * Lead_Time_Days) + Safety_Stock_Units`
+    * **Outputs:**
+        * `Calculated_Reorder_Point_Units` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateReorderPoint():
+            Daily_Demand_Units = GET_INPUT("Daily_Demand_Units")
+            Lead_Time_Days = GET_INPUT("Lead_Time_Days")
+            Safety_Stock_Units = GET_INPUT("Safety_Stock_Units")
+
+            Reorder_Point = (Daily_Demand_Units * Lead_Time_Days) + Safety_Stock_Units
+
+            DISPLAY_OUTPUT("Calculated_Reorder_Point_Units", Reorder_Point)
+        END FUNCTION
+        ```
+
+633. **Accounts Receivable Aging Schedule Analyzer**
+    * **Purpose:** Analyze the breakdown of a company's accounts receivable by how long they've been outstanding, highlighting potential collection issues.
+    * **Inputs:**
+        * `AR_Current_Amount` (Currency)
+        * `AR_1_30_Days_Amount` (Currency)
+        * `AR_31_60_Days_Amount` (Currency)
+        * `AR_61_90_Days_Amount` (Currency)
+        * `AR_Over_90_Days_Amount` (Currency)
+    * **Calculations:**
+        * `Total_Accounts_Receivable = AR_Current_Amount + AR_1_30_Days_Amount + AR_31_60_Days_Amount + AR_61_90_Days_Amount + AR_Over_90_Days_Amount`
+        * `Percentage_Current = (AR_Current_Amount / Total_Accounts_Receivable) * 100` (If Total_AR > 0)
+        * `Percentage_Over_90_Days = (AR_Over_90_Days_Amount / Total_Accounts_Receivable) * 100`
+        * `Risk_Assessment = IF Percentage_Over_90_Days > 10 THEN "High Risk" ELSE "Moderate Risk"`
+    * **Outputs:**
+        * `Total_Accounts_Receivable` (Currency)
+        * `Aging_Schedule_Table` (Table: Category, Amount, Percentage of Total)
+        * `Collection_Risk_Assessment` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeAR AgingSchedule():
+            AR_Current_Amount = GET_INPUT("AR_Current_Amount")
+            AR_1_30_Days_Amount = GET_INPUT("AR_1_30_Days_Amount")
+            AR_31_60_Days_Amount = GET_INPUT("AR_31_60_Days_Amount")
+            AR_61_90_Days_Amount = GET_INPUT("AR_61_90_Days_Amount")
+            AR_Over_90_Days_Amount = GET_INPUT("AR_Over_90_Days_Amount")
+
+            Total_Accounts_Receivable = AR_Current_Amount + AR_1_30_Days_Amount + AR_31_60_Days_Amount + AR_61_90_Days_Amount + AR_Over_90_Days_Amount
+
+            IF Total_Accounts_Receivable <= 0 THEN
+                DISPLAY_OUTPUT("Collection_Risk_Assessment", "No accounts receivable to analyze.")
+                RETURN
+            END IF
+
+            Aging_Schedule_Table = [
+                {Category: "Current", Amount: AR_Current_Amount, Percentage: (AR_Current_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "1-30 Days", Amount: AR_1_30_Days_Amount, Percentage: (AR_1_30_Days_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "31-60 Days", Amount: AR_31_60_Days_Amount, Percentage: (AR_31_60_Days_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "61-90 Days", Amount: AR_61_90_Days_Amount, Percentage: (AR_61_90_Days_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "Over 90 Days", Amount: AR_Over_90_Days_Amount, Percentage: (AR_Over_90_Days_Amount / Total_Accounts_Receivable) * 100}
+            ]
+
+            Percentage_Over_90_Days = (AR_Over_90_Days_Amount / Total_Accounts_Receivable) * 100
+
+            Collection_Risk_Assessment = ""
+            IF Percentage_Over_90_Days > 10 THEN // Common threshold for concern
+                Collection_Risk_Assessment = "High Risk (Significant portion of AR is old, collection issues likely)"
+            ELSE IF Percentage_Over_90_Days > 5 THEN
+                Collection_Risk_Assessment = "Moderate Risk (Some AR is old, monitor closely)"
+            ELSE
+                Collection_Risk_Assessment = "Low Risk (Healthy collection practices)"
+            END IF
+
+            DISPLAY_OUTPUT("Total_Accounts_Receivable", Total_Accounts_Receivable)
+            DISPLAY_OUTPUT("Aging_Schedule_Table", Aging_Schedule_Table)
+            DISPLAY_OUTPUT("Collection_Risk_Assessment", Collection_Risk_Assessment)
+        END FUNCTION
+        ```
+
+634. **Days Sales in Inventory (DSI) - Full Calculation**
+    * **Purpose:** Calculate the average number of days a company holds its inventory before selling it, deriving components from balance sheet and income statement.
+    * **Inputs:**
+        * `Beginning_Inventory` (Currency)
+        * `Ending_Inventory` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+    * **Calculations:**
+        * `Average_Inventory = (Beginning_Inventory + Ending_Inventory) / 2`
+        * `DSI = (Average_Inventory / COGS) * 365`
+    * **Outputs:**
+        * `Calculated_DSI_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDSIFull():
+            Beginning_Inventory = GET_INPUT("Beginning_Inventory")
+            Ending_Inventory = GET_INPUT("Ending_Inventory")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+
+            Average_Inventory = (Beginning_Inventory + Ending_Inventory) / 2
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DSI_Days", "N/A - COGS must be positive.")
+                RETURN
+            END IF
+
+            DSI = (Average_Inventory / COGS) * 365
+
+            DISPLAY_OUTPUT("Calculated_DSI_Days", DSI)
+        END FUNCTION
+        ```
+
+635. **Days Payable Outstanding (DPO) - Full Calculation**
+    * **Purpose:** Calculate the average number of days a company takes to pay its suppliers, deriving components from balance sheet and income statement.
+    * **Inputs:**
+        * `Beginning_Accounts_Payable` (Currency)
+        * `Ending_Accounts_Payable` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+    * **Calculations:**
+        * `Average_Accounts_Payable = (Beginning_Accounts_Payable + Ending_Accounts_Payable) / 2`
+        * `DPO = (Average_Accounts_Payable / COGS) * 365`
+    * **Outputs:**
+        * `Calculated_DPO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDPOFull():
+            Beginning_Accounts_Payable = GET_INPUT("Beginning_Accounts_Payable")
+            Ending_Accounts_Payable = GET_INPUT("Ending_Accounts_Payable")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+
+            Average_Accounts_Payable = (Beginning_Accounts_Payable + Ending_Accounts_Payable) / 2
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DPO_Days", "N/A - COGS must be positive.")
+                RETURN
+            END IF
+
+            DPO = (Average_Accounts_Payable / COGS) * 365
+
+            DISPLAY_OUTPUT("Calculated_DPO_Days", DPO)
+        END FUNCTION
+        ```
+
+636. **Days Sales Outstanding (DSO) - Full Calculation**
+    * **Purpose:** Calculate the average number of days it takes for a company to collect its accounts receivables, deriving components from balance sheet and income statement.
+    * **Inputs:**
+        * `Beginning_Accounts_Receivable` (Currency)
+        * `Ending_Accounts_Receivable` (Currency)
+        * `Total_Credit_Sales` (Currency)
+    * **Calculations:**
+        * `Average_Accounts_Receivable = (Beginning_Accounts_Receivable + Ending_Accounts_Receivable) / 2`
+        * `DSO = (Average_Accounts_Receivable / Total_Credit_Sales) * 365`
+    * **Outputs:**
+        * `Calculated_DSO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDSOFull():
+            Beginning_Accounts_Receivable = GET_INPUT("Beginning_Accounts_Receivable")
+            Ending_Accounts_Receivable = GET_INPUT("Ending_Accounts_Receivable")
+            Total_Credit_Sales = GET_INPUT("Total_Credit_Sales")
+
+            Average_Accounts_Receivable = (Beginning_Accounts_Receivable + Ending_Accounts_Receivable) / 2
+
+            IF Total_Credit_Sales <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DSO_Days", "N/A - Total Credit Sales must be positive.")
+                RETURN
+            END IF
+
+            DSO = (Average_Accounts_Receivable / Total_Credit_Sales) * 365
+
+            DISPLAY_OUTPUT("Calculated_DSO_Days", DSO)
+        END FUNCTION
+        ```
+
+637. **Cash Conversion Cycle (CCC) - Full Calculation from Components**
+    * **Purpose:** Calculate the cash conversion cycle using explicitly provided DSI, DSO, and DPO.
+    * **Inputs:**
+        * `Days_Sales_in_Inventory_DSI` (Days - from calc 634)
+        * `Days_Sales_Outstanding_DSO` (Days - from calc 636)
+        * `Days_Payable_Outstanding_DPO` (Days - from calc 635)
+    * **Calculations:**
+        * `CCC = DSI + DSO - DPO`
+    * **Outputs:**
+        * `Calculated_CCC_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCCCFromComponents():
+            DSI = GET_INPUT("Days_Sales_in_Inventory_DSI")
+            DSO = GET_INPUT("Days_Sales_Outstanding_DSO")
+            DPO = GET_INPUT("Days_Payable_Outstanding_DPO")
+
+            CCC = DSI + DSO - DPO
+
+            DISPLAY_OUTPUT("Calculated_CCC_Days", CCC)
+        END FUNCTION
+        ```
+
+638. **Long-Term Debt to Equity Ratio**
+    * **Purpose:** Assess a company's reliance on long-term debt relative to its equity.
+    * **Inputs:**
+        * `Total_Long_Term_Debt` (Currency)
+        * `Total_Shareholder_Equity` (Currency)
+    * **Calculations:**
+        * `Long_Term_Debt_to_Equity_Ratio = Total_Long_Term_Debt / Total_Shareholder_Equity`
+    * **Outputs:**
+        * `Calculated_Long_Term_Debt_to_Equity_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLongTermDebtToEquityRatio():
+            Total_Long_Term_Debt = GET_INPUT("Total_Long_Term_Debt")
+            Total_Shareholder_Equity = GET_INPUT("Total_Shareholder_Equity")
+
+            IF Total_Shareholder_Equity <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Long_Term_Debt_to_Equity_Ratio", "N/A - Shareholder Equity must be positive.")
+                RETURN
+            END IF
+
+            Long_Term_Debt_to_Equity_Ratio = Total_Long_Term_Debt / Total_Shareholder_Equity
+
+            DISPLAY_OUTPUT("Calculated_Long_Term_Debt_to_Equity_Ratio", Long_Term_Debt_to_Equity_Ratio)
+        END FUNCTION
+        ```
+
+639. **Cost of Debt (Yield to Maturity on Bond) - Advanced**
+    * **Purpose:** Calculate the specific cost of debt for a company by determining the Yield to Maturity (YTM) on its issued bonds.
+    * **Inputs:**
+        * `Bond_Face_Value` (Currency)
+        * `Coupon_Rate` (Percentage)
+        * `Years_to_Maturity` (Years)
+        * `Current_Bond_Market_Price` (Currency)
+        * `Coupon_Frequency` (Number: 1 for annual, 2 for semi-annual)
+    * **Calculations:**
+        * *YTM is an iterative calculation, typically solved using a financial function.*
+        * `YTM = SOLVE_YTM(Bond_Face_Value, Coupon_Rate, Years_to_Maturity, Current_Bond_Market_Price, Coupon_Frequency)`
+    * **Outputs:**
+        * `Calculated_Cost_of_Debt_YTM` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfDebtYTMAdvanced():
+            Bond_Face_Value = GET_INPUT("Bond_Face_Value")
+            Coupon_Rate = GET_INPUT("Coupon_Rate") / 100
+            Years_to_Maturity = GET_INPUT("Years_to_Maturity")
+            Current_Bond_Market_Price = GET_INPUT("Current_Bond_Market_Price")
+            Coupon_Frequency = GET_INPUT("Coupon_Frequency")
+
+            // SOLVE_YTM is a complex financial function (often iterative)
+            // It calculates the discount rate that equates the present value of future bond cash flows to its current market price.
+            Calculated_Cost_of_Debt_YTM = SOLVE_YTM_FUNCTION(
+                Bond_Face_Value, Coupon_Rate, Years_to_Maturity,
+                Current_Bond_Market_Price, Coupon_Frequency
+            ) * 100 // Convert to percentage
+
+            DISPLAY_OUTPUT("Calculated_Cost_of_Debt_YTM", Calculated_Cost_of_Debt_YTM)
+        END FUNCTION
+        ```
+
+640. **Weighted Average Cost of Capital (WACC) - All Components**
+    * **Purpose:** Calculate a company's WACC using explicit values for all components, including cost of equity (CAPM), cost of preferred stock, and after-tax cost of debt.
+    * **Inputs:**
+        * `Market_Value_of_Equity` (Currency)
+        * `Market_Value_of_Preferred_Stock` (Currency)
+        * `Market_Value_of_Debt` (Currency)
+        * `Cost_of_Equity` (Percentage - from CAPM)
+        * `Cost_of_Preferred_Stock` (Percentage - from calc 459)
+        * `Cost_of_Debt_After_Tax` (Percentage - from calc 122)
+    * **Calculations:**
+        * `Total_Capital = Market_Value_of_Equity + Market_Value_of_Preferred_Stock + Market_Value_of_Debt`
+        * `Weight_Equity = Market_Value_of_Equity / Total_Capital`
+        * `Weight_Preferred = Market_Value_of_Preferred_Stock / Total_Capital`
+        * `Weight_Debt = Market_Value_of_Debt / Total_Capital`
+        * `WACC = (Weight_Equity * Cost_of_Equity / 100) + (Weight_Preferred * Cost_of_Preferred_Stock / 100) + (Weight_Debt * Cost_of_Debt_After_Tax / 100)`
+    * **Outputs:**
+        * `Calculated_WACC` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateWACCAllComponents():
+            Market_Value_of_Equity = GET_INPUT("Market_Value_of_Equity")
+            Market_Value_of_Preferred_Stock = GET_INPUT("Market_Value_of_Preferred_Stock")
+            Market_Value_of_Debt = GET_INPUT("Market_Value_of_Debt")
+            Cost_of_Equity = GET_INPUT("Cost_of_Equity") / 100
+            Cost_of_Preferred_Stock = GET_INPUT("Cost_of_Preferred_Stock") / 100
+            Cost_of_Debt_After_Tax = GET_INPUT("Cost_of_Debt_After_Tax") / 100
+
+            Total_Capital = Market_Value_of_Equity + Market_Value_of_Preferred_Stock + Market_Value_of_Debt
+
+            IF Total_Capital <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_WACC", "N/A - Total Capital must be positive.")
+                RETURN
+            END IF
+
+            Weight_Equity = Market_Value_of_Equity / Total_Capital
+            Weight_Preferred = Market_Value_of_Preferred_Stock / Total_Capital
+            Weight_Debt = Market_Value_of_Debt / Total_Capital
+
+            WACC = (Weight_Equity * Cost_of_Equity) + \
+                   (Weight_Preferred * Cost_of_Preferred_Stock) + \
+                   (Weight_Debt * Cost_of_Debt_After_Tax)
+
+            DISPLAY_OUTPUT("Calculated_WACC", WACC * 100)
+        END FUNCTION
+        ```
+
+641. **Return on Invested Capital (ROIC) - Reconciliation with WACC**
+    * **Purpose:** Calculate ROIC and explicitly compare it to WACC to determine if a company is generating value above its cost of capital.
+    * **Inputs:**
+        * `NOPAT_Net_Operating_Profit_After_Tax` (Currency)
+        * `Total_Invested_Capital` (Currency)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * `ROIC = (NOPAT_Net_Operating_Profit_After_Tax / Total_Invested_Capital) * 100`
+        * `ROIC_vs_WACC_Difference = ROIC - WACC_Weighted_Average_Cost_of_Capital`
+        * `Value_Creation_Status = IF ROIC_vs_WACC_Difference > 0 THEN "Creating Value" ELSE "Destroying Value"`
+    * **Outputs:**
+        * `Calculated_ROIC` (Percentage)
+        * `ROIC_vs_WACC_Difference` (Percentage)
+        * `Value_Creation_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ReconcileROICWithWACC():
+            NOPAT = GET_INPUT("NOPAT_Net_Operating_Profit_After_Tax")
+            Total_Invested_Capital = GET_INPUT("Total_Invested_Capital")
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC")
+
+            IF Total_Invested_Capital <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROIC", "N/A")
+                DISPLAY_OUTPUT("Value_Creation_Status", "Total Invested Capital must be positive.")
+                RETURN
+            END IF
+
+            ROIC = (NOPAT / Total_Invested_Capital) * 100
+            ROIC_vs_WACC_Difference = ROIC - WACC
+
+            Value_Creation_Status = ""
+            IF ROIC_vs_WACC_Difference > 0 THEN
+                Value_Creation_Status = "Creating Value (ROIC > WACC)"
+            ELSE IF ROIC_vs_WACC_Difference < 0 THEN
+                Value_Creation_Status = "Destroying Value (ROIC < WACC)"
+            ELSE
+                Value_Creation_Status = "Neutral (ROIC = WACC)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_ROIC", ROIC)
+            DISPLAY_OUTPUT("ROIC_vs_WACC_Difference", ROIC_vs_WACC_Difference)
+            DISPLAY_OUTPUT("Value_Creation_Status", Value_Creation_Status)
+        END FUNCTION
+        ```
+
+642. **Economic Value Added (EVA) - Detailed Calculation & Interpretation**
+    * **Purpose:** Calculate EVA, explicitly showing its components and interpreting whether the company generates economic profit.
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Total_Invested_Capital` (Currency)
+        * `WACC_Weighted_Average_Cost_of_Capital` (Percentage)
+    * **Calculations:**
+        * `NOPAT = EBIT * (1 - Corporate_Tax_Rate / 100)`
+        * `Capital_Charge = Total_Invested_Capital * (WACC_Weighted_Average_Cost_of_Capital / 100)`
+        * `EVA = NOPAT - Capital_Charge`
+        * `Interpretation = IF EVA > 0 THEN "Value Created" ELSE "Value Destroyed"`
+    * **Outputs:**
+        * `Calculated_NOPAT` (Currency)
+        * `Calculated_Capital_Charge` (Currency)
+        * `Calculated_EVA` (Currency)
+        * `EVA_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEVADetailed():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Total_Invested_Capital = GET_INPUT("Total_Invested_Capital")
+            WACC = GET_INPUT("WACC_Weighted_Average_Cost_of_Capital") / 100
+
+            NOPAT = EBIT * (1 - Corporate_Tax_Rate)
+            Capital_Charge = Total_Invested_Capital * WACC
+            EVA = NOPAT - Capital_Charge
+
+            EVA_Interpretation = ""
+            IF EVA > 0 THEN
+                EVA_Interpretation = "Value Created (Company generated returns above its cost of capital)"
+            ELSE IF EVA < 0 THEN
+                EVA_Interpretation = "Value Destroyed (Company did not generate returns sufficient to cover its cost of capital)"
+            ELSE
+                EVA_Interpretation = "Neutral (Company just covered its cost of capital)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_NOPAT", NOPAT)
+            DISPLAY_OUTPUT("Calculated_Capital_Charge", Capital_Charge)
+            DISPLAY_OUTPUT("Calculated_EVA", EVA)
+            DISPLAY_OUTPUT("EVA_Interpretation", EVA_Interpretation)
+        END FUNCTION
+        ```
+
+643. **Free Cash Flow to Firm (FCFF) - Detailed Derivation**
+    * **Purpose:** Derive FCFF from Net Income using the indirect method, showing all adjustments.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Interest_Expense` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Capital_Expenditures` (Currency)
+        * `Change_in_Net_Working_Capital` (Currency)
+        * `Non_Cash_Charges_Excl_DA` (Currency - e.g., stock-based comp)
+        * `Non_Operating_Gains_Losses` (Currency - gains subtracted, losses added)
+    * **Calculations:**
+        * `NOPAT = Net_Income + Interest_Expense * (1 - Corporate_Tax_Rate / 100)`
+        * `FCFF = NOPAT + Depreciation_Amortization + Non_Cash_Charges_Excl_DA - Capital_Expenditures - Change_in_Net_Working_Capital + Non_Operating_Gains_Losses_Adjusted`
+    * **Outputs:**
+        * `Calculated_FCFF` (Currency)
+        * `Derivation_Breakdown` (Table: Item, Adjustment)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION DeriveFCFFDetailed():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Interest_Expense = GET_INPUT("Interest_Expense")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Change_in_Net_Working_Capital = GET_INPUT("Change_in_Net_Working_Capital")
+            Non_Cash_Charges_Excl_DA = GET_INPUT("Non_Cash_Charges_Excl_DA")
+            Non_Operating_Gains_Losses = GET_INPUT("Non_Operating_Gains_Losses") // Positive for gain, negative for loss
+
+            NOPAT = Net_Income + (Interest_Expense * (1 - Corporate_Tax_Rate))
+
+            // Adjustments for FCFF from NOPAT
+            // NOPAT is essentially unlevered income after tax.
+            // FCFF = NOPAT + Non-cash charges - CapEx - Change in NWC
+            // Non_Operating_Gains_Losses need to be added back if they reduced NOPAT (e.g., non-operating loss) or subtracted if they increased (e.g., non-operating gain)
+            // Simplified: Assuming Non_Operating_Gains_Losses is a net effect to be reversed from NOPAT
+            
+            FCFF = NOPAT + Depreciation_Amortization + Non_Cash_Charges_Excl_DA - Capital_Expenditures - Change_in_Net_Working_Capital - Non_Operating_Gains_Losses
+
+            Derivation_Breakdown = [
+                {Item: "Net Income", Amount: Net_Income},
+                {Item: "Add: Interest Expense (1-Tax Rate)", Amount: Interest_Expense * (1 - Corporate_Tax_Rate)},
+                {Item: "Equals: NOPAT", Amount: NOPAT},
+                {Item: "Add: Depreciation & Amortization", Amount: Depreciation_Amortization},
+                {Item: "Add: Other Non-Cash Charges", Amount: Non_Cash_Charges_Excl_DA},
+                {Item: "Less: Capital Expenditures", Amount: -Capital_Expenditures},
+                {Item: "Less: Change in Net Working Capital", Amount: -Change_in_Net_Working_Capital},
+                {Item: "Less: Non-Operating Gains/Losses (Adjusted)", Amount: -Non_Operating_Gains_Losses},
+                {Item: "Equals: FCFF", Amount: FCFF}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_FCFF", FCFF)
+            DISPLAY_OUTPUT("Derivation_Breakdown", Derivation_Breakdown)
+        END FUNCTION
+        ```
+
+644. **Free Cash Flow to Equity (FCFE) - Detailed Derivation**
+    * **Purpose:** Derive FCFE from Net Income, showing all adjustments to determine cash available to equity holders.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Capital_Expenditures` (Currency)
+        * `Change_in_Non_Cash_Working_Capital` (Currency)
+        * `Net_Borrowing_or_Repayment_of_Debt` (Currency - positive for net borrowing, negative for net repayment)
+    * **Calculations:**
+        * `FCFE = Net_Income + Depreciation_Amortization - Capital_Expenditures - Change_in_Non_Cash_Working_Capital + Net_Borrowing_or_Repayment_of_Debt`
+    * **Outputs:**
+        * `Calculated_FCFE` (Currency)
+        * `Derivation_Breakdown` (Table: Item, Adjustment)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION DeriveFCFEDetailed():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Change_in_Non_Cash_Working_Capital = GET_INPUT("Change_in_Non_Cash_Working_Capital")
+            Net_Borrowing_or_Repayment_of_Debt = GET_INPUT("Net_Borrowing_or_Repayment_of_Debt")
+
+            FCFE = Net_Income + Depreciation_Amortization - Capital_Expenditures - Change_in_Non_Cash_Working_Capital + Net_Borrowing_or_Repayment_of_Debt
+
+            Derivation_Breakdown = [
+                {Item: "Net Income", Amount: Net_Income},
+                {Item: "Add: Depreciation & Amortization", Amount: Depreciation_Amortization},
+                {Item: "Less: Capital Expenditures", Amount: -Capital_Expenditures},
+                {Item: "Less: Change in Non-Cash Working Capital", Amount: -Change_in_Non_Cash_Working_Capital},
+                {Item: "Add/Less: Net Borrowing/Repayment of Debt", Amount: Net_Borrowing_or_Repayment_of_Debt},
+                {Item: "Equals: FCFE", Amount: FCFE}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_FCFE", FCFE)
+            DISPLAY_OUTPUT("Derivation_Breakdown", Derivation_Breakdown)
+        END FUNCTION
+        ```
+
+645. **Terminal Value (Perpetuity Growth Model) - Detailed**
+    * **Purpose:** Calculate the terminal value of a company's cash flows beyond the explicit forecast period using a perpetuity growth model.
+    * **Inputs:**
+        * `FCFF_Last_Projection_Year` (Currency)
+        * `Terminal_Growth_Rate` (Percentage)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * `FCFF_Next_Year = FCFF_Last_Projection_Year * (1 + Terminal_Growth_Rate / 100)`
+        * `Terminal_Value = FCFF_Next_Year / (WACC_Weighted_Average_Cost_of_Capital / 100 - Terminal_Growth_Rate / 100)`
+    * **Outputs:**
+        * `Projected_FCFF_Next_Year` (Currency)
+        * `Calculated_Terminal_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTerminalValuePerpetuityDetailed():
+            FCFF_Last_Projection_Year = GET_INPUT("FCFF_Last_Projection_Year")
+            Terminal_Growth_Rate = GET_INPUT("Terminal_Growth_Rate") / 100
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC") / 100
+
+            IF WACC <= Terminal_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Terminal_Value", "Error: WACC must be greater than Terminal Growth Rate.")
+                RETURN
+            END IF
+
+            FCFF_Next_Year = FCFF_Last_Projection_Year * (1 + Terminal_Growth_Rate)
+            Terminal_Value = FCFF_Next_Year / (WACC - Terminal_Growth_Rate)
+
+            DISPLAY_OUTPUT("Projected_FCFF_Next_Year", FCFF_Next_Year)
+            DISPLAY_OUTPUT("Calculated_Terminal_Value", Terminal_Value)
+        END FUNCTION
+        ```
+
+646. **Terminal Value (Exit Multiple Method) - Detailed**
+    * **Purpose:** Calculate the terminal value of a company's cash flows beyond the explicit forecast period using a multiple of a financial metric (e.g., EBITDA).
+    * **Inputs:**
+        * `EBITDA_Last_Projection_Year` (Currency)
+        * `Terminal_Exit_Multiple` (Number - e.g., EV/EBITDA multiple)
+    * **Calculations:**
+        * `Terminal_Value = EBITDA_Last_Projection_Year * Terminal_Exit_Multiple`
+    * **Outputs:**
+        * `Calculated_Terminal_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTerminalValueExitMultipleDetailed():
+            EBITDA_Last_Projection_Year = GET_INPUT("EBITDA_Last_Projection_Year")
+            Terminal_Exit_Multiple = GET_INPUT("Terminal_Exit_Multiple")
+
+            Terminal_Value = EBITDA_Last_Projection_Year * Terminal_Exit_Multiple
+
+            DISPLAY_OUTPUT("Calculated_Terminal_Value", Terminal_Value)
+        END FUNCTION
+        ```
+
+647. **Earnings Power Value (EPV) - Detailed Calculation**
+    * **Purpose:** Calculate EPV by explicitly showing the derivation of normalized earnings (NOPAT minus maintenance CapEx).
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Maintenance_Capital_Expenditures_Annual` (Currency - estimated annual CapEx to maintain current operations)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * `NOPAT = EBIT * (1 - Corporate_Tax_Rate / 100)`
+        * `Adjusted_Earnings = NOPAT - Maintenance_Capital_Expenditures_Annual`
+        * `EPV = Adjusted_Earnings / (WACC_Weighted_Average_Cost_of_Capital / 100)`
+    * **Outputs:**
+        * `Calculated_Normalized_NOPAT` (Currency)
+        * `Calculated_Adjusted_Earnings` (Currency)
+        * `Calculated_EPV` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEPVDetailed():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Maintenance_Capital_Expenditures_Annual = GET_INPUT("Maintenance_Capital_Expenditures_Annual")
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC") / 100
+
+            NOPAT = EBIT * (1 - Corporate_Tax_Rate)
+            Adjusted_Earnings = NOPAT - Maintenance_Capital_Expenditures_Annual
+
+            IF WACC <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EPV", "N/A - WACC must be positive.")
+                RETURN
+            END IF
+
+            EPV = Adjusted_Earnings / WACC
+
+            DISPLAY_OUTPUT("Calculated_Normalized_NOPAT", NOPAT)
+            DISPLAY_OUTPUT("Calculated_Adjusted_Earnings", Adjusted_Earnings)
+            DISPLAY_OUTPUT("Calculated_EPV", EPV)
+        END FUNCTION
+        ```
+
+648. **Dividend Discount Model (DDM) - Multi-Stage (Very Advanced)**
+    * **Purpose:** A very advanced DDM that allows for more flexible growth assumptions across multiple stages (e.g., initial high growth, declining growth, and then stable perpetual growth).
+    * **Inputs:**
+        * `Current_Dividend_D0` (Currency)
+        * `Growth_Rate_Phase_1` (Percentage)
+        * `Years_Phase_1` (Years)
+        * `Growth_Rate_Phase_2` (Percentage)
+        * `Years_Phase_2` (Years)
+        * `Growth_Rate_Phase_3` (Percentage)
+        * `Years_Phase_3` (Years)
+        * `Perpetual_Growth_Rate` (Percentage)
+        * `Required_Rate_of_Return` (Percentage)
+    * **Calculations:**
+        * *Simulate dividends year by year, discount each, calculate terminal value.*
+        * `PV_of_Dividends_Total = 0`
+        * `Last_Calculated_Dividend = D0`
+        * `Current_Year_Index = 0`
+        * `FOR i FROM 1 TO Years_Phase_1:`
+            * `Dividend = Last_Calculated_Dividend * (1 + Growth_Rate_Phase_1 / 100)`
+            * `PV_of_Dividends_Total += Dividend / (1 + Required_Rate_of_Return / 100)^i`
+        * `// ... similar for Phase 2 and Phase 3`
+        * `// Calculate Terminal Value based on last dividend of Phase 3`
+    * **Outputs:**
+        * `Calculated_Intrinsic_Value_Per_Share` (Currency)
+        * `Dividend_Projection_Table` (Table: Year, Dividend, PV of Dividend)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDDMVeryAdvanced():
+            Current_Dividend_D0 = GET_INPUT("Current_Dividend_D0")
+            Growth_Rate_Phase_1 = GET_INPUT("Growth_Rate_Phase_1") / 100
+            Years_Phase_1 = GET_INPUT("Years_Phase_1")
+            Growth_Rate_Phase_2 = GET_INPUT("Growth_Rate_Phase_2") / 100
+            Years_Phase_2 = GET_INPUT("Years_Phase_2")
+            Growth_Rate_Phase_3 = GET_INPUT("Growth_Rate_Phase_3") / 100
+            Years_Phase_3 = GET_INPUT("Years_Phase_3")
+            Perpetual_Growth_Rate = GET_INPUT("Perpetual_Growth_Rate") / 100
+            Required_Rate_of_Return = GET_INPUT("Required_Rate_of_Return") / 100
+
+            IF Required_Rate_of_Return <= Perpetual_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", "Error: Required Return must be greater than Perpetual Growth Rate.")
+                RETURN
+            END IF
+
+            PV_Dividends_Sum = 0
+            Dividend_Proj = Current_Dividend_D0
+            Current_Total_Years = 0
+            Dividend_Projection_Table = []
+
+            // Phase 1
+            FOR i FROM 1 TO Years_Phase_1:
+                Dividend_Proj = Dividend_Proj * (1 + Growth_Rate_Phase_1)
+                Current_Total_Years = Current_Total_Years + 1
+                PV_Dividend = Dividend_Proj / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+                PV_Dividends_Sum = PV_Dividends_Sum + PV_Dividend
+                Dividend_Projection_Table.ADD({Year: Current_Total_Years, Dividend: Dividend_Proj, PV_Dividend: PV_Dividend, Phase: "Phase 1"})
+            END FOR
+
+            // Phase 2
+            FOR i FROM 1 TO Years_Phase_2:
+                Dividend_Proj = Dividend_Proj * (1 + Growth_Rate_Phase_2)
+                Current_Total_Years = Current_Total_Years + 1
+                PV_Dividend = Dividend_Proj / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+                PV_Dividends_Sum = PV_Dividends_Sum + PV_Dividend
+                Dividend_Projection_Table.ADD({Year: Current_Total_Years, Dividend: Dividend_Proj, PV_Dividend: PV_Dividend, Phase: "Phase 2"})
+            END FOR
+
+            // Phase 3
+            FOR i FROM 1 TO Years_Phase_3:
+                Dividend_Proj = Dividend_Proj * (1 + Growth_Rate_Phase_3)
+                Current_Total_Years = Current_Total_Years + 1
+                PV_Dividend = Dividend_Proj / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+                PV_Dividends_Sum = PV_Dividends_Sum + PV_Dividend
+                Dividend_Projection_Table.ADD({Year: Current_Total_Years, Dividend: Dividend_Proj, PV_Dividend: PV_Dividend, Phase: "Phase 3"})
+            END FOR
+
+            // Terminal Value
+            Terminal_Dividend = Dividend_Proj * (1 + Perpetual_Growth_Rate)
+            Terminal_Value = Terminal_Dividend / (Required_Rate_of_Return - Perpetual_Growth_Rate)
+            PV_Terminal_Value = Terminal_Value / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+
+            Calculated_Intrinsic_Value_Per_Share = PV_Dividends_Sum + PV_Terminal_Value
+
+            DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", Calculated_Intrinsic_Value_Per_Share)
+            DISPLAY_OUTPUT("Dividend_Projection_Table", Dividend_Projection_Table)
+        END FUNCTION
+        ```
+
+649. **Sensitivity Analysis for Valuation Models (General)**
+    * **Purpose:** Illustrate how the output of a valuation model (e.g., DCF, DDM) changes when key input variables (e.g., growth rate, discount rate) are varied within a range.
+    * **Inputs:**
+        * `Valuation_Model_Type` (Text: "DCF", "DDM", "Sticker Price")
+        * `Base_Case_Value` (Currency)
+        * `Key_Input_Variable_1` (Text: "Growth Rate", "Discount Rate", "Terminal Multiple")
+        * `Base_Value_1` (Number)
+        * `Min_Value_1` (Number)
+        * `Max_Value_1` (Number)
+        * `Increment_1` (Number)
+        * `Key_Input_Variable_2` (Optional: for 2-way sensitivity)
+        * `Base_Value_2` (Number)
+        * `Min_Value_2` (Number)
+        * `Max_Value_2` (Number)
+        * `Increment_2` (Number)
+    * **Calculations:**
+        * *Iterate through the specified ranges for input variables.*
+        * *For each combination, recalculate the valuation using the relevant model's logic.*
+        * `Result_Table = []`
+        * `FOR Var1_Value FROM Min_Value_1 TO Max_Value_1 STEP Increment_1:`
+            * `FOR Var2_Value FROM Min_Value_2 TO Max_Value_2 STEP Increment_2:`
+                * `Calculated_Val = CALL_VALUATION_FUNCTION(Var1_Value, Var2_Value, Other_Fixed_Inputs)`
+                * `Result_Table.ADD({Var1_Label: Var1_Value, Var2_Label: Var2_Value, Valuation: Calculated_Val})`
+    * **Outputs:**
+        * `Sensitivity_Analysis_Table` (Table: Grid of values)
+        * `Insights_Note` (Text: identifying most sensitive variables)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION PerformValuationSensitivityAnalysis():
+            Valuation_Model_Type = GET_INPUT("Valuation_Model_Type")
+            Base_Case_Value = GET_INPUT("Base_Case_Value")
+            Key_Input_Variable_1 = GET_INPUT("Key_Input_Variable_1")
+            Base_Value_1 = GET_INPUT("Base_Value_1")
+            Min_Value_1 = GET_INPUT("Min_Value_1")
+            Max_Value_1 = GET_INPUT("Max_Value_1")
+            Increment_1 = GET_INPUT("Increment_1")
+            // Assume other necessary inputs for the selected valuation model are also provided
+            // e.g., for DDM: Current_Dividend_D0, Years_Phase_1 etc.
+
+            Sensitivity_Table = []
+            
+            // This requires mapping to the actual valuation functions (e.g., 388, 389, 1)
+            // And passing all other fixed parameters of the valuation model
+            
+            FOR Var1_Current_Val FROM Min_Value_1 TO Max_Value_1 STEP Increment_1:
+                Calculated_Val = 0
+                IF Valuation_Model_Type == "Sticker Price" THEN
+                    // Assuming Sticker Price uses Current_EPS, a growth rate, a future P/E, and Years of Growth
+                    // Here, if Key_Input_Variable_1 is "Growth Rate", then Var1_Current_Val is the growth rate
+                    Calculated_Val = CALCULATE_STICKER_PRICE_BASIC(
+                        GET_INPUT("Current_EPS"), Var1_Current_Val, GET_INPUT("Estimated_Future_P_E"), GET_INPUT("Years_of_Growth")
+                    )
+                // ELSE IF Valuation_Model_Type == "DDM" THEN ... (call DDM function with varied input)
+                // ELSE IF Valuation_Model_Type == "DCF" THEN ... (call DCF function with varied input)
+
+                Sensitivity_Table.ADD({Key_Input_Variable_1: Var1_Current_Val, Valuation_Result: Calculated_Val})
+            END FOR
+
+            Insights_Note = "This table shows how sensitive your valuation is to changes in " + Key_Input_Variable_1 + ". Identify which inputs have the largest impact on the final valuation."
+
+            DISPLAY_OUTPUT("Sensitivity_Analysis_Table", Sensitivity_Table)
+            DISPLAY_OUTPUT("Insights_Note", Insights_Note)
+        END FUNCTION
+        ```
+
+650. **Scenario Analysis for Financial Projections (Best, Worst, Base cases)**
+    * **Purpose:** Model financial outcomes under different economic or operational scenarios (e.g., optimistic, pessimistic, realistic).
+    * **Inputs:**
+        * `Base_Case_Revenue_Growth` (Percentage)
+        * `Base_Case_Gross_Margin` (Percentage)
+        * `Base_Case_Operating_Expenses_Growth` (Percentage)
+        * `Optimistic_Revenue_Growth` (Percentage)
+        * `Optimistic_Gross_Margin` (Percentage)
+        * `Optimistic_Operating_Expenses_Growth` (Percentage)
+        * `Pessimistic_Revenue_Growth` (Percentage)
+        * `Pessimistic_Gross_Margin` (Percentage)
+        * `Pessimistic_Operating_Expenses_Growth` (Percentage)
+        * `Initial_Revenue` (Currency)
+        * `Initial_Operating_Expenses` (Currency)
+        * `Projection_Years` (Years)
+    * **Calculations:**
+        * *For each scenario (Base, Opt, Pess):*
+        * `Projected_Revenue_Year_X = Initial_Revenue * (1 + Scenario_Revenue_Growth)^X`
+        * `Projected_Gross_Profit_Year_X = Projected_Revenue_Year_X * Scenario_Gross_Margin`
+        * `Projected_Operating_Expenses_Year_X = Initial_Operating_Expenses * (1 + Scenario_Operating_Expenses_Growth)^X`
+        * `Projected_Operating_Income_Year_X = Projected_Gross_Profit_Year_X - Projected_Operating_Expenses_Year_X`
+    * **Outputs:**
+        * `Scenario_Projection_Table` (Table: Year, Base Case Revenue, Opt Revenue, Pess Revenue, Base Operating Income, etc.)
+        * `Risk_Assessment_Summary` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION PerformFinancialScenarioAnalysis():
+            Base_Case_Revenue_Growth = GET_INPUT("Base_Case_Revenue_Growth") / 100
+            Base_Case_Gross_Margin = GET_INPUT("Base_Case_Gross_Margin") / 100
+            Base_Case_Operating_Expenses_Growth = GET_INPUT("Base_Case_Operating_Expenses_Growth") / 100
+            Optimistic_Revenue_Growth = GET_INPUT("Optimistic_Revenue_Growth") / 100
+            Optimistic_Gross_Margin = GET_INPUT("Optimistic_Gross_Margin") / 100
+            Optimistic_Operating_Expenses_Growth = GET_INPUT("Optimistic_Operating_Expenses_Growth") / 100
+            Pessimistic_Revenue_Growth = GET_INPUT("Pessimistic_Revenue_Growth") / 100
+            Pessimistic_Gross_Margin = GET_INPUT("Pessimistic_Gross_Margin") / 100
+            Pessimistic_Operating_Expenses_Growth = GET_INPUT("Pessimistic_Operating_Expenses_Growth") / 100
+            Initial_Revenue = GET_INPUT("Initial_Revenue")
+            Initial_Operating_Expenses = GET_INPUT("Initial_Operating_Expenses")
+            Projection_Years = GET_INPUT("Projection_Years")
+
+            Scenario_Projection_Table = []
+
+            FOR y FROM 1 TO Projection_Years:
+                Projected_Revenue_Base = Initial_Revenue * POWER((1 + Base_Case_Revenue_Growth), y)
+                Projected_Gross_Profit_Base = Projected_Revenue_Base * Base_Case_Gross_Margin
+                Projected_Operating_Expenses_Base = Initial_Operating_Expenses * POWER((1 + Base_Case_Operating_Expenses_Growth), y)
+                Projected_Operating_Income_Base = Projected_Gross_Profit_Base - Projected_Operating_Expenses_Base
+
+                Projected_Revenue_Opt = Initial_Revenue * POWER((1 + Optimistic_Revenue_Growth), y)
+                Projected_Gross_Profit_Opt = Projected_Revenue_Opt * Optimistic_Gross_Margin
+                Projected_Operating_Expenses_Opt = Initial_Operating_Expenses * POWER((1 + Optimistic_Operating_Expenses_Growth), y)
+                Projected_Operating_Income_Opt = Projected_Gross_Profit_Opt - Projected_Operating_Expenses_Opt
+
+                Projected_Revenue_Pess = Initial_Revenue * POWER((1 + Pessimistic_Revenue_Growth), y)
+                Projected_Gross_Profit_Pess = Projected_Revenue_Pess * Pessimistic_Gross_Margin
+                Projected_Operating_Expenses_Pess = Initial_Operating_Expenses * POWER((1 + Pessimistic_Operating_Expenses_Growth), y)
+                Projected_Operating_Income_Pess = Projected_Gross_Profit_Pess - Projected_Operating_Expenses_Pess
+
+                Scenario_Projection_Table.ADD({
+                    Year: y,
+                    Revenue_Base: Projected_Revenue_Base,
+                    Revenue_Opt: Projected_Revenue_Opt,
+                    Revenue_Pess: Projected_Revenue_Pess,
+                    Operating_Income_Base: Projected_Operating_Income_Base,
+                    Operating_Income_Opt: Projected_Operating_Income_Opt,
+                    Operating_Income_Pess: Projected_Operating_Income_Pess
+                })
+            END FOR
+
+            Risk_Assessment_Summary = "This analysis shows the range of potential outcomes under different conditions. The pessimistic scenario highlights downside risks, while the optimistic scenario shows best-case potential. Use this to assess the robustness of your financial plans."
+
+            DISPLAY_OUTPUT("Scenario_Projection_Table", Scenario_Projection_Table)
+            DISPLAY_OUTPUT("Risk_Assessment_Summary", Risk_Assessment_Summary)
+        END FUNCTION
+        ```
+
+651. **Contribution Margin Analysis (Total, Per Unit, Ratio)**
+    * **Purpose:** Calculate the contribution margin at various levels, crucial for break-even analysis and profitability decisions.
+    * **Inputs:**
+        * `Total_Sales_Revenue` (Currency)
+        * `Total_Variable_Costs` (Currency)
+        * `Number_of_Units_Sold` (Number)
+    * **Calculations:**
+        * `Total_Contribution_Margin = Total_Sales_Revenue - Total_Variable_Costs`
+        * `Contribution_Margin_Per_Unit = Total_Contribution_Margin / Number_of_Units_Sold` (If Units_Sold > 0)
+        * `Contribution_Margin_Ratio = (Total_Contribution_Margin / Total_Sales_Revenue) * 100` (If Sales_Revenue > 0)
+    * **Outputs:**
+        * `Calculated_Total_Contribution_Margin` (Currency)
+        * `Calculated_Contribution_Margin_Per_Unit` (Currency)
+        * `Calculated_Contribution_Margin_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeContributionMargin():
+            Total_Sales_Revenue = GET_INPUT("Total_Sales_Revenue")
+            Total_Variable_Costs = GET_INPUT("Total_Variable_Costs")
+            Number_of_Units_Sold = GET_INPUT("Number_of_Units_Sold")
+
+            Total_Contribution_Margin = Total_Sales_Revenue - Total_Variable_Costs
+
+            Contribution_Margin_Per_Unit = 0
+            IF Number_of_Units_Sold > 0 THEN
+                Contribution_Margin_Per_Unit = Total_Contribution_Margin / Number_of_Units_Sold
+            END IF
+
+            Contribution_Margin_Ratio = 0
+            IF Total_Sales_Revenue > 0 THEN
+                Contribution_Margin_Ratio = (Total_Contribution_Margin / Total_Sales_Revenue) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Total_Contribution_Margin", Total_Contribution_Margin)
+            DISPLAY_OUTPUT("Calculated_Contribution_Margin_Per_Unit", Contribution_Margin_Per_Unit)
+            DISPLAY_OUTPUT("Calculated_Contribution_Margin_Ratio", Contribution_Margin_Ratio)
+        END FUNCTION
+        ```
+
+652. **Break-Even Analysis (Units & Sales Revenue)**
+    * **Purpose:** Determine the sales volume (in units or revenue) required to cover all fixed and variable costs, resulting in zero profit.
+    * **Inputs:**
+        * `Total_Fixed_Costs` (Currency)
+        * `Sales_Price_Per_Unit` (Currency)
+        * `Variable_Costs_Per_Unit` (Currency)
+        * `Total_Sales_Revenue_For_Ratio` (Currency - for contribution margin ratio)
+    * **Calculations:**
+        * `Contribution_Margin_Per_Unit = Sales_Price_Per_Unit - Variable_Costs_Per_Unit`
+        * `Break_Even_Units = Total_Fixed_Costs / Contribution_Margin_Per_Unit` (If CM_Per_Unit > 0)
+        * `Contribution_Margin_Ratio = (Sales_Price_Per_Unit - Variable_Costs_Per_Unit) / Sales_Price_Per_Unit`
+        * `Break_Even_Sales_Revenue = Total_Fixed_Costs / Contribution_Margin_Ratio` (If CM_Ratio > 0)
+    * **Outputs:**
+        * `Break_Even_Point_Units` (Number)
+        * `Break_Even_Point_Sales_Revenue` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBreakEvenAnalysis():
+            Total_Fixed_Costs = GET_INPUT("Total_Fixed_Costs")
+            Sales_Price_Per_Unit = GET_INPUT("Sales_Price_Per_Unit")
+            Variable_Costs_Per_Unit = GET_INPUT("Variable_Costs_Per_Unit")
+
+            Contribution_Margin_Per_Unit = Sales_Price_Per_Unit - Variable_Costs_Per_Unit
+
+            Break_Even_Units = 0
+            IF Contribution_Margin_Per_Unit > 0 THEN
+                Break_Even_Units = Total_Fixed_Costs / Contribution_Margin_Per_Unit
+            END IF
+
+            Contribution_Margin_Ratio = 0
+            IF Sales_Price_Per_Unit > 0 THEN
+                Contribution_Margin_Ratio = Contribution_Margin_Per_Unit / Sales_Price_Per_Unit
+            END IF
+
+            Break_Even_Sales_Revenue = 0
+            IF Contribution_Margin_Ratio > 0 THEN
+                Break_Even_Sales_Revenue = Total_Fixed_Costs / Contribution_Margin_Ratio
+            END IF
+
+            DISPLAY_OUTPUT("Break_Even_Point_Units", CEILING(Break_Even_Units))
+            DISPLAY_OUTPUT("Break_Even_Point_Sales_Revenue", Break_Even_Sales_Revenue)
+        END FUNCTION
+        ```
+
+653. **Operating Leverage (DOL) - Contribution Margin Method**
+    * **Purpose:** Calculate the degree of operating leverage using contribution margin, showing sensitivity of EBIT to sales changes.
+    * **Inputs:**
+        * `Total_Contribution_Margin` (Currency - from calc 651)
+        * `Total_Fixed_Costs` (Currency)
+    * **Calculations:**
+        * `EBIT = Total_Contribution_Margin - Total_Fixed_Costs`
+        * `DOL = Total_Contribution_Margin / EBIT` (If EBIT > 0)
+    * **Outputs:**
+        * `Calculated_DOL_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDOLContributionMargin():
+            Total_Contribution_Margin = GET_INPUT("Total_Contribution_Margin")
+            Total_Fixed_Costs = GET_INPUT("Total_Fixed_Costs")
+
+            EBIT = Total_Contribution_Margin - Total_Fixed_Costs
+
+            IF EBIT = 0 THEN
+                DISPLAY_OUTPUT("Calculated_DOL_Ratio", "N/A - EBIT is zero, DOL undefined.")
+                RETURN
+            END IF
+
+            DOL = Total_Contribution_Margin / EBIT
+
+            DISPLAY_OUTPUT("Calculated_DOL_Ratio", DOL)
+        END FUNCTION
+        ```
+
+654. **Financial Leverage (DFL) - EBIT & EPS Method**
+    * **Purpose:** Calculate the degree of financial leverage, showing the sensitivity of EPS to changes in EBIT.
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Interest_Expense` (Currency)
+        * `Preferred_Dividends_Annual` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+    * **Calculations:**
+        * `DFL = EBIT / (EBIT - Interest_Expense - (Preferred_Dividends_Annual / (1 - Corporate_Tax_Rate / 100)))`
+    * **Outputs:**
+        * `Calculated_DFL_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDFLEBITEPS():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Interest_Expense = GET_INPUT("Interest_Expense")
+            Preferred_Dividends_Annual = GET_INPUT("Preferred_Dividends_Annual")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+
+            Denominator = EBIT - Interest_Expense - (Preferred_Dividends_Annual / (1 - Corporate_Tax_Rate))
+
+            IF Denominator = 0 THEN
+                DISPLAY_OUTPUT("Calculated_DFL_Ratio", "N/A - Denominator is zero, DFL undefined.")
+                RETURN
+            END IF
+
+            DFL = EBIT / Denominator
+
+            DISPLAY_OUTPUT("Calculated_DFL_Ratio", DFL)
+        END FUNCTION
+        ```
+
+655. **Combined Leverage (DCL) - Sales & EPS Method**
+    * **Purpose:** Calculate the degree of combined leverage, showing the sensitivity of EPS to changes in Sales.
+    * **Inputs:**
+        * `Degree_of_Operating_Leverage_DOL` (Number - from calc 653)
+        * `Degree_of_Financial_Leverage_DFL` (Number - from calc 654)
+    * **Calculations:**
+        * `DCL = DOL * DFL`
+    * **Outputs:**
+        * `Calculated_DCL_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDCLSalesEPS():
+            DOL = GET_INPUT("Degree_of_Operating_Leverage_DOL")
+            DFL = GET_INPUT("Degree_of_Financial_Leverage_DFL")
+
+            DCL = DOL * DFL
+
+            DISPLAY_OUTPUT("Calculated_DCL_Ratio", DCL)
+        END FUNCTION
+        ```
+
+699. **Cash Flow from Operations (CFO) - Indirect Method**
+    * **Purpose:** Calculate cash flow from operating activities using the indirect method, starting from Net Income and adjusting for non-cash items and working capital changes.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Non_Cash_Expenses` (Currency - e.g., stock-based compensation)
+        * `Gain_Loss_on_Sale_of_Assets` (Currency - gains subtracted, losses added)
+        * `Change_in_Accounts_Receivable` (Currency - increase is negative, decrease is positive)
+        * `Change_in_Inventory` (Currency - increase is negative, decrease is positive)
+        * `Change_in_Accounts_Payable` (Currency - increase is positive, decrease is negative)
+        * `Change_in_Accrued_Expenses` (Currency - increase is positive, decrease is negative)
+    * **Calculations:**
+        * `CFO = Net_Income + Depreciation_Amortization + Non_Cash_Expenses - Gain_Loss_on_Sale_of_Assets + Change_in_Accounts_Receivable + Change_in_Inventory + Change_in_Accounts_Payable + Change_in_Accrued_Expenses` (Adjustments are typical for indirect method)
+    * **Outputs:**
+        * `Calculated_Cash_Flow_from_Operations` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCFOIndirectMethod():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Non_Cash_Expenses = GET_INPUT("Non_Cash_Expenses")
+            Gain_Loss_on_Sale_of_Assets = GET_INPUT("Gain_Loss_on_Sale_of_Assets") // Positive for gain, negative for loss
+            Change_in_Accounts_Receivable = GET_INPUT("Change_in_Accounts_Receivable") // Positive for increase, negative for decrease
+            Change_in_Inventory = GET_INPUT("Change_in_Inventory") // Positive for increase, negative for decrease
+            Change_in_Accounts_Payable = GET_INPUT("Change_in_Accounts_Payable") // Positive for increase, negative for decrease
+            Change_in_Accrued_Expenses = GET_INPUT("Change_in_Accrued_Expenses") // Positive for increase, negative for decrease
+
+            CFO = Net_Income + Depreciation_Amortization + Non_Cash_Expenses - Gain_Loss_on_Sale_of_Assets + \
+                  (-Change_in_Accounts_Receivable) + (-Change_in_Inventory) + \
+                  (Change_in_Accounts_Payable) + (Change_in_Accrued_Expenses) // Correct signs for adjustments
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_from_Operations", CFO)
+        END FUNCTION
+        ```
+
+700. **Cash Flow from Investing (CFI) Calculator**
+    * **Purpose:** Calculate the cash flow from a company's investment activities, primarily involving purchases and sales of long-term assets.
+    * **Inputs:**
+        * `Purchases_of_Property_Plant_Equipment_PP_E` (Currency)
+        * `Sales_of_Property_Plant_Equipment_PP_E` (Currency)
+        * `Purchases_of_Investments` (Currency)
+        * `Sales_of_Investments` (Currency)
+    * **Calculations:**
+        * `CFI = Sales_of_Property_Plant_Equipment_PP_E - Purchases_of_Property_Plant_Equipment_PP_E + Sales_of_Investments - Purchases_of_Investments`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_from_Investing` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCFI():
+            Purchases_of_PP_E = GET_INPUT("Purchases_of_Property_Plant_Equipment_PP_E")
+            Sales_of_PP_E = GET_INPUT("Sales_of_Property_Plant_Equipment_PP_E")
+            Purchases_of_Investments = GET_INPUT("Purchases_of_Investments")
+            Sales_of_Investments = GET_INPUT("Sales_of_Investments")
+
+            CFI = Sales_of_PP_E - Purchases_of_PP_E + Sales_of_Investments - Purchases_of_Investments
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_from_Investing", CFI)
+        END FUNCTION
+        ```
+
+701. **Cash Flow from Financing (CFF) Calculator**
+    * **Purpose:** Calculate the cash flow from a company's financing activities, involving debt and equity transactions.
+    * **Inputs:**
+        * `Proceeds_from_Debt` (Currency)
+        * `Repayments_of_Debt` (Currency)
+        * `Proceeds_from_Issuing_Stock` (Currency)
+        * `Repurchases_of_Stock` (Currency)
+        * `Dividends_Paid` (Currency)
+    * **Calculations:**
+        * `CFF = Proceeds_from_Debt - Repayments_of_Debt + Proceeds_from_Issuing_Stock - Repurchases_of_Stock - Dividends_Paid`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_from_Financing` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCFF():
+            Proceeds_from_Debt = GET_INPUT("Proceeds_from_Debt")
+            Repayments_of_Debt = GET_INPUT("Repayments_of_Debt")
+            Proceeds_from_Issuing_Stock = GET_INPUT("Proceeds_from_Issuing_Stock")
+            Repurchases_of_Stock = GET_INPUT("Repurchases_of_Stock")
+            Dividends_Paid = GET_INPUT("Dividends_Paid")
+
+            CFF = Proceeds_from_Debt - Repayments_of_Debt + Proceeds_from_Issuing_Stock - Repurchases_of_Stock - Dividends_Paid
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_from_Financing", CFF)
+        END FUNCTION
+        ```
+
+702. **Free Cash Flow (FCF) Calculation (CFO - CapEx)**
+    * **Purpose:** Calculate Free Cash Flow directly from Cash Flow from Operations and Capital Expenditures.
+    * **Inputs:**
+        * `Cash_Flow_from_Operating_Activities` (Currency - from calc 699)
+        * `Capital_Expenditures` (Currency)
+    * **Calculations:**
+        * `FCF = Cash_Flow_from_Operating_Activities - Capital_Expenditures`
+    * **Outputs:**
+        * `Calculated_Free_Cash_Flow` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFCFOlessCapEx():
+            CFO = GET_INPUT("Cash_Flow_from_Operating_Activities")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+
+            FCF = CFO - Capital_Expenditures
+
+            DISPLAY_OUTPUT("Calculated_Free_Cash_Flow", FCF)
+        END FUNCTION
+        ```
+
+703. **Cash Adequacy Ratio**
+    * **Purpose:** Measure a company's ability to generate enough cash from operations to cover its ongoing capital expenditures, debt repayments, and dividends.
+    * **Inputs:**
+        * `Cash_Flow_from_Operating_Activities` (Currency - from calc 699)
+        * `Capital_Expenditures` (Currency)
+        * `Mandatory_Debt_Repayments` (Currency)
+        * `Dividends_Paid` (Currency)
+    * **Calculations:**
+        * `Cash_Outflows = Capital_Expenditures + Mandatory_Debt_Repayments + Dividends_Paid`
+        * `Cash_Adequacy_Ratio = Cash_Flow_from_Operating_Activities / Cash_Outflows` (If Cash_Outflows > 0)
+    * **Outputs:**
+        * `Calculated_Cash_Adequacy_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCashAdequacyRatio():
+            CFO = GET_INPUT("Cash_Flow_from_Operating_Activities")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Mandatory_Debt_Repayments = GET_INPUT("Mandatory_Debt_Repayments")
+            Dividends_Paid = GET_INPUT("Dividends_Paid")
+
+            Cash_Outflows = Capital_Expenditures + Mandatory_Debt_Repayments + Dividends_Paid
+
+            IF Cash_Outflows <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cash_Adequacy_Ratio", "N/A - Cash outflows must be positive.")
+                RETURN
+            END IF
+
+            Cash_Adequacy_Ratio = CFO / Cash_Outflows
+
+            DISPLAY_OUTPUT("Calculated_Cash_Adequacy_Ratio", Cash_Adequacy_Ratio)
+        END FUNCTION
+        ```
+
+---
+
+We have now added another 31 Company Finance calculators (623-655, and 699-703, correcting for the continuous numbering), bringing our total count to **551 (previous) + 31 = 582 calculators!**
+
+This batch focused heavily on Capital Budgeting and detailed Cash Flow Analysis. We have more Company Finance calculators planned, and we are also approaching our target of 650 unique calculators.
+
+Next, I will continue with **Company Finance Calculators** to ensure we hit the 50+ target for this category (we have 31 + some previously in FA, so still room to add more unique items before moving categories). Then, I'll assess where we stand for the final push to 650.
+
+-------
+
+Rigorous expansion is the path! We're now moving into **Company Finance Calculators**, a deep and crucial area for understanding business operations, investment, and financing decisions. This batch will focus on Capital Budgeting, advanced Working Capital, and deeper Capital Structure/Cost of Capital.
+
+Our current total is 551 calculators. This batch of 50+ will push us well past the 650 mark.
+
+---
+
+## XVI. Company Finance Calculators (Deeper Dive - Batch 1)
+
+623.  **Net Present Value (NPV) - Project Specific**
+    * **Purpose:** Evaluate the profitability of a specific capital project by discounting its future cash flows to the present and subtracting the initial investment.
+    * **Inputs:**
+        * `Initial_Investment` (Currency - usually negative)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Discount_Rate` (Percentage - often WACC or required rate of return)
+    * **Calculations:**
+        * `NPV = Initial_Investment`
+        * `FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:`
+            * `NPV = NPV + (Project_Cash_Flows[i] / (1 + Discount_Rate / 100)^(i + 1))`
+    * **Outputs:**
+        * `Calculated_NPV` (Currency)
+        * `Investment_Decision` (Text: "Accept" if NPV > 0, "Reject" if NPV < 0, "Indifferent" if NPV = 0)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateProjectNPV():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            NPV = Initial_Investment
+
+            FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:
+                NPV = NPV + (Project_Cash_Flows[i] / POWER((1 + Discount_Rate), (i + 1)))
+            END FOR
+
+            Investment_Decision = ""
+            IF NPV > 0 THEN
+                Investment_Decision = "Accept (Project is expected to add value)"
+            ELSE IF NPV < 0 THEN
+                Investment_Decision = "Reject (Project is expected to destroy value)"
+            ELSE
+                Investment_Decision = "Indifferent (Project meets the required rate of return exactly)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_NPV", NPV)
+            DISPLAY_OUTPUT("Investment_Decision", Investment_Decision)
+        END FUNCTION
+        ```
+
+624.  **Internal Rate of Return (IRR) - Project Specific**
+    * **Purpose:** Calculate the discount rate that makes the Net Present Value (NPV) of all cash flows from a specific project equal to zero.
+    * **Inputs:**
+        * `Initial_Investment` (Currency - usually negative)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+    * **Calculations:**
+        * *IRR calculation requires an iterative numerical method (e.g., Newton-Raphson, bisection method) as there is no direct algebraic solution.*
+        * `Cash_Flow_Stream = [-Initial_Investment] + Project_Cash_Flows`
+        * `IRR = SOLVE_IRR(Cash_Flow_Stream)`
+    * **Outputs:**
+        * `Calculated_IRR` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateProjectIRR():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+
+            Cash_Flow_Stream = [-Initial_Investment]
+            FOR EACH CF IN Project_Cash_Flows:
+                Cash_Flow_Stream.ADD(CF)
+            END FOR
+
+            // Use an iterative solver for IRR
+            Calculated_IRR = SOLVE_IRR_FUNCTION(Cash_Flow_Stream) * 100 // Returns decimal, convert to percentage
+
+            DISPLAY_OUTPUT("Calculated_IRR", Calculated_IRR)
+        END FUNCTION
+        ```
+
+625.  **Payback Period Calculator**
+    * **Purpose:** Determine the time required for a project's cumulative cash inflows to equal its initial investment, ignoring time value of money.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Annual_Cash_Inflows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+    * **Calculations:**
+        * `Cumulative_Cash_Flow = 0`
+        * `Payback_Period_Years = 0`
+        * `FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:`
+            * `Cumulative_Cash_Flow = Cumulative_Cash_Flow + Annual_Cash_Inflows[i]`
+            * `IF Cumulative_Cash_Flow >= Initial_Investment THEN`
+                * `Payback_Period_Years = i + 1`
+                * `Partial_Year_Recovery = (Initial_Investment - (Cumulative_Cash_Flow - Annual_Cash_Inflows[i])) / Annual_Cash_Inflows[i]`
+                * `Payback_Period_Years = Payback_Period_Years - 1 + Partial_Year_Recovery`
+                * `BREAK`
+        * `IF Payback_Period_Years == 0 AND Cumulative_Cash_Flow < Initial_Investment THEN Payback_Period_Years = "Never"`
+    * **Outputs:**
+        * `Calculated_Payback_Period_Years` (Years or "Never")
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculatePaybackPeriod():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Annual_Cash_Inflows = GET_INPUT("Annual_Cash_Inflows") // List of cash flows for years 1 to N
+
+            Cumulative_Cash_Flow = 0
+            Payback_Period_Years = 0
+            
+            FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:
+                Cumulative_Cash_Flow = Cumulative_Cash_Flow + Annual_Cash_Inflows[i]
+                IF Cumulative_Cash_Flow >= Initial_Investment THEN
+                    Years_Prior_Full_Recovery = i
+                    Amount_Recovered_Prior = Cumulative_Cash_Flow - Annual_Cash_Inflows[i]
+                    Amount_Still_Needed = Initial_Investment - Amount_Recovered_Prior
+                    Partial_Year_Recovery = Amount_Still_Needed / Annual_Cash_Inflows[i]
+                    Payback_Period_Years = Years_Prior_Full_Recovery + Partial_Year_Recovery
+                    BREAK
+                END IF
+            END FOR
+
+            IF Payback_Period_Years == 0 AND Initial_Investment > 0 AND SUM_LIST(Annual_Cash_Inflows) < Initial_Investment THEN
+                DISPLAY_OUTPUT("Calculated_Payback_Period_Years", "Never (Cash flows insufficient)")
+            ELSE IF Payback_Period_Years == 0 AND Initial_Investment <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Payback_Period_Years", 0) // Already recovered if no investment or positive
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Payback_Period_Years", Payback_Period_Years)
+            END IF
+        END FUNCTION
+        ```
+
+626.  **Discounted Payback Period Calculator**
+    * **Purpose:** Determine the time required for a project's cumulative *discounted* cash inflows to equal its initial investment.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Annual_Cash_Inflows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Discount_Rate` (Percentage)
+    * **Calculations:**
+        * `Cumulative_Discounted_Cash_Flow = 0`
+        * `Discounted_Payback_Period_Years = 0`
+        * `FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:`
+            * `Discounted_CF_This_Year = Annual_Cash_Inflows[i] / (1 + Discount_Rate / 100)^(i + 1)`
+            * `Cumulative_Discounted_Cash_Flow = Cumulative_Discounted_Cash_Flow + Discounted_CF_This_Year`
+            * `IF Cumulative_Discounted_Cash_Flow >= Initial_Investment THEN`
+                * `Years_Prior_Full_Recovery = i`
+                * `Amount_Recovered_Prior = Cumulative_Discounted_Cash_Flow - Discounted_CF_This_Year`
+                * `Amount_Still_Needed = Initial_Investment - Amount_Recovered_Prior`
+                * `Partial_Year_Recovery = Amount_Still_Needed / Discounted_CF_This_Year`
+                * `Discounted_Payback_Period_Years = Years_Prior_Full_Recovery + Partial_Year_Recovery`
+                * `BREAK`
+        * `IF Discounted_Payback_Period_Years == 0 AND Cumulative_Discounted_Cash_Flow < Initial_Investment THEN Discounted_Payback_Period_Years = "Never"`
+    * **Outputs:**
+        * `Calculated_Discounted_Payback_Period_Years` (Years or "Never")
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDiscountedPaybackPeriod():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Annual_Cash_Inflows = GET_INPUT("Annual_Cash_Inflows") // List of cash flows for years 1 to N
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            Cumulative_Discounted_Cash_Flow = 0
+            Discounted_Payback_Period_Years = 0
+            
+            FOR i FROM 0 TO LENGTH(Annual_Cash_Inflows) - 1:
+                Discounted_CF_This_Year = Annual_Cash_Inflows[i] / POWER((1 + Discount_Rate), (i + 1))
+                Cumulative_Discounted_Cash_Flow = Cumulative_Discounted_Cash_Flow + Discounted_CF_This_Year
+                IF Cumulative_Discounted_Cash_Flow >= Initial_Investment THEN
+                    Years_Prior_Full_Recovery = i
+                    Amount_Recovered_Prior = Cumulative_Discounted_Cash_Flow - Discounted_CF_This_Year
+                    Amount_Still_Needed = Initial_Investment - Amount_Recovered_Prior
+                    Partial_Year_Recovery = Amount_Still_Needed / Discounted_CF_This_Year
+                    Discounted_Payback_Period_Years = Years_Prior_Full_Recovery + Partial_Year_Recovery
+                    BREAK
+                END IF
+            END FOR
+
+            IF Discounted_Payback_Period_Years == 0 AND Initial_Investment > 0 AND SUM_LIST(Annual_Cash_Inflows) < Initial_Investment THEN
+                DISPLAY_OUTPUT("Calculated_Discounted_Payback_Period_Years", "Never (Discounted cash flows insufficient)")
+            ELSE IF Discounted_Payback_Period_Years == 0 AND Initial_Investment <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Discounted_Payback_Period_Years", 0)
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Discounted_Payback_Period_Years", Discounted_Payback_Period_Years)
+            END FUNCTION
+        ```
+
+627.  **Profitability Index (PI) Calculator**
+    * **Purpose:** Measure the ratio of the present value of future cash inflows to the initial investment, indicating value created per dollar invested.
+    * **Inputs:**
+        * `Initial_Investment` (Currency)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Discount_Rate` (Percentage)
+    * **Calculations:**
+        * `Present_Value_of_Inflows = 0`
+        * `FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:`
+            * `Present_Value_of_Inflows = Present_Value_of_Inflows + (Project_Cash_Flows[i] / (1 + Discount_Rate / 100)^(i + 1))`
+        * `Profitability_Index = Present_Value_of_Inflows / Initial_Investment`
+    * **Outputs:**
+        * `Calculated_Profitability_Index` (Number)
+        * `Investment_Decision` (Text: "Accept" if PI > 1, "Reject" if PI < 1, "Indifferent" if PI = 1)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateProfitabilityIndex():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            Present_Value_of_Inflows = 0
+            FOR i FROM 0 TO LENGTH(Project_Cash_Flows) - 1:
+                Present_Value_of_Inflows = Present_Value_of_Inflows + (Project_Cash_Flows[i] / POWER((1 + Discount_Rate), (i + 1)))
+            END FOR
+
+            Profitability_Index = 0
+            IF Initial_Investment > 0 THEN // Initial Investment must be positive
+                Profitability_Index = Present_Value_of_Inflows / Initial_Investment
+            ELSE
+                DISPLAY_OUTPUT("Calculated_Profitability_Index", "N/A - Initial Investment must be positive.")
+                RETURN
+            END IF
+
+            Investment_Decision = ""
+            IF Profitability_Index > 1 THEN
+                Investment_Decision = "Accept (Project creates value)"
+            ELSE IF Profitability_Index < 1 THEN
+                Investment_Decision = "Reject (Project destroys value)"
+            ELSE
+                Investment_Decision = "Indifferent (Project meets the required rate of return exactly)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Profitability_Index", Profitability_Index)
+            DISPLAY_OUTPUT("Investment_Decision", Investment_Decision)
+        END FUNCTION
+        ```
+
+628.  **Modified Internal Rate of Return (MIRR) Calculator**
+    * **Purpose:** Calculate a more reliable version of IRR that assumes positive cash flows are reinvested at the cost of capital and initial outlay is financed at the finance rate.
+    * **Inputs:**
+        * `Initial_Investment` (Currency - usually negative)
+        * `Project_Cash_Flows` (List of Currency: `CF1`, `CF2`, ..., `CFn`)
+        * `Reinvestment_Rate` (Percentage - often WACC)
+        * `Finance_Rate` (Percentage - cost of borrowing, if initial outlay is financed)
+    * **Calculations:**
+        * `PV_of_Negative_Cash_Flows = 0` (Discount all negative cash flows to time 0 at finance rate)
+        * `FV_of_Positive_Cash_Flows = 0` (Compound all positive cash flows to the end of the project at reinvestment rate)
+        * `MIRR = (POWER((FV_of_Positive_Cash_Flows / ABS(PV_of_Negative_Cash_Flows)), (1 / Number_of_Periods)) - 1) * 100`
+    * **Outputs:**
+        * `Calculated_MIRR` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateMIRR():
+            Initial_Investment = GET_INPUT("Initial_Investment")
+            Project_Cash_Flows = GET_INPUT("Project_Cash_Flows") // List of cash flows for years 1 to N
+            Reinvestment_Rate = GET_INPUT("Reinvestment_Rate") / 100
+            Finance_Rate = GET_INPUT("Finance_Rate") / 100
+
+            PV_of_Negative_Cash_Flows = 0
+            FV_of_Positive_Cash_Flows = 0
+            Number_of_Periods = LENGTH(Project_Cash_Flows)
+
+            // Assume initial investment is negative, all subsequent are positive for simplicity
+            // If there are negative cash flows in later periods, this logic needs adjustment.
+            PV_of_Negative_Cash_Flows = ABS(Initial_Investment) // Simplified: assume initial investment is the only negative outflow
+
+            FOR i FROM 0 TO Number_of_Periods - 1:
+                IF Project_Cash_Flows[i] > 0 THEN
+                    FV_of_Positive_Cash_Flows = FV_of_Positive_Cash_Flows + \
+                                                (Project_Cash_Flows[i] * POWER((1 + Reinvestment_Rate), (Number_of_Periods - 1 - i)))
+                // ELSE IF Project_Cash_Flows[i] < 0 THEN
+                //     PV_of_Negative_Cash_Flows = PV_of_Negative_Cash_Flows + \
+                //                                (Project_Cash_Flows[i] / POWER((1 + Finance_Rate), (i + 1)))
+                END IF
+            END FOR
+
+            MIRR = 0
+            IF PV_of_Negative_Cash_Flows > 0 AND Number_of_Periods > 0 THEN
+                MIRR = (POWER((FV_of_Positive_Cash_Flows / PV_of_Negative_Cash_Flows), (1 / Number_of_Periods)) - 1) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_MIRR", MIRR)
+        END FUNCTION
+        ```
+
+629.  **Annual Equivalent Annuity (AEC) Calculator**
+    * **Purpose:** Compare mutually exclusive projects with different useful lives by converting their NPVs into equivalent annual cash flows.
+    * **Inputs:**
+        * `Project_NPV` (Currency)
+        * `Project_Life_Years` (Years)
+        * `Discount_Rate` (Percentage)
+    * **Calculations:**
+        * `Discount_Factor = (1 - (1 + Discount_Rate / 100)^-Project_Life_Years) / (Discount_Rate / 100)`
+        * `AEC = Project_NPV / Discount_Factor`
+    * **Outputs:**
+        * `Calculated_Annual_Equivalent_Annuity` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateAEC():
+            Project_NPV = GET_INPUT("Project_NPV")
+            Project_Life_Years = GET_INPUT("Project_Life_Years")
+            Discount_Rate = GET_INPUT("Discount_Rate") / 100
+
+            IF Discount_Rate = 0 THEN
+                Discount_Factor = Project_Life_Years
+            ELSE
+                Discount_Factor = (1 - POWER((1 + Discount_Rate), -Project_Life_Years)) / Discount_Rate
+            END IF
+
+            AEC = 0
+            IF Discount_Factor != 0 THEN
+                AEC = Project_NPV / Discount_Factor
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Annual_Equivalent_Annuity", AEC)
+        END FUNCTION
+        ```
+
+630. **Optimal Cash Balance (Baumol Model) - Conceptual**
+    * **Purpose:** Explain the concept of determining an optimal cash balance that minimizes the sum of holding costs and transaction costs, based on the Baumol model.
+    * **Inputs:**
+        * `Total_Cash_Needed_Annual` (Currency)
+        * `Fixed_Cost_Per_Transaction` (Currency)
+        * `Opportunity_Cost_of_Holding_Cash` (Percentage - interest rate foregone)
+    * **Calculations:**
+        * `Optimal_Cash_Balance = SQRT((2 * Total_Cash_Needed_Annual * Fixed_Cost_Per_Transaction) / (Opportunity_Cost_of_Holding_Cash / 100))`
+    * **Outputs:**
+        * `Calculated_Optimal_Cash_Balance` (Currency)
+        * `Model_Assumptions_Note` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateOptimalCashBaumol():
+            Total_Cash_Needed_Annual = GET_INPUT("Total_Cash_Needed_Annual")
+            Fixed_Cost_Per_Transaction = GET_INPUT("Fixed_Cost_Per_Transaction")
+            Opportunity_Cost_of_Holding_Cash = GET_INPUT("Opportunity_Cost_of_Holding_Cash") / 100
+
+            IF Opportunity_Cost_of_Holding_Cash <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Optimal_Cash_Balance", "N/A - Opportunity cost must be positive.")
+                RETURN
+            END IF
+
+            Optimal_Cash_Balance = SQRT((2 * Total_Cash_Needed_Annual * Fixed_Cost_Per_Transaction) / Opportunity_Cost_of_Holding_Cash)
+
+            Model_Assumptions_Note = "The Baumol model assumes a constant and predictable rate of cash usage and fixed transaction costs, making it a simplified theoretical model for cash management."
+
+            DISPLAY_OUTPUT("Calculated_Optimal_Cash_Balance", Optimal_Cash_Balance)
+            DISPLAY_OUTPUT("Model_Assumptions_Note", Model_Assumptions_Note)
+        END FUNCTION
+        ```
+
+631. **Economic Order Quantity (EOQ) Calculator**
+    * **Purpose:** Determine the ideal order quantity for inventory that minimizes total inventory costs (holding and ordering costs).
+    * **Inputs:**
+        * `Annual_Demand_Units` (Number)
+        * `Ordering_Cost_Per_Order` (Currency)
+        * `Holding_Cost_Per_Unit_Per_Year` (Currency)
+    * **Calculations:**
+        * `EOQ = SQRT((2 * Annual_Demand_Units * Ordering_Cost_Per_Order) / Holding_Cost_Per_Unit_Per_Year)`
+    * **Outputs:**
+        * `Calculated_EOQ_Units` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEOQ():
+            Annual_Demand_Units = GET_INPUT("Annual_Demand_Units")
+            Ordering_Cost_Per_Order = GET_INPUT("Ordering_Cost_Per_Order")
+            Holding_Cost_Per_Unit_Per_Year = GET_INPUT("Holding_Cost_Per_Unit_Per_Year")
+
+            IF Holding_Cost_Per_Unit_Per_Year <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EOQ_Units", "N/A - Holding cost must be positive.")
+                RETURN
+            END IF
+
+            EOQ = SQRT((2 * Annual_Demand_Units * Ordering_Cost_Per_Order) / Holding_Cost_Per_Unit_Per_Year)
+
+            DISPLAY_OUTPUT("Calculated_EOQ_Units", ROUND(EOQ)) // Round to nearest whole unit
+        END FUNCTION
+        ```
+
+632. **Reorder Point Calculator**
+    * **Purpose:** Determine the inventory level at which a new order should be placed to avoid stockouts, considering lead time and demand.
+    * **Inputs:**
+        * `Daily_Demand_Units` (Number)
+        * `Lead_Time_Days` (Days)
+        * `Safety_Stock_Units` (Number - buffer inventory)
+    * **Calculations:**
+        * `Reorder_Point = (Daily_Demand_Units * Lead_Time_Days) + Safety_Stock_Units`
+    * **Outputs:**
+        * `Calculated_Reorder_Point_Units` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateReorderPoint():
+            Daily_Demand_Units = GET_INPUT("Daily_Demand_Units")
+            Lead_Time_Days = GET_INPUT("Lead_Time_Days")
+            Safety_Stock_Units = GET_INPUT("Safety_Stock_Units")
+
+            Reorder_Point = (Daily_Demand_Units * Lead_Time_Days) + Safety_Stock_Units
+
+            DISPLAY_OUTPUT("Calculated_Reorder_Point_Units", Reorder_Point)
+        END FUNCTION
+        ```
+
+633. **Accounts Receivable Aging Schedule Analyzer**
+    * **Purpose:** Analyze the breakdown of a company's accounts receivable by how long they've been outstanding, highlighting potential collection issues.
+    * **Inputs:**
+        * `AR_Current_Amount` (Currency)
+        * `AR_1_30_Days_Amount` (Currency)
+        * `AR_31_60_Days_Amount` (Currency)
+        * `AR_61_90_Days_Amount` (Currency)
+        * `AR_Over_90_Days_Amount` (Currency)
+    * **Calculations:**
+        * `Total_Accounts_Receivable = AR_Current_Amount + AR_1_30_Days_Amount + AR_31_60_Days_Amount + AR_61_90_Days_Amount + AR_Over_90_Days_Amount`
+        * `Percentage_Current = (AR_Current_Amount / Total_Accounts_Receivable) * 100` (If Total_AR > 0)
+        * `Percentage_Over_90_Days = (AR_Over_90_Days_Amount / Total_Accounts_Receivable) * 100`
+        * `Risk_Assessment = IF Percentage_Over_90_Days > 10 THEN "High Risk" ELSE "Moderate Risk"`
+    * **Outputs:**
+        * `Total_Accounts_Receivable` (Currency)
+        * `Aging_Schedule_Table` (Table: Category, Amount, Percentage of Total)
+        * `Collection_Risk_Assessment` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeAR AgingSchedule():
+            AR_Current_Amount = GET_INPUT("AR_Current_Amount")
+            AR_1_30_Days_Amount = GET_INPUT("AR_1_30_Days_Amount")
+            AR_31_60_Days_Amount = GET_INPUT("AR_31_60_Days_Amount")
+            AR_61_90_Days_Amount = GET_INPUT("AR_61_90_Days_Amount")
+            AR_Over_90_Days_Amount = GET_INPUT("AR_Over_90_Days_Amount")
+
+            Total_Accounts_Receivable = AR_Current_Amount + AR_1_30_Days_Amount + AR_31_60_Days_Amount + AR_61_90_Days_Amount + AR_Over_90_Days_Amount
+
+            IF Total_Accounts_Receivable <= 0 THEN
+                DISPLAY_OUTPUT("Collection_Risk_Assessment", "No accounts receivable to analyze.")
+                RETURN
+            END IF
+
+            Aging_Schedule_Table = [
+                {Category: "Current", Amount: AR_Current_Amount, Percentage: (AR_Current_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "1-30 Days", Amount: AR_1_30_Days_Amount, Percentage: (AR_1_30_Days_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "31-60 Days", Amount: AR_31_60_Days_Amount, Percentage: (AR_31_60_Days_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "61-90 Days", Amount: AR_61_90_Days_Amount, Percentage: (AR_61_90_Days_Amount / Total_Accounts_Receivable) * 100},
+                {Category: "Over 90 Days", Amount: AR_Over_90_Days_Amount, Percentage: (AR_Over_90_Days_Amount / Total_Accounts_Receivable) * 100}
+            ]
+
+            Percentage_Over_90_Days = (AR_Over_90_Days_Amount / Total_Accounts_Receivable) * 100
+
+            Collection_Risk_Assessment = ""
+            IF Percentage_Over_90_Days > 10 THEN // Common threshold for concern
+                Collection_Risk_Assessment = "High Risk (Significant portion of AR is old, collection issues likely)"
+            ELSE IF Percentage_Over_90_Days > 5 THEN
+                Collection_Risk_Assessment = "Moderate Risk (Some AR is old, monitor closely)"
+            ELSE
+                Collection_Risk_Assessment = "Low Risk (Healthy collection practices)"
+            END IF
+
+            DISPLAY_OUTPUT("Total_Accounts_Receivable", Total_Accounts_Receivable)
+            DISPLAY_OUTPUT("Aging_Schedule_Table", Aging_Schedule_Table)
+            DISPLAY_OUTPUT("Collection_Risk_Assessment", Collection_Risk_Assessment)
+        END FUNCTION
+        ```
+
+634. **Days Sales in Inventory (DSI) - Full Calculation**
+    * **Purpose:** Calculate the average number of days a company holds its inventory before selling it, deriving components from balance sheet and income statement.
+    * **Inputs:**
+        * `Beginning_Inventory` (Currency)
+        * `Ending_Inventory` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+    * **Calculations:**
+        * `Average_Inventory = (Beginning_Inventory + Ending_Inventory) / 2`
+        * `DSI = (Average_Inventory / COGS) * 365`
+    * **Outputs:**
+        * `Calculated_DSI_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDSIFull():
+            Beginning_Inventory = GET_INPUT("Beginning_Inventory")
+            Ending_Inventory = GET_INPUT("Ending_Inventory")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+
+            Average_Inventory = (Beginning_Inventory + Ending_Inventory) / 2
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DSI_Days", "N/A - COGS must be positive.")
+                RETURN
+            END IF
+
+            DSI = (Average_Inventory / COGS) * 365
+
+            DISPLAY_OUTPUT("Calculated_DSI_Days", DSI)
+        END FUNCTION
+        ```
+
+635. **Days Payable Outstanding (DPO) - Full Calculation**
+    * **Purpose:** Calculate the average number of days a company takes to pay its suppliers, deriving components from balance sheet and income statement.
+    * **Inputs:**
+        * `Beginning_Accounts_Payable` (Currency)
+        * `Ending_Accounts_Payable` (Currency)
+        * `Cost_of_Goods_Sold_COGS` (Currency)
+    * **Calculations:**
+        * `Average_Accounts_Payable = (Beginning_Accounts_Payable + Ending_Accounts_Payable) / 2`
+        * `DPO = (Average_Accounts_Payable / COGS) * 365`
+    * **Outputs:**
+        * `Calculated_DPO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDPOFull():
+            Beginning_Accounts_Payable = GET_INPUT("Beginning_Accounts_Payable")
+            Ending_Accounts_Payable = GET_INPUT("Ending_Accounts_Payable")
+            COGS = GET_INPUT("Cost_of_Goods_Sold_COGS")
+
+            Average_Accounts_Payable = (Beginning_Accounts_Payable + Ending_Accounts_Payable) / 2
+
+            IF COGS <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DPO_Days", "N/A - COGS must be positive.")
+                RETURN
+            END IF
+
+            DPO = (Average_Accounts_Payable / COGS) * 365
+
+            DISPLAY_OUTPUT("Calculated_DPO_Days", DPO)
+        END FUNCTION
+        ```
+
+636. **Days Sales Outstanding (DSO) - Full Calculation**
+    * **Purpose:** Calculate the average number of days it takes for a company to collect its accounts receivables, deriving components from balance sheet and income statement.
+    * **Inputs:**
+        * `Beginning_Accounts_Receivable` (Currency)
+        * `Ending_Accounts_Receivable` (Currency)
+        * `Total_Credit_Sales` (Currency)
+    * **Calculations:**
+        * `Average_Accounts_Receivable = (Beginning_Accounts_Receivable + Ending_Accounts_Receivable) / 2`
+        * `DSO = (Average_Accounts_Receivable / Total_Credit_Sales) * 365`
+    * **Outputs:**
+        * `Calculated_DSO_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDSOFull():
+            Beginning_Accounts_Receivable = GET_INPUT("Beginning_Accounts_Receivable")
+            Ending_Accounts_Receivable = GET_INPUT("Ending_Accounts_Receivable")
+            Total_Credit_Sales = GET_INPUT("Total_Credit_Sales")
+
+            Average_Accounts_Receivable = (Beginning_Accounts_Receivable + Ending_Accounts_Receivable) / 2
+
+            IF Total_Credit_Sales <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_DSO_Days", "N/A - Total Credit Sales must be positive.")
+                RETURN
+            END IF
+
+            DSO = (Average_Accounts_Receivable / Total_Credit_Sales) * 365
+
+            DISPLAY_OUTPUT("Calculated_DSO_Days", DSO)
+        END FUNCTION
+        ```
+
+637. **Cash Conversion Cycle (CCC) - Full Calculation from Components**
+    * **Purpose:** Calculate the cash conversion cycle using explicitly provided DSI, DSO, and DPO.
+    * **Inputs:**
+        * `Days_Sales_in_Inventory_DSI` (Days - from calc 634)
+        * `Days_Sales_Outstanding_DSO` (Days - from calc 636)
+        * `Days_Payable_Outstanding_DPO` (Days - from calc 635)
+    * **Calculations:**
+        * `CCC = DSI + DSO - DPO`
+    * **Outputs:**
+        * `Calculated_CCC_Days` (Days)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCCCFromComponents():
+            DSI = GET_INPUT("Days_Sales_in_Inventory_DSI")
+            DSO = GET_INPUT("Days_Sales_Outstanding_DSO")
+            DPO = GET_INPUT("Days_Payable_Outstanding_DPO")
+
+            CCC = DSI + DSO - DPO
+
+            DISPLAY_OUTPUT("Calculated_CCC_Days", CCC)
+        END FUNCTION
+        ```
+
+638. **Long-Term Debt to Equity Ratio**
+    * **Purpose:** Assess a company's reliance on long-term debt relative to its equity.
+    * **Inputs:**
+        * `Total_Long_Term_Debt` (Currency)
+        * `Total_Shareholder_Equity` (Currency)
+    * **Calculations:**
+        * `Long_Term_Debt_to_Equity_Ratio = Total_Long_Term_Debt / Total_Shareholder_Equity`
+    * **Outputs:**
+        * `Calculated_Long_Term_Debt_to_Equity_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateLongTermDebtToEquityRatio():
+            Total_Long_Term_Debt = GET_INPUT("Total_Long_Term_Debt")
+            Total_Shareholder_Equity = GET_INPUT("Total_Shareholder_Equity")
+
+            IF Total_Shareholder_Equity <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Long_Term_Debt_to_Equity_Ratio", "N/A - Shareholder Equity must be positive.")
+                RETURN
+            END IF
+
+            Long_Term_Debt_to_Equity_Ratio = Total_Long_Term_Debt / Total_Shareholder_Equity
+
+            DISPLAY_OUTPUT("Calculated_Long_Term_Debt_to_Equity_Ratio", Long_Term_Debt_to_Equity_Ratio)
+        END FUNCTION
+        ```
+
+639. **Cost of Debt (Yield to Maturity on Bond) - Advanced**
+    * **Purpose:** Calculate the specific cost of debt for a company by determining the Yield to Maturity (YTM) on its issued bonds.
+    * **Inputs:**
+        * `Bond_Face_Value` (Currency)
+        * `Coupon_Rate` (Percentage)
+        * `Years_to_Maturity` (Years)
+        * `Current_Bond_Market_Price` (Currency)
+        * `Coupon_Frequency` (Number: 1 for annual, 2 for semi-annual)
+    * **Calculations:**
+        * *YTM is an iterative calculation, typically solved using a financial function.*
+        * `YTM = SOLVE_YTM(Bond_Face_Value, Coupon_Rate, Years_to_Maturity, Current_Bond_Market_Price, Coupon_Frequency)`
+    * **Outputs:**
+        * `Calculated_Cost_of_Debt_YTM` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCostOfDebtYTMAdvanced():
+            Bond_Face_Value = GET_INPUT("Bond_Face_Value")
+            Coupon_Rate = GET_INPUT("Coupon_Rate") / 100
+            Years_to_Maturity = GET_INPUT("Years_to_Maturity")
+            Current_Bond_Market_Price = GET_INPUT("Current_Bond_Market_Price")
+            Coupon_Frequency = GET_INPUT("Coupon_Frequency")
+
+            // SOLVE_YTM is a complex financial function (often iterative)
+            // It calculates the discount rate that equates the present value of future bond cash flows to its current market price.
+            Calculated_Cost_of_Debt_YTM = SOLVE_YTM_FUNCTION(
+                Bond_Face_Value, Coupon_Rate, Years_to_Maturity,
+                Current_Bond_Market_Price, Coupon_Frequency
+            ) * 100 // Convert to percentage
+
+            DISPLAY_OUTPUT("Calculated_Cost_of_Debt_YTM", Calculated_Cost_of_Debt_YTM)
+        END FUNCTION
+        ```
+
+640. **Weighted Average Cost of Capital (WACC) - All Components**
+    * **Purpose:** Calculate a company's WACC using explicit values for all components, including cost of equity (CAPM), cost of preferred stock, and after-tax cost of debt.
+    * **Inputs:**
+        * `Market_Value_of_Equity` (Currency)
+        * `Market_Value_of_Preferred_Stock` (Currency)
+        * `Market_Value_of_Debt` (Currency)
+        * `Cost_of_Equity` (Percentage - from CAPM)
+        * `Cost_of_Preferred_Stock` (Percentage - from calc 459)
+        * `Cost_of_Debt_After_Tax` (Percentage - from calc 122)
+    * **Calculations:**
+        * `Total_Capital = Market_Value_of_Equity + Market_Value_of_Preferred_Stock + Market_Value_of_Debt`
+        * `Weight_Equity = Market_Value_of_Equity / Total_Capital`
+        * `Weight_Preferred = Market_Value_of_Preferred_Stock / Total_Capital`
+        * `Weight_Debt = Market_Value_of_Debt / Total_Capital`
+        * `WACC = (Weight_Equity * Cost_of_Equity / 100) + (Weight_Preferred * Cost_of_Preferred_Stock / 100) + (Weight_Debt * Cost_of_Debt_After_Tax / 100)`
+    * **Outputs:**
+        * `Calculated_WACC` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateWACCAllComponents():
+            Market_Value_of_Equity = GET_INPUT("Market_Value_of_Equity")
+            Market_Value_of_Preferred_Stock = GET_INPUT("Market_Value_of_Preferred_Stock")
+            Market_Value_of_Debt = GET_INPUT("Market_Value_of_Debt")
+            Cost_of_Equity = GET_INPUT("Cost_of_Equity") / 100
+            Cost_of_Preferred_Stock = GET_INPUT("Cost_of_Preferred_Stock") / 100
+            Cost_of_Debt_After_Tax = GET_INPUT("Cost_of_Debt_After_Tax") / 100
+
+            Total_Capital = Market_Value_of_Equity + Market_Value_of_Preferred_Stock + Market_Value_of_Debt
+
+            IF Total_Capital <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_WACC", "N/A - Total Capital must be positive.")
+                RETURN
+            END IF
+
+            Weight_Equity = Market_Value_of_Equity / Total_Capital
+            Weight_Preferred = Market_Value_of_Preferred_Stock / Total_Capital
+            Weight_Debt = Market_Value_of_Debt / Total_Capital
+
+            WACC = (Weight_Equity * Cost_of_Equity) + \
+                   (Weight_Preferred * Cost_of_Preferred_Stock) + \
+                   (Weight_Debt * Cost_of_Debt_After_Tax)
+
+            DISPLAY_OUTPUT("Calculated_WACC", WACC * 100)
+        END FUNCTION
+        ```
+
+641. **Return on Invested Capital (ROIC) - Reconciliation with WACC**
+    * **Purpose:** Calculate ROIC and explicitly compare it to WACC to determine if a company is generating value above its cost of capital.
+    * **Inputs:**
+        * `NOPAT_Net_Operating_Profit_After_Tax` (Currency)
+        * `Total_Invested_Capital` (Currency)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * `ROIC = (NOPAT_Net_Operating_Profit_After_Tax / Total_Invested_Capital) * 100`
+        * `ROIC_vs_WACC_Difference = ROIC - WACC_Weighted_Average_Cost_of_Capital`
+        * `Value_Creation_Status = IF ROIC_vs_WACC_Difference > 0 THEN "Creating Value" ELSE "Destroying Value"`
+    * **Outputs:**
+        * `Calculated_ROIC` (Percentage)
+        * `ROIC_vs_WACC_Difference` (Percentage)
+        * `Value_Creation_Status` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION ReconcileROICWithWACC():
+            NOPAT = GET_INPUT("NOPAT_Net_Operating_Profit_After_Tax")
+            Total_Invested_Capital = GET_INPUT("Total_Invested_Capital")
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC")
+
+            IF Total_Invested_Capital <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_ROIC", "N/A")
+                DISPLAY_OUTPUT("Value_Creation_Status", "Total Invested Capital must be positive.")
+                RETURN
+            END IF
+
+            ROIC = (NOPAT / Total_Invested_Capital) * 100
+            ROIC_vs_WACC_Difference = ROIC - WACC
+
+            Value_Creation_Status = ""
+            IF ROIC_vs_WACC_Difference > 0 THEN
+                Value_Creation_Status = "Creating Value (ROIC > WACC)"
+            ELSE IF ROIC_vs_WACC_Difference < 0 THEN
+                Value_Creation_Status = "Destroying Value (ROIC < WACC)"
+            ELSE
+                Value_Creation_Status = "Neutral (ROIC = WACC)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_ROIC", ROIC)
+            DISPLAY_OUTPUT("ROIC_vs_WACC_Difference", ROIC_vs_WACC_Difference)
+            DISPLAY_OUTPUT("Value_Creation_Status", Value_Creation_Status)
+        END FUNCTION
+        ```
+
+642. **Economic Value Added (EVA) - Detailed Calculation & Interpretation**
+    * **Purpose:** Calculate EVA, explicitly showing its components and interpreting whether the company generates economic profit.
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Total_Invested_Capital` (Currency)
+        * `WACC_Weighted_Average_Cost_of_Capital` (Percentage)
+    * **Calculations:**
+        * `NOPAT = EBIT * (1 - Corporate_Tax_Rate / 100)`
+        * `Capital_Charge = Total_Invested_Capital * (WACC_Weighted_Average_Cost_of_Capital / 100)`
+        * `EVA = NOPAT - Capital_Charge`
+        * `Interpretation = IF EVA > 0 THEN "Value Created" ELSE "Value Destroyed"`
+    * **Outputs:**
+        * `Calculated_NOPAT` (Currency)
+        * `Calculated_Capital_Charge` (Currency)
+        * `Calculated_EVA` (Currency)
+        * `EVA_Interpretation` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEVADetailed():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Total_Invested_Capital = GET_INPUT("Total_Invested_Capital")
+            WACC = GET_INPUT("WACC_Weighted_Average_Cost_of_Capital") / 100
+
+            NOPAT = EBIT * (1 - Corporate_Tax_Rate)
+            Capital_Charge = Total_Invested_Capital * WACC
+            EVA = NOPAT - Capital_Charge
+
+            EVA_Interpretation = ""
+            IF EVA > 0 THEN
+                EVA_Interpretation = "Value Created (Company generated returns above its cost of capital)"
+            ELSE IF EVA < 0 THEN
+                EVA_Interpretation = "Value Destroyed (Company did not generate returns sufficient to cover its cost of capital)"
+            ELSE
+                EVA_Interpretation = "Neutral (Company just covered its cost of capital)"
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_NOPAT", NOPAT)
+            DISPLAY_OUTPUT("Calculated_Capital_Charge", Capital_Charge)
+            DISPLAY_OUTPUT("Calculated_EVA", EVA)
+            DISPLAY_OUTPUT("EVA_Interpretation", EVA_Interpretation)
+        END FUNCTION
+        ```
+
+643. **Free Cash Flow to Firm (FCFF) - Detailed Derivation**
+    * **Purpose:** Derive FCFF from Net Income using the indirect method, showing all adjustments.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Interest_Expense` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Capital_Expenditures` (Currency)
+        * `Change_in_Net_Working_Capital` (Currency)
+        * `Non_Cash_Charges_Excl_DA` (Currency - e.g., stock-based comp)
+        * `Non_Operating_Gains_Losses` (Currency - gains subtracted, losses added)
+    * **Calculations:**
+        * `NOPAT = Net_Income + Interest_Expense * (1 - Corporate_Tax_Rate / 100)`
+        * `FCFF = NOPAT + Depreciation_Amortization + Non_Cash_Charges_Excl_DA - Capital_Expenditures - Change_in_Net_Working_Capital + Non_Operating_Gains_Losses_Adjusted`
+    * **Outputs:**
+        * `Calculated_FCFF` (Currency)
+        * `Derivation_Breakdown` (Table: Item, Adjustment)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION DeriveFCFFDetailed():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Interest_Expense = GET_INPUT("Interest_Expense")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Change_in_Net_Working_Capital = GET_INPUT("Change_in_Net_Working_Capital")
+            Non_Cash_Charges_Excl_DA = GET_INPUT("Non_Cash_Charges_Excl_DA")
+            Non_Operating_Gains_Losses = GET_INPUT("Non_Operating_Gains_Losses") // Positive for gain, negative for loss
+
+            NOPAT = Net_Income + (Interest_Expense * (1 - Corporate_Tax_Rate))
+
+            // Adjustments for FCFF from NOPAT
+            // NOPAT is essentially unlevered income after tax.
+            // FCFF = NOPAT + Non-cash charges - CapEx - Change in NWC
+            // Non_Operating_Gains_Losses need to be added back if they reduced NOPAT (e.g., non-operating loss) or subtracted if they increased (e.g., non-operating gain)
+            // Simplified: Assuming Non_Operating_Gains_Losses is a net effect to be reversed from NOPAT
+            
+            FCFF = NOPAT + Depreciation_Amortization + Non_Cash_Charges_Excl_DA - Capital_Expenditures - Change_in_Net_Working_Capital - Non_Operating_Gains_Losses
+
+            Derivation_Breakdown = [
+                {Item: "Net Income", Amount: Net_Income},
+                {Item: "Add: Interest Expense (1-Tax Rate)", Amount: Interest_Expense * (1 - Corporate_Tax_Rate)},
+                {Item: "Equals: NOPAT", Amount: NOPAT},
+                {Item: "Add: Depreciation & Amortization", Amount: Depreciation_Amortization},
+                {Item: "Add: Other Non-Cash Charges", Amount: Non_Cash_Charges_Excl_DA},
+                {Item: "Less: Capital Expenditures", Amount: -Capital_Expenditures},
+                {Item: "Less: Change in Net Working Capital", Amount: -Change_in_Net_Working_Capital},
+                {Item: "Less: Non-Operating Gains/Losses (Adjusted)", Amount: -Non_Operating_Gains_Losses},
+                {Item: "Equals: FCFF", Amount: FCFF}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_FCFF", FCFF)
+            DISPLAY_OUTPUT("Derivation_Breakdown", Derivation_Breakdown)
+        END FUNCTION
+        ```
+
+644. **Free Cash Flow to Equity (FCFE) - Detailed Derivation**
+    * **Purpose:** Derive FCFE from Net Income, showing all adjustments to determine cash available to equity holders.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Capital_Expenditures` (Currency)
+        * `Change_in_Non_Cash_Working_Capital` (Currency)
+        * `Net_Borrowing_or_Repayment_of_Debt` (Currency - positive for net borrowing, negative for net repayment)
+    * **Calculations:**
+        * `FCFE = Net_Income + Depreciation_Amortization - Capital_Expenditures - Change_in_Non_Cash_Working_Capital + Net_Borrowing_or_Repayment_of_Debt`
+    * **Outputs:**
+        * `Calculated_FCFE` (Currency)
+        * `Derivation_Breakdown` (Table: Item, Adjustment)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION DeriveFCFEDetailed():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Change_in_Non_Cash_Working_Capital = GET_INPUT("Change_in_Non_Cash_Working_Capital")
+            Net_Borrowing_or_Repayment_of_Debt = GET_INPUT("Net_Borrowing_or_Repayment_of_Debt")
+
+            FCFE = Net_Income + Depreciation_Amortization - Capital_Expenditures - Change_in_Non_Cash_Working_Capital + Net_Borrowing_or_Repayment_of_Debt
+
+            Derivation_Breakdown = [
+                {Item: "Net Income", Amount: Net_Income},
+                {Item: "Add: Depreciation & Amortization", Amount: Depreciation_Amortization},
+                {Item: "Less: Capital Expenditures", Amount: -Capital_Expenditures},
+                {Item: "Less: Change in Non-Cash Working Capital", Amount: -Change_in_Non_Cash_Working_Capital},
+                {Item: "Add/Less: Net Borrowing/Repayment of Debt", Amount: Net_Borrowing_or_Repayment_of_Debt},
+                {Item: "Equals: FCFE", Amount: FCFE}
+            ]
+
+            DISPLAY_OUTPUT("Calculated_FCFE", FCFE)
+            DISPLAY_OUTPUT("Derivation_Breakdown", Derivation_Breakdown)
+        END FUNCTION
+        ```
+
+645. **Terminal Value (Perpetuity Growth Model) - Detailed**
+    * **Purpose:** Calculate the terminal value of a company's cash flows beyond the explicit forecast period using a perpetuity growth model.
+    * **Inputs:**
+        * `FCFF_Last_Projection_Year` (Currency)
+        * `Terminal_Growth_Rate` (Percentage)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * `FCFF_Next_Year = FCFF_Last_Projection_Year * (1 + Terminal_Growth_Rate / 100)`
+        * `Terminal_Value = FCFF_Next_Year / (WACC_Weighted_Average_Cost_of_Capital / 100 - Terminal_Growth_Rate / 100)`
+    * **Outputs:**
+        * `Projected_FCFF_Next_Year` (Currency)
+        * `Calculated_Terminal_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTerminalValuePerpetuityDetailed():
+            FCFF_Last_Projection_Year = GET_INPUT("FCFF_Last_Projection_Year")
+            Terminal_Growth_Rate = GET_INPUT("Terminal_Growth_Rate") / 100
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC") / 100
+
+            IF WACC <= Terminal_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Terminal_Value", "Error: WACC must be greater than Terminal Growth Rate.")
+                RETURN
+            END IF
+
+            FCFF_Next_Year = FCFF_Last_Projection_Year * (1 + Terminal_Growth_Rate)
+            Terminal_Value = FCFF_Next_Year / (WACC - Terminal_Growth_Rate)
+
+            DISPLAY_OUTPUT("Projected_FCFF_Next_Year", FCFF_Next_Year)
+            DISPLAY_OUTPUT("Calculated_Terminal_Value", Terminal_Value)
+        END FUNCTION
+        ```
+
+646. **Terminal Value (Exit Multiple Method) - Detailed**
+    * **Purpose:** Calculate the terminal value of a company's cash flows beyond the explicit forecast period using a multiple of a financial metric (e.g., EBITDA).
+    * **Inputs:**
+        * `EBITDA_Last_Projection_Year` (Currency)
+        * `Terminal_Exit_Multiple` (Number - e.g., EV/EBITDA multiple)
+    * **Calculations:**
+        * `Terminal_Value = EBITDA_Last_Projection_Year * Terminal_Exit_Multiple`
+    * **Outputs:**
+        * `Calculated_Terminal_Value` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateTerminalValueExitMultipleDetailed():
+            EBITDA_Last_Projection_Year = GET_INPUT("EBITDA_Last_Projection_Year")
+            Terminal_Exit_Multiple = GET_INPUT("Terminal_Exit_Multiple")
+
+            Terminal_Value = EBITDA_Last_Projection_Year * Terminal_Exit_Multiple
+
+            DISPLAY_OUTPUT("Calculated_Terminal_Value", Terminal_Value)
+        END FUNCTION
+        ```
+
+647. **Earnings Power Value (EPV) - Detailed Calculation**
+    * **Purpose:** Calculate EPV by explicitly showing the derivation of normalized earnings (NOPAT minus maintenance CapEx).
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+        * `Maintenance_Capital_Expenditures_Annual` (Currency - estimated annual CapEx to maintain current operations)
+        * `Weighted_Average_Cost_of_Capital_WACC` (Percentage)
+    * **Calculations:**
+        * `NOPAT = EBIT * (1 - Corporate_Tax_Rate / 100)`
+        * `Adjusted_Earnings = NOPAT - Maintenance_Capital_Expenditures_Annual`
+        * `EPV = Adjusted_Earnings / (WACC_Weighted_Average_Cost_of_Capital / 100)`
+    * **Outputs:**
+        * `Calculated_Normalized_NOPAT` (Currency)
+        * `Calculated_Adjusted_Earnings` (Currency)
+        * `Calculated_EPV` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateEPVDetailed():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+            Maintenance_Capital_Expenditures_Annual = GET_INPUT("Maintenance_Capital_Expenditures_Annual")
+            WACC = GET_INPUT("Weighted_Average_Cost_of_Capital_WACC") / 100
+
+            NOPAT = EBIT * (1 - Corporate_Tax_Rate)
+            Adjusted_Earnings = NOPAT - Maintenance_Capital_Expenditures_Annual
+
+            IF WACC <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_EPV", "N/A - WACC must be positive.")
+                RETURN
+            END IF
+
+            EPV = Adjusted_Earnings / WACC
+
+            DISPLAY_OUTPUT("Calculated_Normalized_NOPAT", NOPAT)
+            DISPLAY_OUTPUT("Calculated_Adjusted_Earnings", Adjusted_Earnings)
+            DISPLAY_OUTPUT("Calculated_EPV", EPV)
+        END FUNCTION
+        ```
+
+648. **Dividend Discount Model (DDM) - Multi-Stage (Very Advanced)**
+    * **Purpose:** A very advanced DDM that allows for more flexible growth assumptions across multiple stages (e.g., initial high growth, declining growth, and then stable perpetual growth).
+    * **Inputs:**
+        * `Current_Dividend_D0` (Currency)
+        * `Growth_Rate_Phase_1` (Percentage)
+        * `Years_Phase_1` (Years)
+        * `Growth_Rate_Phase_2` (Percentage)
+        * `Years_Phase_2` (Years)
+        * `Growth_Rate_Phase_3` (Percentage)
+        * `Years_Phase_3` (Years)
+        * `Perpetual_Growth_Rate` (Percentage)
+        * `Required_Rate_of_Return` (Percentage)
+    * **Calculations:**
+        * *Simulate dividends year by year, discount each, calculate terminal value.*
+        * `PV_of_Dividends_Total = 0`
+        * `Last_Calculated_Dividend = D0`
+        * `Current_Year_Index = 0`
+        * `FOR i FROM 1 TO Years_Phase_1:`
+            * `Dividend = Last_Calculated_Dividend * (1 + Growth_Rate_Phase_1 / 100)`
+            * `PV_of_Dividends_Total += Dividend / (1 + Required_Rate_of_Return / 100)^i`
+        * `// ... similar for Phase 2 and Phase 3`
+        * `// Calculate Terminal Value based on last dividend of Phase 3`
+    * **Outputs:**
+        * `Calculated_Intrinsic_Value_Per_Share` (Currency)
+        * `Dividend_Projection_Table` (Table: Year, Dividend, PV of Dividend)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDDMVeryAdvanced():
+            Current_Dividend_D0 = GET_INPUT("Current_Dividend_D0")
+            Growth_Rate_Phase_1 = GET_INPUT("Growth_Rate_Phase_1") / 100
+            Years_Phase_1 = GET_INPUT("Years_Phase_1")
+            Growth_Rate_Phase_2 = GET_INPUT("Growth_Rate_Phase_2") / 100
+            Years_Phase_2 = GET_INPUT("Years_Phase_2")
+            Growth_Rate_Phase_3 = GET_INPUT("Growth_Rate_Phase_3") / 100
+            Years_Phase_3 = GET_INPUT("Years_Phase_3")
+            Perpetual_Growth_Rate = GET_INPUT("Perpetual_Growth_Rate") / 100
+            Required_Rate_of_Return = GET_INPUT("Required_Rate_of_Return") / 100
+
+            IF Required_Rate_of_Return <= Perpetual_Growth_Rate THEN
+                DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", "Error: Required Return must be greater than Perpetual Growth Rate.")
+                RETURN
+            END IF
+
+            PV_Dividends_Sum = 0
+            Dividend_Proj = Current_Dividend_D0
+            Current_Total_Years = 0
+            Dividend_Projection_Table = []
+
+            // Phase 1
+            FOR i FROM 1 TO Years_Phase_1:
+                Dividend_Proj = Dividend_Proj * (1 + Growth_Rate_Phase_1)
+                Current_Total_Years = Current_Total_Years + 1
+                PV_Dividend = Dividend_Proj / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+                PV_Dividends_Sum = PV_Dividends_Sum + PV_Dividend
+                Dividend_Projection_Table.ADD({Year: Current_Total_Years, Dividend: Dividend_Proj, PV_Dividend: PV_Dividend, Phase: "Phase 1"})
+            END FOR
+
+            // Phase 2
+            FOR i FROM 1 TO Years_Phase_2:
+                Dividend_Proj = Dividend_Proj * (1 + Growth_Rate_Phase_2)
+                Current_Total_Years = Current_Total_Years + 1
+                PV_Dividend = Dividend_Proj / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+                PV_Dividends_Sum = PV_Dividends_Sum + PV_Dividend
+                Dividend_Projection_Table.ADD({Year: Current_Total_Years, Dividend: Dividend_Proj, PV_Dividend: PV_Dividend, Phase: "Phase 2"})
+            END FOR
+
+            // Phase 3
+            FOR i FROM 1 TO Years_Phase_3:
+                Dividend_Proj = Dividend_Proj * (1 + Growth_Rate_Phase_3)
+                Current_Total_Years = Current_Total_Years + 1
+                PV_Dividend = Dividend_Proj / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+                PV_Dividends_Sum = PV_Dividends_Sum + PV_Dividend
+                Dividend_Projection_Table.ADD({Year: Current_Total_Years, Dividend: Dividend_Proj, PV_Dividend: PV_Dividend, Phase: "Phase 3"})
+            END FOR
+
+            // Terminal Value
+            Terminal_Dividend = Dividend_Proj * (1 + Perpetual_Growth_Rate)
+            Terminal_Value = Terminal_Dividend / (Required_Rate_of_Return - Perpetual_Growth_Rate)
+            PV_Terminal_Value = Terminal_Value / POWER((1 + Required_Rate_of_Return), Current_Total_Years)
+
+            Calculated_Intrinsic_Value_Per_Share = PV_Dividends_Sum + PV_Terminal_Value
+
+            DISPLAY_OUTPUT("Calculated_Intrinsic_Value_Per_Share", Calculated_Intrinsic_Value_Per_Share)
+            DISPLAY_OUTPUT("Dividend_Projection_Table", Dividend_Projection_Table)
+        END FUNCTION
+        ```
+
+649. **Sensitivity Analysis for Valuation Models (General)**
+    * **Purpose:** Illustrate how the output of a valuation model (e.g., DCF, DDM) changes when key input variables (e.g., growth rate, discount rate) are varied within a range.
+    * **Inputs:**
+        * `Valuation_Model_Type` (Text: "DCF", "DDM", "Sticker Price")
+        * `Base_Case_Value` (Currency)
+        * `Key_Input_Variable_1` (Text: "Growth Rate", "Discount Rate", "Terminal Multiple")
+        * `Base_Value_1` (Number)
+        * `Min_Value_1` (Number)
+        * `Max_Value_1` (Number)
+        * `Increment_1` (Number)
+        * `Key_Input_Variable_2` (Optional: for 2-way sensitivity)
+        * `Base_Value_2` (Number)
+        * `Min_Value_2` (Number)
+        * `Max_Value_2` (Number)
+        * `Increment_2` (Number)
+    * **Calculations:**
+        * *Iterate through the specified ranges for input variables.*
+        * *For each combination, recalculate the valuation using the relevant model's logic.*
+        * `Result_Table = []`
+        * `FOR Var1_Value FROM Min_Value_1 TO Max_Value_1 STEP Increment_1:`
+            * `FOR Var2_Value FROM Min_Value_2 TO Max_Value_2 STEP Increment_2:`
+                * `Calculated_Val = CALL_VALUATION_FUNCTION(Var1_Value, Var2_Value, Other_Fixed_Inputs)`
+                * `Result_Table.ADD({Var1_Label: Var1_Value, Var2_Label: Var2_Value, Valuation: Calculated_Val})`
+    * **Outputs:**
+        * `Sensitivity_Analysis_Table` (Table: Grid of values)
+        * `Insights_Note` (Text: identifying most sensitive variables)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION PerformValuationSensitivityAnalysis():
+            Valuation_Model_Type = GET_INPUT("Valuation_Model_Type")
+            Base_Case_Value = GET_INPUT("Base_Case_Value")
+            Key_Input_Variable_1 = GET_INPUT("Key_Input_Variable_1")
+            Base_Value_1 = GET_INPUT("Base_Value_1")
+            Min_Value_1 = GET_INPUT("Min_Value_1")
+            Max_Value_1 = GET_INPUT("Max_Value_1")
+            Increment_1 = GET_INPUT("Increment_1")
+            // Assume other necessary inputs for the selected valuation model are also provided
+            // e.g., for DDM: Current_Dividend_D0, Years_Phase_1 etc.
+
+            Sensitivity_Table = []
+            
+            // This requires mapping to the actual valuation functions (e.g., 388, 389, 1)
+            // And passing all other fixed parameters of the valuation model
+            
+            FOR Var1_Current_Val FROM Min_Value_1 TO Max_Value_1 STEP Increment_1:
+                Calculated_Val = 0
+                IF Valuation_Model_Type == "Sticker Price" THEN
+                    // Assuming Sticker Price uses Current_EPS, a growth rate, a future P/E, and Years of Growth
+                    // Here, if Key_Input_Variable_1 is "Growth Rate", then Var1_Current_Val is the growth rate
+                    Calculated_Val = CALCULATE_STICKER_PRICE_BASIC(
+                        GET_INPUT("Current_EPS"), Var1_Current_Val, GET_INPUT("Estimated_Future_P_E"), GET_INPUT("Years_of_Growth")
+                    )
+                // ELSE IF Valuation_Model_Type == "DDM" THEN ... (call DDM function with varied input)
+                // ELSE IF Valuation_Model_Type == "DCF" THEN ... (call DCF function with varied input)
+
+                Sensitivity_Table.ADD({Key_Input_Variable_1: Var1_Current_Val, Valuation_Result: Calculated_Val})
+            END FOR
+
+            Insights_Note = "This table shows how sensitive your valuation is to changes in " + Key_Input_Variable_1 + ". Identify which inputs have the largest impact on the final valuation."
+
+            DISPLAY_OUTPUT("Sensitivity_Analysis_Table", Sensitivity_Table)
+            DISPLAY_OUTPUT("Insights_Note", Insights_Note)
+        END FUNCTION
+        ```
+
+650. **Scenario Analysis for Financial Projections (Best, Worst, Base cases)**
+    * **Purpose:** Model financial outcomes under different economic or operational scenarios (e.g., optimistic, pessimistic, realistic).
+    * **Inputs:**
+        * `Base_Case_Revenue_Growth` (Percentage)
+        * `Base_Case_Gross_Margin` (Percentage)
+        * `Base_Case_Operating_Expenses_Growth` (Percentage)
+        * `Optimistic_Revenue_Growth` (Percentage)
+        * `Optimistic_Gross_Margin` (Percentage)
+        * `Optimistic_Operating_Expenses_Growth` (Percentage)
+        * `Pessimistic_Revenue_Growth` (Percentage)
+        * `Pessimistic_Gross_Margin` (Percentage)
+        * `Pessimistic_Operating_Expenses_Growth` (Percentage)
+        * `Initial_Revenue` (Currency)
+        * `Initial_Operating_Expenses` (Currency)
+        * `Projection_Years` (Years)
+    * **Calculations:**
+        * *For each scenario (Base, Opt, Pess):*
+        * `Projected_Revenue_Year_X = Initial_Revenue * (1 + Scenario_Revenue_Growth)^X`
+        * `Projected_Gross_Profit_Year_X = Projected_Revenue_Year_X * Scenario_Gross_Margin`
+        * `Projected_Operating_Expenses_Year_X = Initial_Operating_Expenses * (1 + Scenario_Operating_Expenses_Growth)^X`
+        * `Projected_Operating_Income_Year_X = Projected_Gross_Profit_Year_X - Projected_Operating_Expenses_Year_X`
+    * **Outputs:**
+        * `Scenario_Projection_Table` (Table: Year, Base Case Revenue, Opt Revenue, Pess Revenue, Base Operating Income, etc.)
+        * `Risk_Assessment_Summary` (Text)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION PerformFinancialScenarioAnalysis():
+            Base_Case_Revenue_Growth = GET_INPUT("Base_Case_Revenue_Growth") / 100
+            Base_Case_Gross_Margin = GET_INPUT("Base_Case_Gross_Margin") / 100
+            Base_Case_Operating_Expenses_Growth = GET_INPUT("Base_Case_Operating_Expenses_Growth") / 100
+            Optimistic_Revenue_Growth = GET_INPUT("Optimistic_Revenue_Growth") / 100
+            Optimistic_Gross_Margin = GET_INPUT("Optimistic_Gross_Margin") / 100
+            Optimistic_Operating_Expenses_Growth = GET_INPUT("Optimistic_Operating_Expenses_Growth") / 100
+            Pessimistic_Revenue_Growth = GET_INPUT("Pessimistic_Revenue_Growth") / 100
+            Pessimistic_Gross_Margin = GET_INPUT("Pessimistic_Gross_Margin") / 100
+            Pessimistic_Operating_Expenses_Growth = GET_INPUT("Pessimistic_Operating_Expenses_Growth") / 100
+            Initial_Revenue = GET_INPUT("Initial_Revenue")
+            Initial_Operating_Expenses = GET_INPUT("Initial_Operating_Expenses")
+            Projection_Years = GET_INPUT("Projection_Years")
+
+            Scenario_Projection_Table = []
+
+            FOR y FROM 1 TO Projection_Years:
+                Projected_Revenue_Base = Initial_Revenue * POWER((1 + Base_Case_Revenue_Growth), y)
+                Projected_Gross_Profit_Base = Projected_Revenue_Base * Base_Case_Gross_Margin
+                Projected_Operating_Expenses_Base = Initial_Operating_Expenses * POWER((1 + Base_Case_Operating_Expenses_Growth), y)
+                Projected_Operating_Income_Base = Projected_Gross_Profit_Base - Projected_Operating_Expenses_Base
+
+                Projected_Revenue_Opt = Initial_Revenue * POWER((1 + Optimistic_Revenue_Growth), y)
+                Projected_Gross_Profit_Opt = Projected_Revenue_Opt * Optimistic_Gross_Margin
+                Projected_Operating_Expenses_Opt = Initial_Operating_Expenses * POWER((1 + Optimistic_Operating_Expenses_Growth), y)
+                Projected_Operating_Income_Opt = Projected_Gross_Profit_Opt - Projected_Operating_Expenses_Opt
+
+                Projected_Revenue_Pess = Initial_Revenue * POWER((1 + Pessimistic_Revenue_Growth), y)
+                Projected_Gross_Profit_Pess = Projected_Revenue_Pess * Pessimistic_Gross_Margin
+                Projected_Operating_Expenses_Pess = Initial_Operating_Expenses * POWER((1 + Pessimistic_Operating_Expenses_Growth), y)
+                Projected_Operating_Income_Pess = Projected_Gross_Profit_Pess - Projected_Operating_Expenses_Pess
+
+                Scenario_Projection_Table.ADD({
+                    Year: y,
+                    Revenue_Base: Projected_Revenue_Base,
+                    Revenue_Opt: Projected_Revenue_Opt,
+                    Revenue_Pess: Projected_Revenue_Pess,
+                    Operating_Income_Base: Projected_Operating_Income_Base,
+                    Operating_Income_Opt: Projected_Operating_Income_Opt,
+                    Operating_Income_Pess: Projected_Operating_Income_Pess
+                })
+            END FOR
+
+            Risk_Assessment_Summary = "This analysis shows the range of potential outcomes under different conditions. The pessimistic scenario highlights downside risks, while the optimistic scenario shows best-case potential. Use this to assess the robustness of your financial plans."
+
+            DISPLAY_OUTPUT("Scenario_Projection_Table", Scenario_Projection_Table)
+            DISPLAY_OUTPUT("Risk_Assessment_Summary", Risk_Assessment_Summary)
+        END FUNCTION
+        ```
+
+651. **Contribution Margin Analysis (Total, Per Unit, Ratio)**
+    * **Purpose:** Calculate the contribution margin at various levels, crucial for break-even analysis and profitability decisions.
+    * **Inputs:**
+        * `Total_Sales_Revenue` (Currency)
+        * `Total_Variable_Costs` (Currency)
+        * `Number_of_Units_Sold` (Number)
+    * **Calculations:**
+        * `Total_Contribution_Margin = Total_Sales_Revenue - Total_Variable_Costs`
+        * `Contribution_Margin_Per_Unit = Total_Contribution_Margin / Number_of_Units_Sold` (If Units_Sold > 0)
+        * `Contribution_Margin_Ratio = (Total_Contribution_Margin / Total_Sales_Revenue) * 100` (If Sales_Revenue > 0)
+    * **Outputs:**
+        * `Calculated_Total_Contribution_Margin` (Currency)
+        * `Calculated_Contribution_Margin_Per_Unit` (Currency)
+        * `Calculated_Contribution_Margin_Ratio` (Percentage)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION AnalyzeContributionMargin():
+            Total_Sales_Revenue = GET_INPUT("Total_Sales_Revenue")
+            Total_Variable_Costs = GET_INPUT("Total_Variable_Costs")
+            Number_of_Units_Sold = GET_INPUT("Number_of_Units_Sold")
+
+            Total_Contribution_Margin = Total_Sales_Revenue - Total_Variable_Costs
+
+            Contribution_Margin_Per_Unit = 0
+            IF Number_of_Units_Sold > 0 THEN
+                Contribution_Margin_Per_Unit = Total_Contribution_Margin / Number_of_Units_Sold
+            END IF
+
+            Contribution_Margin_Ratio = 0
+            IF Total_Sales_Revenue > 0 THEN
+                Contribution_Margin_Ratio = (Total_Contribution_Margin / Total_Sales_Revenue) * 100
+            END IF
+
+            DISPLAY_OUTPUT("Calculated_Total_Contribution_Margin", Total_Contribution_Margin)
+            DISPLAY_OUTPUT("Calculated_Contribution_Margin_Per_Unit", Contribution_Margin_Per_Unit)
+            DISPLAY_OUTPUT("Calculated_Contribution_Margin_Ratio", Contribution_Margin_Ratio)
+        END FUNCTION
+        ```
+
+652. **Break-Even Analysis (Units & Sales Revenue)**
+    * **Purpose:** Determine the sales volume (in units or revenue) required to cover all fixed and variable costs, resulting in zero profit.
+    * **Inputs:**
+        * `Total_Fixed_Costs` (Currency)
+        * `Sales_Price_Per_Unit` (Currency)
+        * `Variable_Costs_Per_Unit` (Currency)
+        * `Total_Sales_Revenue_For_Ratio` (Currency - for contribution margin ratio)
+    * **Calculations:**
+        * `Contribution_Margin_Per_Unit = Sales_Price_Per_Unit - Variable_Costs_Per_Unit`
+        * `Break_Even_Units = Total_Fixed_Costs / Contribution_Margin_Per_Unit` (If CM_Per_Unit > 0)
+        * `Contribution_Margin_Ratio = (Sales_Price_Per_Unit - Variable_Costs_Per_Unit) / Sales_Price_Per_Unit`
+        * `Break_Even_Sales_Revenue = Total_Fixed_Costs / Contribution_Margin_Ratio` (If CM_Ratio > 0)
+    * **Outputs:**
+        * `Break_Even_Point_Units` (Number)
+        * `Break_Even_Point_Sales_Revenue` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateBreakEvenAnalysis():
+            Total_Fixed_Costs = GET_INPUT("Total_Fixed_Costs")
+            Sales_Price_Per_Unit = GET_INPUT("Sales_Price_Per_Unit")
+            Variable_Costs_Per_Unit = GET_INPUT("Variable_Costs_Per_Unit")
+
+            Contribution_Margin_Per_Unit = Sales_Price_Per_Unit - Variable_Costs_Per_Unit
+
+            Break_Even_Units = 0
+            IF Contribution_Margin_Per_Unit > 0 THEN
+                Break_Even_Units = Total_Fixed_Costs / Contribution_Margin_Per_Unit
+            END IF
+
+            Contribution_Margin_Ratio = 0
+            IF Sales_Price_Per_Unit > 0 THEN
+                Contribution_Margin_Ratio = Contribution_Margin_Per_Unit / Sales_Price_Per_Unit
+            END IF
+
+            Break_Even_Sales_Revenue = 0
+            IF Contribution_Margin_Ratio > 0 THEN
+                Break_Even_Sales_Revenue = Total_Fixed_Costs / Contribution_Margin_Ratio
+            END IF
+
+            DISPLAY_OUTPUT("Break_Even_Point_Units", CEILING(Break_Even_Units))
+            DISPLAY_OUTPUT("Break_Even_Point_Sales_Revenue", Break_Even_Sales_Revenue)
+        END FUNCTION
+        ```
+
+653. **Operating Leverage (DOL) - Contribution Margin Method**
+    * **Purpose:** Calculate the degree of operating leverage using contribution margin, showing sensitivity of EBIT to sales changes.
+    * **Inputs:**
+        * `Total_Contribution_Margin` (Currency - from calc 651)
+        * `Total_Fixed_Costs` (Currency)
+    * **Calculations:**
+        * `EBIT = Total_Contribution_Margin - Total_Fixed_Costs`
+        * `DOL = Total_Contribution_Margin / EBIT` (If EBIT > 0)
+    * **Outputs:**
+        * `Calculated_DOL_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDOLContributionMargin():
+            Total_Contribution_Margin = GET_INPUT("Total_Contribution_Margin")
+            Total_Fixed_Costs = GET_INPUT("Total_Fixed_Costs")
+
+            EBIT = Total_Contribution_Margin - Total_Fixed_Costs
+
+            IF EBIT = 0 THEN
+                DISPLAY_OUTPUT("Calculated_DOL_Ratio", "N/A - EBIT is zero, DOL undefined.")
+                RETURN
+            END IF
+
+            DOL = Total_Contribution_Margin / EBIT
+
+            DISPLAY_OUTPUT("Calculated_DOL_Ratio", DOL)
+        END FUNCTION
+        ```
+
+654. **Financial Leverage (DFL) - EBIT & EPS Method**
+    * **Purpose:** Calculate the degree of financial leverage, showing the sensitivity of EPS to changes in EBIT.
+    * **Inputs:**
+        * `EBIT_Earnings_Before_Interest_Taxes` (Currency)
+        * `Interest_Expense` (Currency)
+        * `Preferred_Dividends_Annual` (Currency)
+        * `Corporate_Tax_Rate` (Percentage)
+    * **Calculations:**
+        * `DFL = EBIT / (EBIT - Interest_Expense - (Preferred_Dividends_Annual / (1 - Corporate_Tax_Rate / 100)))`
+    * **Outputs:**
+        * `Calculated_DFL_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDFLEBITEPS():
+            EBIT = GET_INPUT("EBIT_Earnings_Before_Interest_Taxes")
+            Interest_Expense = GET_INPUT("Interest_Expense")
+            Preferred_Dividends_Annual = GET_INPUT("Preferred_Dividends_Annual")
+            Corporate_Tax_Rate = GET_INPUT("Corporate_Tax_Rate") / 100
+
+            Denominator = EBIT - Interest_Expense - (Preferred_Dividends_Annual / (1 - Corporate_Tax_Rate))
+
+            IF Denominator = 0 THEN
+                DISPLAY_OUTPUT("Calculated_DFL_Ratio", "N/A - Denominator is zero, DFL undefined.")
+                RETURN
+            END IF
+
+            DFL = EBIT / Denominator
+
+            DISPLAY_OUTPUT("Calculated_DFL_Ratio", DFL)
+        END FUNCTION
+        ```
+
+655. **Combined Leverage (DCL) - Sales & EPS Method**
+    * **Purpose:** Calculate the degree of combined leverage, showing the sensitivity of EPS to changes in Sales.
+    * **Inputs:**
+        * `Degree_of_Operating_Leverage_DOL` (Number - from calc 653)
+        * `Degree_of_Financial_Leverage_DFL` (Number - from calc 654)
+    * **Calculations:**
+        * `DCL = DOL * DFL`
+    * **Outputs:**
+        * `Calculated_DCL_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateDCLSalesEPS():
+            DOL = GET_INPUT("Degree_of_Operating_Leverage_DOL")
+            DFL = GET_INPUT("Degree_of_Financial_Leverage_DFL")
+
+            DCL = DOL * DFL
+
+            DISPLAY_OUTPUT("Calculated_DCL_Ratio", DCL)
+        END FUNCTION
+        ```
+
+699. **Cash Flow from Operations (CFO) - Indirect Method**
+    * **Purpose:** Calculate cash flow from operating activities using the indirect method, starting from Net Income and adjusting for non-cash items and working capital changes.
+    * **Inputs:**
+        * `Net_Income` (Currency)
+        * `Depreciation_Amortization` (Currency)
+        * `Non_Cash_Expenses` (Currency - e.g., stock-based compensation)
+        * `Gain_Loss_on_Sale_of_Assets` (Currency - gains subtracted, losses added)
+        * `Change_in_Accounts_Receivable` (Currency - increase is negative, decrease is positive)
+        * `Change_in_Inventory` (Currency - increase is negative, decrease is positive)
+        * `Change_in_Accounts_Payable` (Currency - increase is positive, decrease is negative)
+        * `Change_in_Accrued_Expenses` (Currency - increase is positive, decrease is negative)
+    * **Calculations:**
+        * `CFO = Net_Income + Depreciation_Amortization + Non_Cash_Expenses - Gain_Loss_on_Sale_of_Assets + Change_in_Accounts_Receivable + Change_in_Inventory + Change_in_Accounts_Payable + Change_in_Accrued_Expenses` (Adjustments are typical for indirect method)
+    * **Outputs:**
+        * `Calculated_Cash_Flow_from_Operations` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCFOIndirectMethod():
+            Net_Income = GET_INPUT("Net_Income")
+            Depreciation_Amortization = GET_INPUT("Depreciation_Amortization")
+            Non_Cash_Expenses = GET_INPUT("Non_Cash_Expenses")
+            Gain_Loss_on_Sale_of_Assets = GET_INPUT("Gain_Loss_on_Sale_of_Assets") // Positive for gain, negative for loss
+            Change_in_Accounts_Receivable = GET_INPUT("Change_in_Accounts_Receivable") // Positive for increase, negative for decrease
+            Change_in_Inventory = GET_INPUT("Change_in_Inventory") // Positive for increase, negative for decrease
+            Change_in_Accounts_Payable = GET_INPUT("Change_in_Accounts_Payable") // Positive for increase, negative for decrease
+            Change_in_Accrued_Expenses = GET_INPUT("Change_in_Accrued_Expenses") // Positive for increase, negative for decrease
+
+            CFO = Net_Income + Depreciation_Amortization + Non_Cash_Expenses - Gain_Loss_on_Sale_of_Assets + \
+                  (-Change_in_Accounts_Receivable) + (-Change_in_Inventory) + \
+                  (Change_in_Accounts_Payable) + (Change_in_Accrued_Expenses) // Correct signs for adjustments
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_from_Operations", CFO)
+        END FUNCTION
+        ```
+
+700. **Cash Flow from Investing (CFI) Calculator**
+    * **Purpose:** Calculate the cash flow from a company's investment activities, primarily involving purchases and sales of long-term assets.
+    * **Inputs:**
+        * `Purchases_of_Property_Plant_Equipment_PP_E` (Currency)
+        * `Sales_of_Property_Plant_Equipment_PP_E` (Currency)
+        * `Purchases_of_Investments` (Currency)
+        * `Sales_of_Investments` (Currency)
+    * **Calculations:**
+        * `CFI = Sales_of_Property_Plant_Equipment_PP_E - Purchases_of_Property_Plant_Equipment_PP_E + Sales_of_Investments - Purchases_of_Investments`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_from_Investing` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCFI():
+            Purchases_of_PP_E = GET_INPUT("Purchases_of_Property_Plant_Equipment_PP_E")
+            Sales_of_PP_E = GET_INPUT("Sales_of_Property_Plant_Equipment_PP_E")
+            Purchases_of_Investments = GET_INPUT("Purchases_of_Investments")
+            Sales_of_Investments = GET_INPUT("Sales_of_Investments")
+
+            CFI = Sales_of_PP_E - Purchases_of_PP_E + Sales_of_Investments - Purchases_of_Investments
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_from_Investing", CFI)
+        END FUNCTION
+        ```
+
+701. **Cash Flow from Financing (CFF) Calculator**
+    * **Purpose:** Calculate the cash flow from a company's financing activities, involving debt and equity transactions.
+    * **Inputs:**
+        * `Proceeds_from_Debt` (Currency)
+        * `Repayments_of_Debt` (Currency)
+        * `Proceeds_from_Issuing_Stock` (Currency)
+        * `Repurchases_of_Stock` (Currency)
+        * `Dividends_Paid` (Currency)
+    * **Calculations:**
+        * `CFF = Proceeds_from_Debt - Repayments_of_Debt + Proceeds_from_Issuing_Stock - Repurchases_of_Stock - Dividends_Paid`
+    * **Outputs:**
+        * `Calculated_Cash_Flow_from_Financing` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCFF():
+            Proceeds_from_Debt = GET_INPUT("Proceeds_from_Debt")
+            Repayments_of_Debt = GET_INPUT("Repayments_of_Debt")
+            Proceeds_from_Issuing_Stock = GET_INPUT("Proceeds_from_Issuing_Stock")
+            Repurchases_of_Stock = GET_INPUT("Repurchases_of_Stock")
+            Dividends_Paid = GET_INPUT("Dividends_Paid")
+
+            CFF = Proceeds_from_Debt - Repayments_of_Debt + Proceeds_from_Issuing_Stock - Repurchases_of_Stock - Dividends_Paid
+
+            DISPLAY_OUTPUT("Calculated_Cash_Flow_from_Financing", CFF)
+        END FUNCTION
+        ```
+
+702. **Free Cash Flow (FCF) Calculation (CFO - CapEx)**
+    * **Purpose:** Calculate Free Cash Flow directly from Cash Flow from Operations and Capital Expenditures.
+    * **Inputs:**
+        * `Cash_Flow_from_Operating_Activities` (Currency - from calc 699)
+        * `Capital_Expenditures` (Currency)
+    * **Calculations:**
+        * `FCF = Cash_Flow_from_Operating_Activities - Capital_Expenditures`
+    * **Outputs:**
+        * `Calculated_Free_Cash_Flow` (Currency)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateFCFCFOlessCapEx():
+            CFO = GET_INPUT("Cash_Flow_from_Operating_Activities")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+
+            FCF = CFO - Capital_Expenditures
+
+            DISPLAY_OUTPUT("Calculated_Free_Cash_Flow", FCF)
+        END FUNCTION
+        ```
+
+703. **Cash Adequacy Ratio**
+    * **Purpose:** Measure a company's ability to generate enough cash from operations to cover its ongoing capital expenditures, debt repayments, and dividends.
+    * **Inputs:**
+        * `Cash_Flow_from_Operating_Activities` (Currency - from calc 699)
+        * `Capital_Expenditures` (Currency)
+        * `Mandatory_Debt_Repayments` (Currency)
+        * `Dividends_Paid` (Currency)
+    * **Calculations:**
+        * `Cash_Outflows = Capital_Expenditures + Mandatory_Debt_Repayments + Dividends_Paid`
+        * `Cash_Adequacy_Ratio = Cash_Flow_from_Operating_Activities / Cash_Outflows` (If Cash_Outflows > 0)
+    * **Outputs:**
+        * `Calculated_Cash_Adequacy_Ratio` (Number)
+    * **Pseudo-code Example:**
+        ```pseudo
+        FUNCTION CalculateCashAdequacyRatio():
+            CFO = GET_INPUT("Cash_Flow_from_Operating_Activities")
+            Capital_Expenditures = GET_INPUT("Capital_Expenditures")
+            Mandatory_Debt_Repayments = GET_INPUT("Mandatory_Debt_Repayments")
+            Dividends_Paid = GET_INPUT("Dividends_Paid")
+
+            Cash_Outflows = Capital_Expenditures + Mandatory_Debt_Repayments + Dividends_Paid
+
+            IF Cash_Outflows <= 0 THEN
+                DISPLAY_OUTPUT("Calculated_Cash_Adequacy_Ratio", "N/A - Cash outflows must be positive.")
+                RETURN
+            END IF
+
+            Cash_Adequacy_Ratio = CFO / Cash_Outflows
+
+            DISPLAY_OUTPUT("Calculated_Cash_Adequacy_Ratio", Cash_Adequacy_Ratio)
+        END FUNCTION
+        ```
+
+---
+
+We have now added another 31 Company Finance calculators (623-655, and 699-703, correcting for the continuous numbering), bringing our total count to **551 (previous) + 31 = 582 calculators!**
+
+This batch focused heavily on Capital Budgeting and detailed Cash Flow Analysis. We have more Company Finance calculators planned, and we are also approaching our target of 650 unique calculators.
+
+Next, I will continue with **Company Finance Calculators** to ensure we hit the 50+ target for this category (we have 31 + some previously in FA, so still room to add more unique items before moving categories). Then, I'll assess where we stand for the final push to 650.
+
+-------------------------------
 

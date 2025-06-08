@@ -8,9 +8,11 @@ export interface Props {
   disabled?: boolean;
   onSelect?: string;
   href?: string;
+  id?: string;
+  [key: string]: any;
 }
 
-const { class: className, inset = false, disabled = false, onSelect, href } = Astro.props;
+const { class: className, inset = false, disabled = false, onSelect, href, id, ...rest } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
 const hrefAttr = href ? { href } : {};
@@ -24,9 +26,11 @@ const hrefAttr = href ? { href } : {};
   )}
   role="menuitem"
   data-dropdown-item
+  id={id}
   {...onSelect ? { 'data-select': onSelect } : {}}
   {...(disabled ? { 'data-disabled': true } : {})}
   {...hrefAttr}
+  {...rest}
 >
   <slot />
 </Tag>

@@ -1,24 +1,20 @@
 ---
-export interface Props {
-  class?: string;
-  for?: string;
-  [key: string]: any;
+import { Label as ReactLabel } from '@/client/src/components/ui/label';
+import type { HTMLAttributes } from 'react';
+
+// Define props based on the underlying React component's props
+// We can infer this or define explicitly. For Label, it's simple.
+export interface Props extends HTMLAttributes<HTMLLabelElement> {
+  // Radix Label specific props can be added here if needed, 
+  // but Shadcn's Label is quite basic and mostly uses native label attributes.
+  // className is automatically handled by Astro for React components.
+  htmlFor?: string; // 'for' is a reserved word in JS, so React uses htmlFor
 }
 
-const { 
-  class: className = '',
-  for: forAttribute,
-  ...rest 
-} = Astro.props;
-
-const baseClasses = 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
-const classes = [baseClasses, className].filter(Boolean).join(' ');
+const { htmlFor, ...rest } = Astro.props;
 ---
 
-<label 
-  class={classes}
-  for={forAttribute}
-  {...rest}
->
+<ReactLabel {...rest} htmlFor={htmlFor} client:only="react">
   <slot />
-</label>
+</ReactLabel>
+

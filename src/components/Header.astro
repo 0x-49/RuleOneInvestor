@@ -6,9 +6,7 @@ import DropdownMenuTrigger from './ui/DropdownMenuTrigger.astro';
 import DropdownMenuContent from './ui/DropdownMenuContent.astro';
 import DropdownMenuItem from './ui/DropdownMenuItem.astro';
 import DropdownMenuSeparator from './ui/DropdownMenuSeparator.astro';
-import Sheet from './ui/Sheet.astro';
-import SheetTrigger from './ui/SheetTrigger.astro';
-import SheetContent from './ui/SheetContent.astro';
+import SheetWrapper from './ui/SheetWrapper.astro';
 
 // Imports for Lucide icons
 import {
@@ -204,25 +202,27 @@ const handleSignInClick = () => {
 
         <!-- Mobile Menu Trigger -->
         <div class="lg:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
+          <SheetWrapper
+            trigger={
               <Button variant="ghost" size="sm">
-                <MenuIcon className="h-5 w-5" client:only="react" />
+                <MenuIcon className="h-5 w-5" />
               </Button>
-            </SheetTrigger>
-            <SheetContent side="right" class="w-80 pt-12">
+            }
+            side="right"
+            className="w-80 pt-12"
+            content={
               <nav class="flex flex-col space-y-3">
                 {navigationItems.map((item) => {
                   const isActive = item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
                   const iconClasses = `h-5 w-5 ${isActive ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'}`;
                   return (
                     <a href={item.href} class={`text-lg font-medium flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''}`}>
-                      {item.icon === HomeIcon && <HomeIcon className={iconClasses} client:only="react" />}
-                      {item.icon === Search && <Search className={iconClasses} client:only="react" />}
-                      {item.icon === Star && <Star className={iconClasses} client:only="react" />}
-                      {item.icon === BarChart3 && <BarChart3 className={iconClasses} client:only="react" />}
-                      {item.icon === Calculator && <Calculator className={iconClasses} client:only="react" />}
-                      {item.icon === PieChartIcon && <PieChartIcon className={iconClasses} client:only="react" />}
+                      {item.icon === HomeIcon && <HomeIcon className={iconClasses} />}
+                      {item.icon === Search && <Search className={iconClasses} />}
+                      {item.icon === Star && <Star className={iconClasses} />}
+                      {item.icon === BarChart3 && <BarChart3 className={iconClasses} />}
+                      {item.icon === Calculator && <Calculator className={iconClasses} />}
+                      {item.icon === PieChartIcon && <PieChartIcon className={iconClasses} />}
                       <span class={isActive ? 'text-blue-600' : 'text-gray-700 dark:text-gray-200'}>{item.label}</span>
                     </a>
                   );
@@ -230,12 +230,12 @@ const handleSignInClick = () => {
                 <hr class="my-4"/>
                 {/* Mobile Search Quick Access (if desired) */}
                 <a href="/search" class="text-lg font-medium flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <Search className="h-5 w-5 text-gray-600 dark:text-gray-300" client:only="react" />
+                  <Search className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                   <span>Search Stocks</span>
                 </a>
               </nav>
-            </SheetContent>
-          </Sheet>
+            }
+          />
         </div>
       </div>
     </div>

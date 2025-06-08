@@ -1,0 +1,31 @@
+---
+import { SheetWrapper as ReactSheetWrapper } from './SheetWrapper';
+import type { JSX } from 'react';
+
+export interface Props {
+  trigger: JSX.Element;
+  title?: string;
+  description?: string;
+  content: JSX.Element;
+  footer?: JSX.Element;
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  className?: string;
+}
+
+const { trigger, title, description, content, footer, side, open, onOpenChange, className } = Astro.props;
+---
+
+<ReactSheetWrapper 
+  trigger={trigger}
+  title={title}
+  description={description}
+  content={content}
+  footer={footer}
+  side={side}
+  open={open}
+  onOpenChange={onOpenChange}
+  className={className}
+  client:only="react"
+/>

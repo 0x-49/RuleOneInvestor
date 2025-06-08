@@ -46,6 +46,7 @@ export default defineConfig({
         '@client': path.resolve('./src/client/src'),
         '@components': path.resolve('./src/components'),
         '@layouts': path.resolve('./src/layouts'),
+        '@': path.resolve('./src'),
       }
     }
   },

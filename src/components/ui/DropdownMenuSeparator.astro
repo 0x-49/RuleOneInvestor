@@ -1,11 +1,16 @@
 ---
 // src/components/ui/DropdownMenuSeparator.astro
-import { DropdownMenuSeparator as ReactDropdownMenuSeparator } from '@client/components/ui/dropdown-menu';
+import { cn } from '../../lib/utils';
 
 export interface Props {
-  [key: string]: any;
+  class?: string;
 }
 
-const astroProps = Astro.props;
+const { class: className } = Astro.props;
 ---
-<ReactDropdownMenuSeparator {...astroProps} client:only="react" />
+
+<div 
+  class={cn('-mx-1 my-1 h-px bg-muted', className)}
+  role="separator"
+  data-dropdown-separator
+></div>

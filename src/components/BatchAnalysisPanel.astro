@@ -1,0 +1,95 @@
+---
+// Props for the component
+interface Props {
+  analysisStatus?: string; // e.g., 'idle', 'running', 'completed', 'error'
+  progress?: number; // 0-100
+  completedCount?: number;
+  totalCount?: number;
+  errorMessage?: string;
+  isLoading?: boolean; // Added isLoading prop
+}
+
+const { 
+  analysisStatus = 'idle', 
+  progress = 0, 
+  completedCount = 0, 
+  totalCount = 0, 
+  errorMessage 
+} = Astro.props;
+
+// Determine status text and color
+let statusText = 'Idle';
+let statusColor = 'text-gray-600';
+let showProgress = false;
+let showResults = false;
+let showError = false;
+
+switch (analysisStatus) {
+  case 'running':
+    statusText = 'Running Analysis...';
+    statusColor = 'text-blue-600';
+    showProgress = true;
+    break;
+  case 'completed':
+    statusText = 'Analysis Completed';
+    statusColor = 'text-green-600';
+    showResults = true;
+    break;
+  case 'error':
+    statusText = 'Analysis Failed';
+    statusColor = 'text-red-600';
+    showError = true;
+    break;
+  default:
+    // idle
+    break;
+}
+---
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Batch Analysis
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Run analysis on a batch of stocks.
+    </p>
+  </div>
+  
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div class="text-sm font-medium {statusColor}">
+        Status: {statusText}
+      </div>
+      <button 
+        class={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 ${analysisStatus === 'running' ? 'opacity-50 cursor-not-allowed' : ''}`}
+        disabled={analysisStatus === 'running'}
+      >
+        Run Batch Analysis
+      </button>
+    </div>
+    
+    {showProgress && (
+      <div class="mt-4">
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-blue-600 h-2.5 rounded-full" style={`width: ${progress}%`}></div>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">
+          Processing: {completedCount} of {totalCount} ({progress.toFixed(0)}%)
+        </p>
+      </div>
+    )}
+    
+    {showResults && (
+      <div class="mt-4 text-green-700 font-medium">
+        Batch analysis completed successfully.
+      </div>
+    )}
+    
+    {showError && (
+      <div class="mt-4 text-red-700 font-medium">
+        Error during batch analysis: {errorMessage || 'Unknown error.'}
+      </div>
+    )}
+  </div>
+</div>

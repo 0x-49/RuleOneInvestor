@@ -1,4 +1,4 @@
-import { Stock, FinancialMetrics, InsertStock, InsertFinancialMetrics } from "@shared/schema";
+import type { Stock, FinancialMetrics, InsertStock, InsertFinancialMetrics } from "@shared/schema";
 import { deepSearchAgent } from "./deepSearchAgent";
 
 interface YahooFinanceResponse {

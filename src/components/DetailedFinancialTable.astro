@@ -1,166 +1,179 @@
 ---
-import Card from './ui/card.astro';
-import CardContent from './ui/card-content.astro';
-import CardHeader from './ui/card-header.astro';
-import CardTitle from './ui/card-title.astro';
-import Badge from './ui/Badge.astro';
-
-interface FinancialMetrics {
+// Define interfaces for financial data structure (replace with actual types if available)
+interface FinancialStatementItem {
   year: string;
-  revenue: number | null;
-  earnings: number | null;
-  freeCashFlow: number | null;
-  bookValue: number | null;
-  eps: number | null;
-  roic: number | null;
-  debt: number | null;
+  [key: string]: any; // Allow other properties with any type
 }
 
+interface FinancialData {
+  incomeStatement?: FinancialStatementItem[];
+  balanceSheet?: FinancialStatementItem[];
+  cashFlowStatement?: FinancialStatementItem[];
+}
+
+// Props for the component
 interface Props {
-  metrics: FinancialMetrics[];
-  metricType: 'revenue' | 'earnings' | 'freeCashFlow' | 'bookValue' | 'eps';
-  title: string;
-  unit: string;
-  growthRate: number | null;
+  financialData?: FinancialData;
+  isLoading?: boolean;
 }
 
-const { metrics, metricType, title, unit, growthRate } = Astro.props;
+const { financialData, isLoading = false } = Astro.props;
 
-// Filter and sort metrics by year
-const sortedMetrics = metrics
-  .filter(m => m[metricType] !== null && m[metricType] !== undefined)
-  .sort((a, b) => parseInt(a.year) - parseInt(b.year));
-
-// Calculate year-over-year growth rates
-const dataWithGrowth = sortedMetrics.map((metric, index) => {
-  const currentValue = metric[metricType] as number;
-  const previousValue = index > 0 ? (sortedMetrics[index - 1][metricType] as number) : null;
-  const yoyGrowth = previousValue && previousValue > 0
-    ? ((currentValue - previousValue) / previousValue) * 100
-    : null;
-
-  return {
-    ...metric,
-    value: currentValue,
-    yoyGrowth
-  };
-});
-
-// Calculate averages
-const values = dataWithGrowth.map(d => d.value);
-const growthRates = dataWithGrowth.map(d => d.yoyGrowth).filter(g => g !== null) as number[];
-
-const average = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
-const avgGrowthRate = growthRates.length > 0 ? growthRates.reduce((sum, val) => sum + val, 0) / growthRates.length : 0;
-const maxValue = Math.max(...values);
-const minValue = Math.min(...values);
-
-const formatValue = (value: number) => {
-  if (metricType === 'eps') {
-    return `$${value.toFixed(2)}`;
-  } else if (value >= 1e9) {
-    return `$${(value / 1e9).toFixed(1)}B`;
-  } else if (value >= 1e6) {
-    return `$${(value / 1e6).toFixed(1)}M`;
-  } else {
-    return `$${value.toFixed(1)}`;
-  }
+// Helper function to format currency
+const formatCurrency = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value) : 'N/A';
 };
 
-const formatGrowth = (growth: number | null) => {
-  if (growth === null) return 'N/A';
-  return `${growth > 0 ? '+' : ''}${growth.toFixed(1)}%`;
+// Helper function to format numbers
+const formatNumber = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US').format(value) : 'N/A';
 };
+
+// Determine the years for the table headers
+const years = financialData?.incomeStatement?.map(item => item.year).reverse() || [];
 ---
 
-<Card class="mt-4">
-  <CardHeader>
-    <CardTitle class="text-lg">{title} - Historical Data & Analysis</CardTitle>
-  </CardHeader>
-  <CardContent>
-    {/* Summary Statistics */}
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-      <div class="text-center">
-        <div class="text-lg font-bold text-blue-600">{formatValue(average)}</div>
-        <div class="text-xs text-gray-600">Average {unit}</div>
-      </div>
-      <div class="text-center">
-        <div class="text-lg font-bold text-green-600">{formatValue(maxValue)}</div>
-        <div class="text-xs text-gray-600">Maximum</div>
-      </div>
-      <div class="text-center">
-        <div class="text-lg font-bold text-orange-600">{formatValue(minValue)}</div>
-        <div class="text-xs text-gray-600">Minimum</div>
-      </div>
-      <div class="text-center">
-        <div class="text-lg font-bold text-purple-600">{formatGrowth(avgGrowthRate)}</div>
-        <div class="text-xs text-gray-600">Avg YoY Growth</div>
-      </div>
-      <div class="text-center">
-        <div class={`text-lg font-bold ${(growthRate || 0) >= 10 ? 'text-green-600' : 'text-red-600'}`}>
-          {formatGrowth(growthRate)}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Detailed Financials
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Comprehensive financial statements.
+    </p>
+  </div>
+
+  <div class="border-t border-gray-200">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="p-6">
+        <div class="grid grid-cols-6 gap-4">
+          <div class="h-6 bg-gray-200 rounded col-span-1"></div>
+          <div class="h-6 bg-gray-200 rounded col-span-1"></div>
+          <div class="h-6 bg-gray-200 rounded col-span-1"></div>
+          <div class="h-6 bg-gray-200 rounded col-span-1"></div>
+          <div class="h-6 bg-gray-200 rounded col-span-1"></div>
+          <div class="h-6 bg-gray-200 rounded col-span-1"></div>
         </div>
-        <div class="text-xs text-gray-600">10Y CAGR</div>
-      </div>
-    </div>
-
-    {/* Detailed Year-by-Year Table */}
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b bg-gray-50">
-            <th class="text-left p-3 font-semibold">Year</th>
-            <th class="text-right p-3 font-semibold">{title}</th>
-            <th class="text-right p-3 font-semibold">YoY Growth</th>
-            <th class="text-right p-3 font-semibold">vs Average</th>
-            <th class="text-center p-3 font-semibold">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dataWithGrowth.map((data, index) => {
-            const vsAverage = ((data.value - average) / average) * 100;
-            const isAboveAverage = data.value > average;
-            const isGrowthPositive = (data.yoyGrowth || 0) > 0;
-
-            return (
-              <tr class={`border-b hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
-                <td class="p-3 font-medium">{data.year}</td>
-                <td class="text-right p-3 font-mono">{formatValue(data.value)}</td>
-                <td class={`text-right p-3 font-mono ${isGrowthPositive ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatGrowth(data.yoyGrowth)}
-                </td>
-                <td class={`text-right p-3 font-mono ${isAboveAverage ? 'text-green-600' : 'text-red-600'}`}>
-                  {vsAverage > 0 ? '+' : ''}{vsAverage.toFixed(1)}%
-                </td>
-                <td class="text-center p-3">
-                  {data.yoyGrowth !== null && (
-                    <Badge variant={data.yoyGrowth >= 10 ? "default" : data.yoyGrowth >= 0 ? "secondary" : "destructive"}>
-                      {data.yoyGrowth >= 10 ? "Excellent" : data.yoyGrowth >= 0 ? "Positive" : "Declining"}
-                    </Badge>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-
-    {/* Rule One Assessment */}
-    <div class="mt-4 p-4 bg-blue-50 rounded-lg">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="font-semibold text-blue-900">Rule One Assessment</div>
-          <div class="text-sm text-blue-700">
-            Phil Town recommends ≥10% annual growth for {title.toLowerCase()}
-          </div>
-        </div>
-        <div class="text-right">
-          <Badge variant={(growthRate || 0) >= 10 ? "default" : "destructive"} class="text-lg px-4 py-2">
-            {(growthRate || 0) >= 10 ? "PASSES" : "FAILS"}
-          </Badge>
+        <div class="mt-4 space-y-4">
+          {[...Array(20)].map((_, i) => (
+            <div class="grid grid-cols-6 gap-4">
+              <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+              <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+              <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+              <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+              <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+              <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
-  </CardContent>
-</Card>
+    ) : !financialData || (
+        !financialData.incomeStatement?.length &&
+        !financialData.balanceSheet?.length &&
+        !financialData.cashFlowStatement?.length
+      ) ? (
+      <!-- No Data Fallback -->
+      <div class="p-6 text-center text-gray-500">
+        No detailed financial data available for this stock.
+      </div>
+    ) : (
+      <!-- Financial Tables -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Metric
+              </th>
+              {years.map(year => (
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {year}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {/* Income Statement */}
+            {financialData.incomeStatement?.length! > 0 && (
+              <>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-100" colspan={years.length + 1}>
+                    Income Statement
+                  </td>
+                </tr>
+                {financialData.incomeStatement![0] && Object.keys(financialData.incomeStatement![0]).map(key => {
+                  if (key === 'year') return null;
+                  return (
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </td>
+                      {financialData.incomeStatement!.map(item => (
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {typeof item[key] === 'number' ? formatCurrency(item[key]) : item[key]}
+                        </td>
+                      )).reverse()}
+                    </tr>
+                  );
+                })}
+              </>
+            )}
+
+            {/* Balance Sheet */}
+            {financialData.balanceSheet?.length! > 0 && (
+              <>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-100" colspan={years.length + 1}>
+                    Balance Sheet
+                  </td>
+                </tr>
+                {financialData.balanceSheet![0] && Object.keys(financialData.balanceSheet![0]).map(key => {
+                  if (key === 'year') return null;
+                  return (
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </td>
+                      {financialData.balanceSheet!.map(item => (
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {typeof item[key] === 'number' ? formatCurrency(item[key]) : item[key]}
+                        </td>
+                      )).reverse()}
+                    </tr>
+                  );
+                })}
+              </>
+            )}
+
+            {/* Cash Flow Statement */}
+            {financialData.cashFlowStatement?.length! > 0 && (
+              <>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-gray-100" colspan={years.length + 1}>
+                    Cash Flow Statement
+                  </td>
+                </tr>
+                {financialData.cashFlowStatement![0] && Object.keys(financialData.cashFlowStatement![0]).map(key => {
+                  if (key === 'year') return null;
+                  return (
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </td>
+                      {financialData.cashFlowStatement!.map(item => (
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {typeof item[key] === 'number' ? formatCurrency(item[key]) : item[key]}
+                        </td>
+                      )).reverse()}
+                    </tr>
+                  );
+                })}
+              </>
+            )}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+</div>

@@ -1,180 +1,178 @@
 ---
-import type { StockWithMetrics, FinancialMetrics as FinancialMetricsType } from '@shared/schema';
-import DropdownMenu from './ui/DropdownMenu.astro';
-import DropdownMenuTrigger from './ui/DropdownMenuTrigger.astro';
-import DropdownMenuContent from './ui/DropdownMenuContent.astro';
-import DropdownMenuItem from './ui/DropdownMenuItem.astro';
-
-export interface Props {
-  stockData?: StockWithMetrics;
-  isLoading: boolean;
+// Define interface for income statement data structure (replace with actual types if available)
+interface IncomeStatementItem {
+  year: string;
+  revenue?: number;
+  netIncome?: number;
+  eps?: number;
+  [key: string]: any; // Allow other properties with any type
 }
 
-const { stockData, isLoading } = Astro.props;
-
-type MetricType = 'revenue' | 'earnings' | 'freeCashFlow' | 'bookValue';
-
-const formatFinancialValue = (value: number | undefined | null): string => {
-  if (value === undefined || value === null) return "N/A";
-  if (value === 0) return "$0";
-  
-  const absValue = Math.abs(value);
-  
-  if (absValue >= 1e12) {
-    return `$${(value / 1e12).toFixed(1)}T`;
-  } else if (absValue >= 1e9) {
-    return `$${(value / 1e9).toFixed(1)}B`;
-  } else if (absValue >= 1e6) {
-    return `$${(value / 1e6).toFixed(1)}M`;
-  } else if (absValue >= 1e3) {
-    return `$${(value / 1e3).toFixed(1)}K`;
-  } else {
-    return `$${value.toFixed(0)}`;
-  }
-};
-
-const calculateConsistency = (values: (number | undefined | null)[]): number => {
-  const validValues = values.filter(v => typeof v === 'number' && v > 0) as number[];
-  if (validValues.length < 2) return 0;
-  let increases = 0;
-  for (let i = 1; i < validValues.length; i++) {
-    if (validValues[i] > validValues[i - 1]) {
-      increases++;
-    }
-  }
-  return (increases / (validValues.length - 1)) * 100;
-};
-
-const metricConfigs: Record<MetricType, { label: string; color: string }> = {
-  revenue: {
-    label: "Revenue",
-    color: "#1E40AF", // blue-800
-  },
-  earnings: {
-    label: "Earnings",
-    color: "#059669", // green-600
-  },
-  freeCashFlow: {
-    label: "Free Cash Flow",
-    color: "#F59E0B", // amber-500
-  },
-  bookValue: {
-    label: "Book Value",
-    color: "#8B5CF6", // violet-500
-  },
-};
-
-const initialMetric: MetricType = 'revenue';
-let sortedMetrics: FinancialMetricsType[] = [];
-if (stockData?.metrics) {
-    sortedMetrics = [...stockData.metrics].sort((a, b) => {
-        // Ensure year is treated as a string for parseInt, and handle potential null/undefined cases
-        const yearA = a.year ? parseInt(a.year) : 0;
-        const yearB = b.year ? parseInt(b.year) : 0;
-        return yearA - yearB;
-    });
+interface FinancialData {
+  incomeStatement?: IncomeStatementItem[];
+  // Add interfaces for other financial statements if needed
 }
 
-// Initial data for the selected metric (will be updated by client-side script)
-const getMetricData = (metricKey: MetricType, data: FinancialMetricsType[]) => {
-    return data.map(m => ({ year: m.year, value: m[metricKey] }));
+// Props for the component
+interface Props {
+  stockSymbol?: string;
+  companyName?: string;
+  financialData?: FinancialData;
+  isLoading?: boolean;
+}
+
+const { stockSymbol, companyName, financialData, isLoading = false } = Astro.props;
+
+// Helper function to format currency
+const formatCurrency = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value) : 'N/A';
 };
 
-const initialChartData = getMetricData(initialMetric, sortedMetrics);
-const initialValues = initialChartData.map(d => d.value).filter(v => typeof v === 'number' && v > 0) as number[];
-const initialCagr = initialValues.length > 1 
-    ? (Math.pow(initialValues[initialValues.length - 1] / initialValues[0], 1 / (initialValues.length - 1)) - 1) * 100
-    : 0;
-const initialConsistency = calculateConsistency(initialValues);
-const initialLatest = initialValues[initialValues.length - 1] ?? 0;
+// Helper function to format numbers
+const formatNumber = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US').format(value) : 'N/A';
+};
 
-const frappeChartsVersion = "1.6.2"; // Define version for CDN links
+// Prepare chart data for key financial metrics
+const chartData = financialData?.incomeStatement?.map(item => ({
+  year: item.year,
+  revenue: item.revenue,
+  netIncome: item.netIncome,
+  eps: item.eps,
+})).reverse() || [];
+
+const hasData = chartData.length > 0;
 ---
 
-<style is:global>
-  @import url('https://cdn.jsdelivr.net/npm/frappe-charts@1.6.2/dist/frappe-charts.min.css');
-  /* Custom styles for Frappe Charts if needed */
-  .chart-container .axis-line, .chart-container .x-axis-line, .chart-container .y-axis-line {
-    stroke: #d1d5db; /* gray-300 */
-  }
-  .chart-container .chart-label {
-    fill: #4b5563; /* gray-600 */
-  }
-  .dark .chart-container .axis-line, .dark .chart-container .x-axis-line, .dark .chart-container .y-axis-line {
-    stroke: #4b5563; /* dark:gray-600 */
-  }
-  .dark .chart-container .chart-label {
-    fill: #d1d5db; /* dark:gray-300 */
-  }
-</style>
-
-<div id="financial-trends-container" class="p-6 border rounded-lg shadow-sm bg-card text-card-foreground" data-stock-data={JSON.stringify(stockData)} data-metric-configs={JSON.stringify(metricConfigs)} data-initial-metric={JSON.stringify(initialMetric)}>
-  <div class="flex items-center justify-between mb-4">
-    <h3 class="text-xl font-semibold text-slate-800 dark:text-slate-200">10-Year Financial Trends</h3>
-    {isLoading ? (
-      <div class="h-9 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-    ) : stockData?.metrics && stockData.metrics.length > 0 ? (
-      <DropdownMenu id="financial-metric-selector">
-        <DropdownMenuTrigger class="w-40">
-          <button id="selected-metric-trigger" class="inline-flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600">
-            <span id="selected-metric-label">{metricConfigs[initialMetric].label}</span>
-            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent class="w-40">
-          {Object.entries(metricConfigs).map(([key, config]) => (
-            <DropdownMenuItem data-metric-key={key} class="cursor-pointer">
-              {config.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ) : null}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Financial Trends
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Visualizing key financial metrics over time for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
   </div>
 
-  {isLoading ? (
-    <div>
-      <div class="h-80 w-full mb-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-      <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-        {[...Array(3)].map(() => (
-          <div class="text-center">
-            <div class="h-4 w-16 mx-auto mb-2 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-            <div class="h-6 w-12 mx-auto bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-          </div>
-        ))}
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        <div class="h-64 bg-gray-200 rounded w-full"></div>
       </div>
-    </div>
-  ) : !stockData?.metrics || stockData.metrics.length === 0 ? (
-    <div class="text-center text-slate-600 dark:text-slate-400 py-8">
-      No financial data available for trend analysis
-    </div>
-  ) : (
-    <div>
-      {/* Chart will be omitted for now - placeholder for future implementation */}
-      <div id="chart-placeholder" class="h-80 w-full mb-4 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center text-slate-500 dark:text-slate-400">
-        Chart Visualization (To be implemented)
+    ) : !hasData ? (
+      <!-- No Data Fallback -->
+      <div class="text-center text-gray-500">
+        Financial trend data not available for {stockSymbol || 'this stock'}.
       </div>
-      
-      {/* Key Statistics */}
-      <div id="key-statistics" class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-        <div class="text-center">
-          <p class="text-sm text-slate-500 dark:text-slate-400">CAGR (10yr)</p>
-          <p id="stat-cagr" class="text-xl font-semibold text-slate-800 dark:text-slate-200">{initialCagr.toFixed(1)}%</p>
-        </div>
-        <div class="text-center">
-          <p class="text-sm text-slate-500 dark:text-slate-400">Consistency</p>
-          <p id="stat-consistency" class="text-xl font-semibold text-slate-800 dark:text-slate-200">{initialConsistency.toFixed(0)}%</p>
-        </div>
-        <div class="text-center">
-          <p class="text-sm text-slate-500 dark:text-slate-400">Latest</p>
-          <p id="stat-latest" class="text-xl font-semibold text-slate-800 dark:text-slate-200">{formatFinancialValue(initialLatest)}</p>
-        </div>
-      </div>
-    </div>
-  )}
+    ) : (
+      <!-- Financial Trends Chart -->
+      <div class="w-full h-64" id="financial-trends-chart"></div>
+    )}
+  </div>
 </div>
 
-<script type="text/javascript" src={`https://cdn.jsdelivr.net/npm/frappe-charts@${frappeChartsVersion}/dist/frappe-charts.min.iife.js`}></script>
-<script type="module" src="../scripts/financial-trends.ts"></script>
+<script define:vars={{ chartData }}>
+  import Chart from 'chart.js/auto'; // Import Chart.js
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const chartCanvas = document.getElementById('financial-trends-chart');
+
+    if (chartCanvas && chartData && chartData.length > 0) {
+      new Chart(chartCanvas, {
+        type: 'line',
+        data: {
+          labels: chartData.map(item => item.year),
+          datasets: [
+            {
+              label: 'Revenue',
+              data: chartData.map(item => item.revenue),
+              borderColor: '#3B82F6', // Blue
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              tension: 0.1,
+              fill: false,
+              yAxisID: 'y',
+            },
+            {
+              label: 'Net Income',
+              data: chartData.map(item => item.netIncome),
+              borderColor: '#10B981', // Green
+              backgroundColor: 'rgba(16, 185, 129, 0.2)',
+              tension: 0.1,
+              fill: false,
+              yAxisID: 'y',
+            },
+            {
+              label: 'EPS',
+              data: chartData.map(item => item.eps),
+              borderColor: '#F59E0B', // Yellow
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              tension: 0.1,
+              fill: false,
+              yAxisID: 'y1', // Use a secondary Y-axis for EPS
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Value ($)'
+              },
+              beginAtZero: true,
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'EPS ($)'
+              },
+              beginAtZero: true,
+              grid: {
+                drawOnChartArea: false, // Only draw grid lines for the left axis
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Year'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += context.dataset.label === 'EPS' ? `$${context.parsed.y.toFixed(2)}` : `$${context.parsed.y.toFixed(0)}`;
+                  }
+                  return label;
+                }
+              }
+            }
+          }
+        },
+      });
+    }
+  });
+</script>
+
+<style>
+  /* Add any component-specific styles here */
+</style>

@@ -1,237 +1,421 @@
 ---
-import type { StockWithMetrics } from '../shared/schema';
-import Card from './ui/card.astro';
-import CardHeader from './ui/card-header.astro';
-import CardTitle from './ui/card-title.astro';
-import CardContent from './ui/card-content.astro';
-
+// Props for the component
 interface Props {
-  stockData?: StockWithMetrics;
-  isLoading: boolean;
-  symbol?: string;
+  stockSymbol?: string;
+  companyName?: string;
+  metrics?: {
+    year: string;
+    revenue?: number;
+    eps?: number;
+    bookValue?: number;
+    freeCashFlow?: number;
+  }[];
+  isLoading?: boolean;
 }
 
-const { stockData, isLoading, symbol } = Astro.props;
+const { stockSymbol = '', companyName = '', metrics, isLoading = false } = Astro.props;
 
-// Helper functions for metrics formatting and evaluation
-const formatPercentage = (value: number) => {
-  return `${(value * 100).toFixed(2)}%`;
+// Helper function to calculate period averages
+const calculatePeriodAverages = (metrics: any[], field: string, years: number) => {
+  if (!metrics || metrics.length === 0) return 0;
+
+  const recentMetrics = metrics.slice(-years);
+  const growthRates = recentMetrics.map((metric, index) => {
+    if (index === 0) return null;
+    const currentValue = metric[field];
+    const previousValue = recentMetrics[index - 1][field];
+    if (currentValue === undefined || previousValue === undefined || previousValue === null || previousValue <= 0) return null;
+    return ((currentValue - previousValue) / previousValue) * 100;
+  }).filter(rate => rate !== null) as number[];
+
+  return growthRates.length > 0
+    ? growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length
+    : 0;
 };
 
-const formatGrowthRate = (rate: number | null | undefined) => {
-  if (rate === null || rate === undefined) return 'N/A';
-  return formatPercentage(rate);
+// Calculate different time period averages
+const tenYearAverages = {
+  salesGrowth: calculatePeriodAverages(metrics!, 'revenue', 10),
+  epsGrowth: calculatePeriodAverages(metrics!, 'eps', 10),
+  equityGrowth: calculatePeriodAverages(metrics!, 'bookValue', 10),
+  fcfGrowth: calculatePeriodAverages(metrics!, 'freeCashFlow', 10),
 };
 
-const getGrowthClass = (rate: number | null | undefined) => {
-  if (rate === null || rate === undefined) return 'text-gray-500';
-  if (rate >= 0.10) return 'text-green-600'; // >= 10%
-  if (rate >= 0.05) return 'text-green-500'; // >= 5%
-  if (rate >= 0) return 'text-amber-500';    // >= 0%
-  return 'text-red-500';                     // < 0%
+const fiveYearAverages = {
+  salesGrowth: calculatePeriodAverages(metrics!, 'revenue', 5),
+  epsGrowth: calculatePeriodAverages(metrics!, 'eps', 5),
+  equityGrowth: calculatePeriodAverages(metrics!, 'bookValue', 5),
+  fcfGrowth: calculatePeriodAverages(metrics!, 'freeCashFlow', 5),
 };
 
-const getMetricStatus = (value: number | null | undefined) => {
-  if (value === null || value === undefined) return 'unknown';
-  if (value >= 0.10) return 'excellent';
-  if (value >= 0.05) return 'good';
-  if (value >= 0) return 'fair';
-  return 'poor';
+const oneYearAverages = {
+  salesGrowth: calculatePeriodAverages(metrics!, 'revenue', 2),
+  epsGrowth: calculatePeriodAverages(metrics!, 'eps', 2),
+  equityGrowth: calculatePeriodAverages(metrics!, 'bookValue', 2),
+  fcfGrowth: calculatePeriodAverages(metrics!, 'freeCashFlow', 2),
 };
 
-// Extract Big Four metrics if data is available
-const salesGrowth = stockData?.financialMetrics?.salesGrowthRate;
-const epsgGrowth = stockData?.financialMetrics?.epsGrowthRate;
-const equityGrowth = stockData?.financialMetrics?.bookValueGrowthRate;
-const fcfGrowth = stockData?.financialMetrics?.freeCashFlowGrowthRate;
+// Prepare chart data for ALL years (not filtered)
+const chartData = metrics?.map((metric, index) => {
+  if (index === 0) return null;
 
-// Calculate overall health score (0-100)
-let healthScore = 0;
-let availableMetrics = 0;
+  const previousMetric = metrics![index - 1];
 
-if (salesGrowth !== null && salesGrowth !== undefined) {
-  healthScore += salesGrowth >= 0.10 ? 25 : (salesGrowth >= 0.05 ? 15 : (salesGrowth >= 0 ? 10 : 0));
-  availableMetrics++;
-}
+  const salesGrowth = metric.revenue !== undefined && previousMetric.revenue !== undefined && previousMetric.revenue !== null && previousMetric.revenue > 0
+    ? ((metric.revenue - previousMetric.revenue) / previousMetric.revenue) * 100
+    : 0;
 
-if (epsgGrowth !== null && epsgGrowth !== undefined) {
-  healthScore += epsgGrowth >= 0.10 ? 25 : (epsgGrowth >= 0.05 ? 15 : (epsgGrowth >= 0 ? 10 : 0));
-  availableMetrics++;
-}
+  const epsGrowth = metric.eps !== undefined && previousMetric.eps !== undefined && previousMetric.eps !== null && previousMetric.eps > 0
+    ? ((metric.eps - previousMetric.eps) / previousMetric.eps) * 100
+    : 0;
 
-if (equityGrowth !== null && equityGrowth !== undefined) {
-  healthScore += equityGrowth >= 0.10 ? 25 : (equityGrowth >= 0.05 ? 15 : (equityGrowth >= 0 ? 10 : 0));
-  availableMetrics++;
-}
+  const equityGrowth = metric.bookValue !== undefined && previousMetric.bookValue !== undefined && previousMetric.bookValue !== null && previousMetric.bookValue > 0
+    ? ((metric.bookValue - previousMetric.bookValue) / previousMetric.bookValue) * 100
+    : 0;
 
-if (fcfGrowth !== null && fcfGrowth !== undefined) {
-  healthScore += fcfGrowth >= 0.10 ? 25 : (fcfGrowth >= 0.05 ? 15 : (fcfGrowth >= 0 ? 10 : 0));
-  availableMetrics++;
-}
+  const fcfGrowth = metric.freeCashFlow !== undefined && previousMetric.freeCashFlow !== undefined && previousMetric.freeCashFlow !== null && previousMetric.freeCashFlow > 0
+    ? ((metric.freeCashFlow - previousMetric.freeCashFlow) / previousMetric.freeCashFlow) * 100
+    : 0;
 
-// Normalize the score based on available metrics
-const finalHealthScore = availableMetrics > 0 ? Math.round((healthScore / (availableMetrics * 25)) * 100) : 0;
+  return {
+    year: metric.year,
+    salesGrowth,
+    epsGrowth,
+    equityGrowth,
+    fcfGrowth,
+  };
+}).filter(item => item !== null) || [];
 
-// Overall evaluation
-let overallStatus = 'Unknown';
-if (availableMetrics > 0) {
-  if (finalHealthScore >= 80) overallStatus = 'Excellent';
-  else if (finalHealthScore >= 60) overallStatus = 'Good';
-  else if (finalHealthScore >= 40) overallStatus = 'Fair';
-  else overallStatus = 'Poor';
-}
+const dataYearsAvailable = metrics?.length || 0;
+const showDeepSearchPrompt = dataYearsAvailable > 0 && dataYearsAvailable < 7;
 
-// Get color class for overall status
-const getOverallStatusClass = () => {
-  switch(overallStatus.toLowerCase()) {
-    case 'excellent': return 'text-green-600';
-    case 'good': return 'text-green-500';
-    case 'fair': return 'text-amber-500';
-    case 'poor': return 'text-red-500';
-    default: return 'text-gray-500';
-  }
-};
+// Icons (using inline SVG for simplicity)
+const TrendingUpIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up">
+    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+    <polyline points="16 7 22 7 22 13"/>
+  </svg>
+`;
+
+const DollarSignIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign">
+    <line x1="12" x2="12" y1="2" y2="22"/>
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+  </svg>
+`;
+
+const BarChart3Icon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-3">
+    <path d="M3 3v18h18"/>
+    <path d="M18 17V9"/>
+    <path d="M13 17V5"/>
+    <path d="M8 17v-3"/>
+  </svg>
+`;
+
+const PiggyBankIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-piggy-bank">
+    <path d="M19 5c0 1.1-.9 2-2 2h-4v8c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2Z"/>
+    <path d="M2 17v.01"/>
+    <path d="M7 15h4"/>
+    <path d="M17 15h2"/>
+    <path d="M21 12V7a2 2 0 0 0-2-2H17"/>
+    <path d="M12 17h.01"/>
+  </svg>
+`;
+
+const InfoIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" x2="12" y1="16" y2="12"/>
+    <line x1="12" x2="12.01" y1="8" y2="8"/>
+  </svg>
+`;
+
+// Metric data structure for rendering
+const metricItems = [
+  {
+    title: "Sales Growth",
+    key: "salesGrowth",
+    icon: TrendingUpIcon,
+    color: "text-green-600",
+    bgColor: "from-green-500/10 to-green-500/5 border-green-500/20",
+  },
+  {
+    title: "EPS Growth",
+    key: "epsGrowth",
+    icon: DollarSignIcon,
+    color: "text-blue-600", // Changed color for distinction
+    bgColor: "from-blue-500/10 to-blue-500/5 border-blue-500/20", // Changed color for distinction
+  },
+  {
+    title: "Equity Growth",
+    key: "equityGrowth",
+    icon: BarChart3Icon,
+    color: "text-yellow-600", // Changed color for distinction
+    bgColor: "from-yellow-500/10 to-yellow-500/5 border-yellow-500/20", // Changed color for distinction
+  },
+  {
+    title: "FCF Growth",
+    key: "fcfGrowth",
+    icon: PiggyBankIcon,
+    color: "text-purple-600", // Changed color for distinction
+    bgColor: "from-purple-500/10 to-purple-500/5 border-purple-500/20", // Changed color for distinction
+  },
+];
 ---
 
-<Card>
-  <CardHeader>
-    <CardTitle>
-      <div class="flex justify-between items-center">
-        <span>Big Four Growth Metrics</span>
-        {!isLoading && stockData && (
-          <span class={`text-lg font-bold ${getOverallStatusClass()}`}>
-            {overallStatus}
-          </span>
-        )}
+<div class="space-y-4">
+  {isLoading ? (
+    <!-- Skeleton Loader -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        <div class="h-6 bg-gray-200 rounded w-32"></div>
       </div>
-    </CardTitle>
-  </CardHeader>
-  
-  <CardContent>
-    {isLoading ? (
-      <div class="flex justify-center items-center h-48">
-        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
-          <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
-        </div>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="h-32 bg-gray-200 rounded-lg"></div>
+        <div class="h-32 bg-gray-200 rounded-lg"></div>
+        <div class="h-32 bg-gray-200 rounded-lg"></div>
+        <div class="h-32 bg-gray-200 rounded-lg"></div>
       </div>
-    ) : symbol && !stockData ? (
-      <div class="flex flex-col items-center justify-center h-48 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h3 class="mt-2 text-lg font-medium">No data available</h3>
-        <p class="mt-1 text-sm text-gray-500">We couldn't find financial metrics for {symbol}.</p>
+      <div class="h-64 bg-gray-200 rounded-lg"></div>
+    </div>
+  ) : !metrics || metrics.length === 0 ? (
+    <!-- No Data Fallback -->
+    <div class="bg-white shadow rounded-lg p-6 text-center">
+      <div class="mb-4">
+        <Fragment set:html={InfoIcon} class="h-12 w-12 text-gray-400 mx-auto mb-2" />
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">
+          No Financial Data Available
+        </h3>
       </div>
-    ) : !symbol ? (
-      <div class="flex flex-col items-center justify-center h-48 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <h3 class="mt-2 text-lg font-medium">Search for a stock</h3>
-        <p class="mt-1 text-sm text-gray-500">Enter a stock symbol to view financial metrics.</p>
+      <div class="text-gray-600 space-y-2 max-w-md mx-auto">
+        <p>This stock isn't covered by our financial data providers.</p>
+        <p class="text-sm">
+          This commonly happens with smaller international stocks, recent IPOs, or companies from emerging markets.
+        </p>
       </div>
-    ) : (
-      <div>
-        <!-- Health Score Gauge -->
-        <div class="mb-6">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-600">Overall Health</span>
-            <span class="text-sm font-bold">{finalHealthScore}%</span>
-          </div>
-          <div class="h-3 w-full bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              class={`h-full rounded-full ${finalHealthScore >= 80 ? 'bg-green-600' : 
-                                             finalHealthScore >= 60 ? 'bg-green-500' : 
-                                             finalHealthScore >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
-              style={`width: ${finalHealthScore}%`}
-            ></div>
-          </div>
-        </div>
-        
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Sales Growth -->
-          <div class="border rounded-lg p-4">
-            <h4 class="text-sm font-medium text-gray-600 mb-1">Sales Growth (CAGR)</h4>
-            <div class="flex justify-between items-center">
-              <span class={`text-xl font-bold ${getGrowthClass(salesGrowth)}`}>
-                {formatGrowthRate(salesGrowth)}
-              </span>
-              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
-                        ${getMetricStatus(salesGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
-                          getMetricStatus(salesGrowth) === 'good' ? 'bg-green-50 text-green-700' :
-                          getMetricStatus(salesGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
-                          getMetricStatus(salesGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
-                          'bg-gray-100 text-gray-700'}"
-              >
-                {getMetricStatus(salesGrowth) !== 'unknown' ? getMetricStatus(salesGrowth) : 'N/A'}
-              </span>
-            </div>
-          </div>
-          
-          <!-- EPS Growth -->
-          <div class="border rounded-lg p-4">
-            <h4 class="text-sm font-medium text-gray-600 mb-1">EPS Growth (CAGR)</h4>
-            <div class="flex justify-between items-center">
-              <span class={`text-xl font-bold ${getGrowthClass(epsgGrowth)}`}>
-                {formatGrowthRate(epsgGrowth)}
-              </span>
-              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
-                        ${getMetricStatus(epsgGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
-                          getMetricStatus(epsgGrowth) === 'good' ? 'bg-green-50 text-green-700' :
-                          getMetricStatus(epsgGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
-                          getMetricStatus(epsgGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
-                          'bg-gray-100 text-gray-700'}"
-              >
-                {getMetricStatus(epsgGrowth) !== 'unknown' ? getMetricStatus(epsgGrowth) : 'N/A'}
-              </span>
-            </div>
-          </div>
-          
-          <!-- Equity (Book Value) Growth -->
-          <div class="border rounded-lg p-4">
-            <h4 class="text-sm font-medium text-gray-600 mb-1">Book Value Growth (CAGR)</h4>
-            <div class="flex justify-between items-center">
-              <span class={`text-xl font-bold ${getGrowthClass(equityGrowth)}`}>
-                {formatGrowthRate(equityGrowth)}
-              </span>
-              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
-                        ${getMetricStatus(equityGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
-                          getMetricStatus(equityGrowth) === 'good' ? 'bg-green-50 text-green-700' :
-                          getMetricStatus(equityGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
-                          getMetricStatus(equityGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
-                          'bg-gray-100 text-gray-700'}"
-              >
-                {getMetricStatus(equityGrowth) !== 'unknown' ? getMetricStatus(equityGrowth) : 'N/A'}
-              </span>
-            </div>
-          </div>
-          
-          <!-- Free Cash Flow Growth -->
-          <div class="border rounded-lg p-4">
-            <h4 class="text-sm font-medium text-gray-600 mb-1">FCF Growth (CAGR)</h4>
-            <div class="flex justify-between items-center">
-              <span class={`text-xl font-bold ${getGrowthClass(fcfGrowth)}`}>
-                {formatGrowthRate(fcfGrowth)}
-              </span>
-              <span class="text-xs px-2 py-1 rounded-full uppercase font-medium
-                        ${getMetricStatus(fcfGrowth) === 'excellent' ? 'bg-green-100 text-green-800' :
-                          getMetricStatus(fcfGrowth) === 'good' ? 'bg-green-50 text-green-700' :
-                          getMetricStatus(fcfGrowth) === 'fair' ? 'bg-amber-50 text-amber-700' :
-                          getMetricStatus(fcfGrowth) === 'poor' ? 'bg-red-50 text-red-700' : 
-                          'bg-gray-100 text-gray-700'}"
-              >
-                {getMetricStatus(fcfGrowth) !== 'unknown' ? getMetricStatus(fcfGrowth) : 'N/A'}
-              </span>
+    </div>
+  ) : (
+    <!-- Metrics and Chart -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-900">The Big Four Growth Rates</h2>
+        <div class="flex items-center space-x-2">
+          <select id="period-select" class="rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+            <option value="10year">10-Year Avg</option>
+            <option value="5year">5-Year Avg</option>
+            <option value="1year">1-Year Avg</option>
+          </select>
+          <div class="relative group">
+            <Fragment set:html={InfoIcon} class="h-4 w-4 text-gray-400 cursor-help" />
+            <div class="absolute z-10 invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 top-full mt-2 w-48">
+              Rule One focuses on businesses growing consistently in all four areas
             </div>
           </div>
         </div>
-        
-        <div class="mt-6 text-xs text-gray-500 italic">
-          <p>Rule #1 metrics provide insight into the company's long-term growth consistency.</p>
-          <p>* CAGR = Compound Annual Growth Rate over the past 10 years</p>
-        </div>
       </div>
-    )}
-  </CardContent>
-</Card>
+
+      <div class="grid grid-cols-2 gap-4 mb-6" id="metrics-grid">
+        {metricItems.map((metric, index) => (
+          <div class={`bg-gradient-to-r ${metric.bgColor} rounded-lg p-4 border`} data-metric={metric.key}>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">
+                {metric.title}
+              </span>
+              <Fragment set:html={metric.icon} class={`h-5 w-5 ${metric.color}`} />
+            </div>
+            <div class="text-2xl font-bold text-gray-900" data-value>
+              {/* Value will be updated by client-side script */}
+              N/A
+            </div>
+            <div class="text-xs text-gray-600 space-y-1">
+              <div class="flex justify-between">
+                <span>10Y: </span>
+                <span class="font-medium" data-10year>N/A</span>
+              </div>
+              <div class="flex justify-between">
+                <span>5Y: </span>
+                <span class="font-medium" data-5year>N/A</span>
+              </div>
+              <div class="flex justify-between">
+                <span>1Y: </span>
+                <span class="font-medium" data-1year>N/A</span>
+              </div>
+              <div class="text-green-600 font-medium pt-1">
+                Target: >10%
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Chart Container -->
+      <div class="mt-6">
+        <div id="growth-chart" class="w-full h-64"></div>
+      </div>
+    </div>
+  )}
+
+  {showDeepSearchPrompt && stockSymbol && (
+    <!-- DeepSearchPrompt Component (Astro version needed) -->
+    <div class="bg-white shadow rounded-lg p-6 text-center">
+      <h3 class="text-lg font-semibold mb-2">More Data Available?</h3>
+      <p class="text-gray-600 mb-4">
+        We only found {dataYearsAvailable} years of data. Would you like to perform a deeper search for {stockSymbol}?
+      </p>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        Deep Search
+      </button>
+    </div>
+    <!-- Note: DeepSearchPrompt.astro needs to be created -->
+  )}
+</div>
+
+<script lang="ts" define:vars={{ tenYearAverages, fiveYearAverages, oneYearAverages, chartData }}>
+  import Chart from 'chart.js/auto'; // Import Chart.js
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const periodSelect = document.getElementById('period-select');
+    const metricsGrid = document.getElementById('metrics-grid');
+    const chartCanvas = document.getElementById('growth-chart');
+
+    // Data for updating metrics display
+    const averages = {
+      '10year': tenYearAverages,
+      '5year': fiveYearAverages,
+      '1year': oneYearAverages,
+    };
+
+    // Function to update the displayed metric values
+    const updateMetrics = (selectedPeriod) => {
+      if (!metricsGrid) return;
+
+      const currentAverages = averages[selectedPeriod];
+
+      metricsGrid.querySelectorAll('[data-metric]').forEach(metricElement => {
+        const metricKey = metricElement.getAttribute('data-metric');
+        const valueElement = metricElement.querySelector('[data-value]');
+        const tenYearElement = metricElement.querySelector('[data-10year]');
+        const fiveYearElement = metricElement.querySelector('[data-5year]');
+        const oneYearElement = metricElement.querySelector('[data-1year]');
+
+        if (valueElement && metricKey) {
+          const value = currentAverages[metricKey];
+          valueElement.textContent = `${value.toFixed(1)}%`;
+        }
+        if (tenYearElement && metricKey) {
+           tenYearElement.textContent = `${tenYearAverages[metricKey].toFixed(1)}%`;
+        }
+        if (fiveYearElement && metricKey) {
+           fiveYearElement.textContent = `${fiveYearAverages[metricKey].toFixed(1)}%`;
+        }
+        if (oneYearElement && metricKey) {
+           oneYearElement.textContent = `${oneYearAverages[metricKey].toFixed(1)}%`;
+        }
+      });
+    };
+
+    // Initial update based on default selected period
+    if (periodSelect) {
+      updateMetrics(periodSelect.value);
+    }
+
+
+    // Add event listener to the select element
+    if (periodSelect) {
+      periodSelect.addEventListener('change', (event) => {
+        const selectedPeriod = event.target.value;
+        updateMetrics(selectedPeriod);
+      });
+    }
+
+
+    // Initialize the chart
+    if (chartCanvas) {
+      new Chart(chartCanvas, {
+        type: 'line',
+        data: {
+          labels: chartData.map(item => item.year),
+          datasets: [
+            {
+              label: 'Sales Growth',
+              data: chartData.map(item => item.salesGrowth),
+              borderColor: '#059669',
+              backgroundColor: 'rgba(5, 150, 105, 0.2)',
+              tension: 0.1,
+              fill: false,
+            },
+            {
+              label: 'EPS Growth',
+              data: chartData.map(item => item.epsGrowth),
+              borderColor: '#1E40AF',
+              backgroundColor: 'rgba(30, 64, 175, 0.2)',
+              tension: 0.1,
+              fill: false,
+            },
+            {
+              label: 'Equity Growth',
+              data: chartData.map(item => item.equityGrowth),
+              borderColor: '#F59E0B',
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              tension: 0.1,
+              fill: false,
+            },
+            {
+              label: 'FCF Growth',
+              data: chartData.map(item => item.fcfGrowth),
+              borderColor: '#8B5CF6',
+              backgroundColor: 'rgba(139, 92, 246, 0.2)',
+              tension: 0.1,
+              fill: false,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Growth Rate (%)'
+              }
+            },
+            x: {
+                title: {
+                display: true,
+                text: 'Year'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += `${context.parsed.y.toFixed(1)}%`;
+                  }
+                  return label;
+                }
+              }
+            }
+          }
+        },
+      });
+    }
+  });
+</script>
+
+<style>
+  /* Add any component-specific styles here */
+</style>

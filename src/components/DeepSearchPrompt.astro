@@ -1,0 +1,31 @@
+---
+// Props for the component
+interface Props {
+  stockSymbol?: string;
+  dataYearsFound?: number;
+}
+
+const { stockSymbol, dataYearsFound = 0 } = Astro.props;
+
+// Determine the message based on data years found
+let message = `We found ${dataYearsFound} years of data for ${stockSymbol}.`;
+if (dataYearsFound === 0) {
+  message = `No financial data found for ${stockSymbol}.`;
+} else if (dataYearsFound < 7) {
+  message = `We only found ${dataYearsFound} years of data for ${stockSymbol}. Would you like to perform a deeper search?`;
+} else {
+  message = `We found ${dataYearsFound} years of data for ${stockSymbol}.`;
+}
+---
+
+<div class="bg-white shadow rounded-lg p-6 text-center">
+  <h3 class="text-lg font-semibold mb-2">Data Availability</h3>
+  <p class="text-gray-600 mb-4">
+    {message}
+  </p>
+  {(dataYearsFound === 0 || dataYearsFound < 7) && stockSymbol && (
+    <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+      Deep Search
+    </button>
+  )}
+</div>

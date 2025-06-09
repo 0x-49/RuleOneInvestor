@@ -1,0 +1,62 @@
+---
+/**
+ * ExampleUsage.astro
+ * 
+ * This file demonstrates the correct way to use React components that rely on context
+ * within Astro templates, avoiding the common "X must be used within Y" errors.
+ */
+import ReactIsland from './ReactIsland.astro';
+import DialogWrapper from './ui/DialogWrapper.astro';
+import DropdownWrapper from './ui/DropdownWrapper.astro';
+import { Button } from '@client/components/ui/button';
+---
+
+<div class="p-8">
+  <h1 class="text-2xl font-bold mb-8">Context-Aware React Components in Astro</h1>
+
+  <!-- Example 1: Using a Sheet/Dialog with proper context -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold mb-4">Example 1: Sheet/Dialog Component</h2>
+    
+    <DialogWrapper>
+      <Button slot="trigger">Open Sheet</Button>
+      <div class="p-4">
+        <h3 class="text-lg font-medium mb-2">Sheet Content</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+          This sheet component maintains proper React context because it's wrapped in a DialogWrapper
+          that ensures all Radix UI context providers are properly set up.
+        </p>
+      </div>
+    </DialogWrapper>
+  </div>
+
+  <!-- Example 2: Using a DropdownMenu with proper context -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold mb-4">Example 2: Dropdown Menu Component</h2>
+    
+    <DropdownWrapper>
+      <Button slot="trigger">Open Dropdown</Button>
+      <div class="p-2 min-w-[200px]">
+        <p class="text-sm font-medium">Dropdown Content</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          This dropdown maintains proper React context.
+        </p>
+      </div>
+    </DropdownWrapper>
+  </div>
+
+  <!-- Example 3: Using the general ReactIsland for custom components -->
+  <div>
+    <h2 class="text-xl font-semibold mb-4">Example 3: Custom React Components</h2>
+    
+    <ReactIsland>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
+        <h3 class="text-lg font-medium mb-2">Custom React Island</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+          For complex React components that need ThemeProvider or other context,
+          wrap them in ReactIsland to ensure proper context is maintained.
+        </p>
+      </div>
+    </ReactIsland>
+  </div>
+</div>

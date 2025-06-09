@@ -1,0 +1,102 @@
+---
+// Props for the component
+interface Props {
+  stockSymbol?: string;
+  companyName?: string;
+  balanceSheetData?: any[]; // Replace 'any' with a more specific type if available
+}
+
+const { stockSymbol = '', companyName = '', balanceSheetData } = Astro.props;
+
+// Helper function to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+};
+
+// Helper function to calculate current ratio
+const calculateCurrentRatio = (currentAssets: number, currentLiabilities: number) => {
+  return currentLiabilities > 0 ? (currentAssets / currentLiabilities).toFixed(2) : 'N/A';
+};
+
+// Helper function to calculate debt to equity ratio
+const calculateDebtToEquityRatio = (totalDebt: number, totalEquity: number) => {
+  return totalEquity > 0 ? (totalDebt / totalEquity).toFixed(2) : 'N/A';
+};
+
+// Get the latest balance sheet data
+const latestBalanceSheet = balanceSheetData?.[0];
+
+// Calculate key metrics for the latest period
+const currentRatio = latestBalanceSheet ? calculateCurrentRatio(latestBalanceSheet.totalCurrentAssets, latestBalanceSheet.totalCurrentLiabilities) : 'N/A';
+const debtToEquityRatio = latestBalanceSheet ? calculateDebtToEquityRatio(latestBalanceSheet.totalDebt, latestBalanceSheet.totalEquity) : 'N/A';
+---
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Balance Sheet Health
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Key balance sheet metrics for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
+  </div>
+  
+  <div class="border-t border-gray-200">
+    {latestBalanceSheet ? (
+      <dl>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Total Current Assets
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {formatCurrency(latestBalanceSheet.totalCurrentAssets)}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Total Current Liabilities
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {formatCurrency(latestBalanceSheet.totalCurrentLiabilities)}
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Current Ratio
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {currentRatio}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Total Debt
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {formatCurrency(latestBalanceSheet.totalDebt)}
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Total Equity
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {formatCurrency(latestBalanceSheet.totalEquity)}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Debt to Equity Ratio
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {debtToEquityRatio}
+          </dd>
+        </div>
+      </dl>
+    ) : (
+      <div class="p-6 text-center text-gray-500">
+        No balance sheet data available for {stockSymbol || 'this stock'}.
+      </div>
+    )}
+  </div>
+</div>

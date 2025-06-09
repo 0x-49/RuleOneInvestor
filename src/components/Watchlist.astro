@@ -1,185 +1,79 @@
 ---
-export interface Props {
-  // The onStockSelect prop is tricky for pure Astro client scripts if it's a complex function.
-  // For now, we'll assume it's either not passed or will be handled by a global script / custom event if needed.
-  // Or, if it's simple enough, it might be passed as a string to be eval'd, but that's not ideal.
-  // Let's proceed by focusing on navigation and allow 'onStockSelect' to be optionally handled if passed.
-  onStockSelect?: (symbol: string) => void; 
+// Props for the component
+interface Props {
+  watchlistItems?: {
+    symbol: string;
+    name?: string;
+    price?: number;
+    change?: number;
+    changePercent?: number;
+  }[];
+  isLoading?: boolean;
 }
 
-const { onStockSelect } = Astro.props;
+const { watchlistItems, isLoading = false } = Astro.props;
 
-// SVG Icon components (can be moved to separate .astro files if reused more widely)
-const IconSettings = ({ class: className = 'h-4 w-4' }: { class?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}>
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 .54 1.73L5 8.3v.38a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-.54-1.73L19 5.7V5.3a2 2 0 0 0-2-2h-.44a2 2 0 0 1-2-2v-.18a2 2 0 0 0-1-1.73l-.43-.25a2 2 0 0 0-2 0l-.15.08A2 2 0 0 1 12.22 2Z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
+// Helper function to format currency
+const formatCurrency = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value) : 'N/A';
+};
 
-const IconX = ({ class: className = 'h-4 w-4' }: { class?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}>
-    <path d="M18 6 6 18" />
-    <path d="m6 6 12 12" />
-  </svg>
-);
+// Helper function to format percentage
+const formatPercent = (value?: number) => {
+  return value !== undefined ? `${value.toFixed(2)}%` : 'N/A';
+};
 ---
 
-<div class="p-1 bg-card text-card-foreground border rounded-lg shadow-sm">
-  <div class="flex items-center justify-between p-3 border-b">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Watchlist</h3>
-    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 py-2 text-primary hover:text-blue-700">
-      <IconSettings class="h-4 w-4 mr-1" />
-      Manage
-    </button>
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Watchlist
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Your list of tracked stocks.
+    </p>
   </div>
-  <div id="watchlist-content" class="p-3">
-    {/* Loading State - initial content before script runs */}
-    <div id="watchlist-loading" class="space-y-3">
-      {[...Array(3)].map(() => (
-        <div class="h-16 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-      ))}
-    </div>
 
-    {/* Empty State - will be shown by script if no items */}
-    <div id="watchlist-empty" class="hidden text-center text-slate-600 dark:text-slate-400 py-8">
-      <p>No stocks in your watchlist</p>
-      <p class="text-sm mt-2">Add stocks to track their performance</p>
-    </div>
-
-    {/* Items Container - will be populated by script */}
-    <div id="watchlist-items-container" class="space-y-3"></div>
+  <div class="border-t border-gray-200">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="p-6 space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        {[...Array(5)].map((_, i) => (
+          <div class="grid grid-cols-3 gap-4">
+            <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+            <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+            <div class="h-4 bg-gray-200 rounded col-span-1"></div>
+          </div>
+        ))}
+      </div>
+    ) : !watchlistItems?.length ? (
+      <!-- No Data Fallback -->
+      <div class="p-6 text-center text-gray-500">
+        Your watchlist is empty.
+      </div>
+    ) : (
+      <!-- Watchlist Items -->
+      <ul class="divide-y divide-gray-200">
+        {watchlistItems.map(item => (
+          <li class="px-4 py-4 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex-1 pr-4">
+                <a href={`/stock/${item.symbol}`} class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                  {item.symbol}
+                </a>
+                {item.name && <p class="text-sm text-gray-500">{item.name}</p>}
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-medium text-gray-900">{formatCurrency(item.price)}</p>
+                <p class={`text-sm ${item.change! >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {item.change !== undefined ? formatCurrency(item.change) : 'N/A'} ({item.changePercent !== undefined ? formatPercent(item.changePercent) : 'N/A'})
+                </p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 </div>
-
-<script define:vars={{ onStockSelect }}>
-  // Client-side script for fetching, rendering, and interactivity will go here.
-  // Type for watchlist items, simplified for client-side script
-  type WatchlistItemClient = {
-    id: number;
-    stockSymbol: string;
-    addedAt: string; // Date as string from API
-    stock?: {
-      symbol: string;
-      name: string;
-      price: number;
-      changePercent: number;
-    };
-  };
-
-  const watchlistLoadingEl = document.getElementById('watchlist-loading');
-  const watchlistEmptyEl = document.getElementById('watchlist-empty');
-  const watchlistItemsContainerEl = document.getElementById('watchlist-items-container');
-
-  // Helper to create a single item element
-  function createWatchlistItemElement(item: WatchlistItemClient) {
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'group flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer hover:shadow-md';
-    itemDiv.addEventListener('click', () => {
-      if (typeof onStockSelect === 'function') {
-        onStockSelect(item.stockSymbol);
-      }
-      window.location.href = `/stock/${item.stockSymbol}`;
-    });
-
-    const stockInfoDiv = document.createElement('div');
-    stockInfoDiv.className = 'flex-1';
-    
-    const symbolDiv = document.createElement('div');
-    symbolDiv.className = 'font-semibold text-slate-900 dark:text-slate-100';
-    symbolDiv.textContent = item.stock?.symbol || item.stockSymbol;
-    stockInfoDiv.appendChild(symbolDiv);
-
-    const nameDiv = document.createElement('div');
-    nameDiv.className = 'text-sm text-slate-600 dark:text-slate-400';
-    nameDiv.textContent = item.stock?.name || 'Loading...';
-    stockInfoDiv.appendChild(nameDiv);
-    itemDiv.appendChild(stockInfoDiv);
-
-    if (item.stock) {
-      const priceInfoDiv = document.createElement('div');
-      priceInfoDiv.className = 'text-right mr-4'; // Adjusted margin from mr-8 to mr-4
-      
-      const priceDiv = document.createElement('div');
-      priceDiv.className = 'font-semibold text-slate-900 dark:text-slate-100';
-      priceDiv.textContent = `$${item.stock.price.toFixed(2)}`;
-      priceInfoDiv.appendChild(priceDiv);
-
-      const changeDiv = document.createElement('div');
-      changeDiv.className = `text-sm ${item.stock.changePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
-      changeDiv.textContent = `${item.stock.changePercent >= 0 ? '+' : ''}${item.stock.changePercent.toFixed(1)}%`;
-      priceInfoDiv.appendChild(changeDiv);
-      itemDiv.appendChild(priceInfoDiv);
-    }
-
-    const removeButtonContainer = document.createElement('div');
-    // removeButtonContainer.className = 'opacity-0 group-hover:opacity-100 transition-opacity'; // Opacity handled by button directly for simplicity
-
-    const removeButton = document.createElement('button');
-    removeButton.className = 'opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700';
-    removeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>`; // IconX SVG
-    removeButton.title = 'Remove from watchlist';
-    removeButton.addEventListener('click', async (e) => {
-      e.stopPropagation(); // Prevent triggering item click
-      removeButton.disabled = true;
-      removeButton.innerHTML = `<svg class="animate-spin h-4 w-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-
-      try {
-        const response = await fetch(`/api/watchlist/${item.stockSymbol}`, { method: 'DELETE' });
-        if (response.ok) {
-          itemDiv.remove(); // Remove the item from DOM
-          // Check if watchlist is now empty
-          if (watchlistItemsContainerEl.children.length === 0) {
-            watchlistEmptyEl.classList.remove('hidden');
-          }
-        } else {
-          console.error('Failed to remove stock from watchlist');
-          // Revert button state on error
-          removeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>`;
-          removeButton.disabled = false;
-        }
-      } catch (error) {
-        console.error('Error removing stock:', error);
-        removeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>`;
-        removeButton.disabled = false;
-      }
-    });
-    removeButtonContainer.appendChild(removeButton);
-    itemDiv.appendChild(removeButtonContainer);
-    return itemDiv;
-  }
-
-  async function fetchWatchlistItems() {
-    try {
-      const response = await fetch('/api/watchlist');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const items: WatchlistItemClient[] = await response.json();
-      
-      watchlistLoadingEl.classList.add('hidden');
-      watchlistItemsContainerEl.innerHTML = ''; // Clear previous items
-
-      if (items.length === 0) {
-        watchlistEmptyEl.classList.remove('hidden');
-      } else {
-        watchlistEmptyEl.classList.add('hidden');
-        items.forEach(item => {
-          const itemElement = createWatchlistItemElement(item);
-          watchlistItemsContainerEl.appendChild(itemElement);
-        });
-      }
-    } catch (error) {
-      console.error("Failed to fetch watchlist items:", error);
-      watchlistLoadingEl.classList.add('hidden');
-      watchlistItemsContainerEl.innerHTML = '<p class="text-red-500">Failed to load watchlist. Please try again later.</p>';
-    }
-  }
-
-  // Fetch items when the script loads
-  document.addEventListener('DOMContentLoaded', fetchWatchlistItems);
-
-  // Listen for custom event to refresh watchlist (e.g., after adding a stock from StockSelector)
-  document.addEventListener('watchlist:refresh', fetchWatchlistItems);
-
-</script>

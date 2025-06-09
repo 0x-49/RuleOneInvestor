@@ -1,0 +1,31 @@
+---
+// Props for the component
+interface Props {
+  currentPage?: string;
+}
+
+const { currentPage = "dashboard" } = Astro.props;
+
+// Navigation items (adjust hrefs as needed for your Astro routing)
+const navItems = [
+  { name: "Dashboard", href: "/dashboard", id: "dashboard" },
+  { name: "Stock Analysis", href: "/stock-analysis", id: "stock-analysis" },
+  { name: "Screening", href: "/screening", id: "screening" },
+  { name: "Watchlist", href: "/watchlist", id: "watchlist" },
+];
+---
+
+<nav>
+  <ul class="flex space-x-4">
+    {navItems.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class={`text-gray-600 hover:text-blue-700 px-2 py-1 rounded-md ${currentPage === item.id ? 'bg-blue-50 text-blue-700 font-medium' : ''}`}
+        >
+          {item.name}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

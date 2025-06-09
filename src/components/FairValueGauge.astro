@@ -1,198 +1,131 @@
 ---
-import { Card, CardContent, CardHeader, CardTitle } from '../client/src/components/ui/card'; // Assuming UI components are React
-import { Badge } from '../client/src/components/ui/badge'; // Assuming UI components are React
-import { Button } from '../client/src/components/ui/button'; // Assuming UI components are React
-import { Tooltip, TooltipContent, TooltipTrigger } from '../client/src/components/ui/tooltip'; // Assuming UI components are React
-import { Target, TrendingUp, TrendingDown, Info, Calculator, DollarSign } from 'lucide-react'; // Keep for now, will address later
-
+// Props for the component
 interface Props {
-  currentPrice: number;
-  stickerPrice: number;
-  marginOfSafetyPrice: number;
-  symbol: string;
-  lastUpdated?: string;
+  stockSymbol?: string;
+  companyName?: string;
+  currentPrice?: number;
+  stickerPrice?: number;
+  mosPrice?: number;
+  isLoading?: boolean;
 }
 
-const { currentPrice, stickerPrice, marginOfSafetyPrice, symbol, lastUpdated } = Astro.props;
+const { stockSymbol, companyName, currentPrice, stickerPrice, mosPrice, isLoading = false } = Astro.props;
 
-// Calculate valuation status
-const getValuationStatus = () => {
-  if (currentPrice <= marginOfSafetyPrice) {
-    return {
-      status: "Significantly Undervalued",
-      color: "text-green-700",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200",
-      percentage: ((stickerPrice - currentPrice) / stickerPrice * 100),
-      recommendation: "Strong Buy - Excellent Margin of Safety"
-    };
-  } else if (currentPrice <= stickerPrice) {
-    return {
-      status: "Undervalued",
-      color: "text-amber-700",
-      bgColor: "bg-amber-50",
-      borderColor: "border-amber-200",
-      percentage: ((stickerPrice - currentPrice) / stickerPrice * 100),
-      recommendation: "Buy - Good Value"
-    };
-  } else {
-    return {
-      status: "Overvalued",
-      color: "text-red-700",
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200",
-      percentage: ((currentPrice - stickerPrice) / stickerPrice * 100),
-      recommendation: "Hold/Avoid - Above Fair Value"
-    };
-  }
+// Helper function to format currency
+const formatCurrency = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value) : 'N/A';
 };
 
-const valuation = getValuationStatus();
+// Calculate the position of the current price on the gauge
+const calculateGaugePosition = (current: number, min: number, max: number) => {
+  if (current === undefined || min === undefined || max === undefined || max <= min) return 0;
+  const range = max - min;
+  const position = ((current - min) / range) * 100;
+  return Math.max(0, Math.min(100, position)); // Clamp between 0 and 100
+};
 
-// Calculate gauge position (0-100%)
-const maxPrice = Math.max(currentPrice, stickerPrice, marginOfSafetyPrice) * 1.2;
-const currentPosition = (currentPrice / maxPrice) * 100;
-const stickerPosition = (stickerPrice / maxPrice) * 100;
-const mosPosition = (marginOfSafetyPrice / maxPrice) * 100;
+// Determine the range for the gauge (using MOS price and Sticker price as anchors)
+const gaugeMin = mosPrice !== undefined ? mosPrice * 0.8 : undefined; // 20% below MOS
+const gaugeMax = stickerPrice !== undefined ? stickerPrice * 1.2 : undefined; // 20% above Sticker
+
+const currentPricePosition = currentPrice !== undefined && gaugeMin !== undefined && gaugeMax !== undefined
+  ? calculateGaugePosition(currentPrice, gaugeMin, gaugeMax)
+  : undefined;
+
+// Determine the color of the current price indicator
+let priceColor = 'text-gray-500';
+if (currentPrice !== undefined && mosPrice !== undefined && stickerPrice !== undefined) {
+  if (currentPrice <= mosPrice) {
+    priceColor = 'text-green-600'; // Below MOS (Buy)
+  } else if (currentPrice > mosPrice && currentPrice <= stickerPrice) {
+    priceColor = 'text-yellow-600'; // Between MOS and Sticker (Hold/Consider)
+  } else {
+    priceColor = 'text-red-600'; // Above Sticker (Sell/Avoid)
+  }
+}
 ---
 
-<Card className={`${valuation.borderColor} border-2`}>
-  <CardHeader>
-    <CardTitle className="flex items-center justify-between">
-      <div class="flex items-center space-x-2">
-        <Target className="h-5 w-5" />
-        <span>Fair Value Analysis</span>
-      </div>
-      <Badge className={`${valuation.bgColor} ${valuation.color} border-0`}>
-        {valuation.percentage > 0 ?
-          `${valuation.percentage.toFixed(1)}% ${currentPrice <= stickerPrice ? 'Undervalued' : 'Overvalued'}` :
-          'At Fair Value'
-        }
-      </Badge>
-    </CardTitle>
-    {lastUpdated && (
-      <p class="text-sm text-gray-500">Updated {lastUpdated}</p>
-    )}
-  </CardHeader>
-  <CardContent>
-    {/* Main Gauge Visualization */}
-    <div class="relative mb-8">
-      {/* Gauge Background */}
-      <div class="relative h-32 bg-gray-100 rounded-full overflow-hidden">
-        {/* Value Zones */}
-        <div
-          class="absolute left-0 top-0 h-full bg-green-300 opacity-60"
-          style={`width: ${mosPosition}%;`}
-        />
-        <div
-          class="absolute top-0 h-full bg-amber-300 opacity-60"
-          style={`left: ${mosPosition}%; width: ${stickerPosition - mosPosition}%;`}
-        />
-        <div
-          class="absolute top-0 h-full bg-red-300 opacity-60"
-          style={`left: ${stickerPosition}%; width: ${100 - stickerPosition}%;`}
-        />
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Fair Value Gauge
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Visualizing current price relative to estimated fair value for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
+  </div>
 
-        {/* Current Price Indicator */}
-        <div
-          class="absolute top-0 w-1 h-full bg-blue-600 shadow-lg"
-          style={`left: ${currentPosition}%; transform: translateX(-50%);`}
-        />
-
-        {/* Price Labels */}
-        <div class="absolute inset-0 flex items-center justify-between px-4 text-xs font-medium">
-          <span class="text-green-700">Excellent Buy</span>
-          <span class="text-amber-700">Good Value</span>
-          <span class="text-red-700">Overvalued</span>
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        <div class="h-8 bg-gray-200 rounded w-full"></div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="h-12 bg-gray-200 rounded"></div>
+          <div class="h-12 bg-gray-200 rounded"></div>
+          <div class="h-12 bg-gray-200 rounded"></div>
         </div>
       </div>
-
-      {/* Current Price Badge */}
-      <div
-        class="absolute -bottom-6 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
-        style={`left: ${currentPosition}%; transform: translateX(-50%);`}
-      >
-        ${currentPrice.toFixed(2)}
+    ) : currentPrice === undefined || stickerPrice === undefined || mosPrice === undefined ? (
+      <!-- No Data Fallback -->
+      <div class="text-center text-gray-500">
+        Fair value data not available for {stockSymbol || 'this stock'}.
       </div>
-    </div>
+    ) : (
+      <!-- Fair Value Gauge -->
+      <div class="space-y-6">
+        <div class="relative h-8 bg-gray-200 rounded-full overflow-hidden">
+          <!-- Green (Buy) Zone -->
+          {gaugeMin !== undefined && mosPrice !== undefined && gaugeMax !== undefined && (
+            <div 
+              class="absolute inset-y-0 left-0 bg-green-500 opacity-75"
+              style={`width: ${calculateGaugePosition(mosPrice!, gaugeMin!, gaugeMax!)}%;`}
+            ></div>
+          )}
+          <!-- Yellow (Hold) Zone -->
+           {gaugeMin !== undefined && mosPrice !== undefined && stickerPrice !== undefined && gaugeMax !== undefined && (
+            <div
+              class="absolute inset-y-0 bg-yellow-500 opacity-75"
+              style={`left: ${calculateGaugePosition(mosPrice!, gaugeMin!, gaugeMax!)}%; width: ${calculateGaugePosition(stickerPrice!, mosPrice!, gaugeMax!) - calculateGaugePosition(mosPrice!, gaugeMin!, gaugeMax!)}%;`}
+            ></div>
+          )}
+          <!-- Red (Sell) Zone -->
+           {stickerPrice !== undefined && gaugeMax !== undefined && (
+            <div
+              class="absolute inset-y-0 bg-red-500 opacity-75"
+              style={`left: ${calculateGaugePosition(stickerPrice!, gaugeMin!, gaugeMax!)}%; width: ${100 - calculateGaugePosition(stickerPrice!, gaugeMin!, gaugeMax!)}%;`}
+            ></div>
+          )}
 
-    {/* Key Metrics Grid */}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <div
-        class="text-center p-4 bg-blue-50 rounded-lg border"
-      >
-        <div class="flex items-center justify-center mb-2">
-          <DollarSign className="h-4 w-4 text-blue-600 mr-1" />
-          <span class="text-sm font-medium text-blue-800">Current Price</span>
+          <!-- Current Price Indicator -->
+          {currentPricePosition !== undefined && (
+            <div
+              class={`absolute top-0 bottom-0 w-1 bg-gray-900 rounded-full shadow-lg ${priceColor === 'text-green-600' ? 'bg-green-800' : priceColor === 'text-yellow-600' ? 'bg-yellow-800' : priceColor === 'text-red-600' ? 'bg-red-800' : 'bg-gray-900'}`}
+              style={`left: ${currentPricePosition}%; transform: translateX(-50%);`}
+            ></div>
+          )}
         </div>
-        <div class="text-2xl font-bold text-blue-600">${currentPrice.toFixed(2)}</div>
-      </div>
 
-      <div
-        class="text-center p-4 bg-green-50 rounded-lg border"
-      >
-        <div class="flex items-center justify-center mb-2">
-          <Target className="h-4 w-4 text-green-600 mr-1" />
-          <span class="text-sm font-medium text-green-800">Sticker Price</span>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="h-3 w-3 text-gray-400 ml-1" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Phil Town's calculated fair value based on growth projections</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <div class="text-2xl font-bold text-green-600">${stickerPrice.toFixed(2)}</div>
-      </div>
-
-      <div
-        class="text-center p-4 bg-orange-50 rounded-lg border"
-      >
-        <div class="flex items-center justify-center mb-2">
-          <Calculator className="h-4 w-4 text-orange-600 mr-1" />
-          <span class="text-sm font-medium text-orange-800">MOS Price</span>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="h-3 w-3 text-gray-400 ml-1" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Margin of Safety: 50% discount from Sticker Price</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <div class="text-2xl font-bold text-orange-600">${marginOfSafetyPrice.toFixed(2)}</div>
-      </div>
-    </div>
-
-    {/* Valuation Summary */}
-    <div class={`${valuation.bgColor} border ${valuation.borderColor}`}>
-      <div class="flex items-center justify-between mb-2">
-        <h4 class={`${valuation.color}`}>Valuation Assessment</h4>
-        {valuation.percentage > 0 && (
-          <div class="flex items-center space-x-1">
-            {currentPrice <= stickerPrice ?
-              <TrendingDown className="h-4 w-4 text-green-600" /> :
-              <TrendingUp className="h-4 w-4 text-red-600" />
-            }
-            <span class={`text-sm font-medium ${valuation.color}`}>
-              {Math.abs(valuation.percentage).toFixed(1)}%
-            </span>
+        <div class="grid grid-cols-3 text-center text-sm font-medium">
+          <div>
+            <p class="text-green-600">Buy Below</p>
+            <p class="text-gray-900 font-bold">{formatCurrency(mosPrice)}</p>
           </div>
-        )}
-      </div>
-      <p class={`${valuation.color}`}>{valuation.status}</p>
-      <p class={`${valuation.color} mt-1`}>{valuation.recommendation}</p>
-    </div>
+          <div>
+            <p class="text-yellow-600">Fair Value</p>
+            <p class="text-gray-900 font-bold">{formatCurrency(stickerPrice)}</p>
+          </div>
+          <div>
+            <p class="text-red-600">Sell Above</p>
+            <p class="text-gray-900 font-bold">{formatCurrency(stickerPrice)}</p> {/* Often Sticker Price is used as a sell signal too */}
+          </div>
+        </div>
 
-    {/* Rule One Explanation */}
-    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-      <h5 class="font-medium text-gray-800 mb-2">Phil Town's Rule One Valuation</h5>
-      <div class="text-sm text-gray-600 space-y-1">
-        <p>• <strong>Sticker Price:</strong> Fair value based on growth assumptions and minimum 15% return</p>
-        <p>• <strong>Margin of Safety:</strong> 50% discount from Sticker Price for risk protection</p>
-        <p>• <strong>Buy Signal:</strong> Stock trading below Margin of Safety Price</p>
+        <div class="text-center text-sm text-gray-600">
+          Current Price: <span class={`font-bold ${priceColor}`}>{formatCurrency(currentPrice)}</span>
+        </div>
       </div>
-    </div>
-  </CardContent>
-</Card>
+    )}
+  </div>
+</div>

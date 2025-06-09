@@ -1,226 +1,155 @@
 ---
-import { Card, CardContent, CardHeader, CardTitle } from '../client/src/components/ui/card'; // Assuming UI components are React
-import { Badge } from '../client/src/components/ui/badge'; // Assuming UI components are React
-import { Button } from '../client/src/components/ui/button'; // Assuming UI components are React
-import { Tooltip, TooltipContent, TooltipTrigger } from '../client/src/components/ui/tooltip'; // Assuming UI components are React
-import { BarChart3, Target, Info, TrendingUp, TrendingDown, Calculator, DollarSign } from 'lucide-react'; // Keep for now, will address later
-// Recharts and Framer Motion are React-specific and will not work directly in a static Astro component.
-// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, Cell } from "recharts";
-// import { motion } from "framer-motion";
-
-interface PEData {
-  period: string;
-  pe: number;
-  price: number;
-  eps: number;
-}
-
+// Props for the component
 interface Props {
-  symbol: string;
-  currentPE: number;
-  industryAvgPE: number;
-  fairPE: number;
-  historicalPE: PEData[];
-  analystTargetPrice?: number;
-  numAnalysts?: number;
+  stockSymbol?: string;
+  companyName?: string;
+  peRatio?: number;
+  industryPeRatio?: number;
+  sectorPeRatio?: number;
+  historicalPeRatios?: { year: string; peRatio?: number }[];
+  isLoading?: boolean;
 }
 
-const { symbol, currentPE, industryAvgPE, fairPE, historicalPE, analystTargetPrice, numAnalysts } = Astro.props;
+const { stockSymbol, companyName, peRatio, industryPeRatio, sectorPeRatio, historicalPeRatios, isLoading = false } = Astro.props;
 
-// Prepare comparison data (for display, charting needs a different approach)
-const comparisonData = [
-  { name: 'Current P/E', value: currentPE, color: '#3b82f6' },
-  { name: 'Industry Avg', value: industryAvgPE, color: '#6b7280' },
-  { name: 'Fair P/E', value: fairPE, color: '#10b981' }
-];
-
-// Determine P/E status
-const getPEStatus = () => {
-  if (currentPE < industryAvgPE * 0.8) {
-    return { status: "Attractive", color: "text-green-600", bg: "bg-green-50" };
-  } else if (currentPE > industryAvgPE * 1.2) {
-    return { status: "Expensive", color: "text-red-600", bg: "bg-red-50" };
-  } else {
-    return { status: "Reasonable", color: "text-amber-600", bg: "bg-amber-50" };
-  }
+// Helper function to format P/E ratio
+const formatPERatio = (value?: number) => {
+  return value !== undefined ? value.toFixed(2) : 'N/A';
 };
 
-const peStatus = getPEStatus();
+// Prepare chart data for historical P/E ratios
+const chartData = historicalPeRatios?.map(item => ({
+  year: item.year,
+  peRatio: item.peRatio,
+})).reverse() || [];
 
-// Calculate P/E trends
-const recentPE = historicalPE.slice(-5);
-const peChange = recentPE.length >= 2 ?
-  ((recentPE[recentPE.length - 1].pe - recentPE[0].pe) / recentPE[0].pe) * 100 : 0;
-
-// Calculate historical P/E stats
-const historicalPEValues = historicalPE.map(d => d.pe);
-const fiveYearHighPE = historicalPEValues.length > 0 ? Math.max(...historicalPEValues) : 0;
-const fiveYearLowPE = historicalPEValues.length > 0 ? Math.min(...historicalPEValues) : 0;
-const fiveYearAvgPE = historicalPEValues.length > 0 ? historicalPEValues.reduce((sum, d) => sum + d, 0) / historicalPEValues.length : 0;
+const hasHistoricalData = chartData.length > 0;
 ---
 
-<div class="space-y-6">
-  {/* P/E Comparison Overview */}
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <BarChart3 className="h-5 w-5" />
-          <span>Price-to-Earnings Analysis</span>
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      P/E Ratio Analysis
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Analyzing the Price-to-Earnings ratio for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="h-12 bg-gray-200 rounded"></div>
+          <div class="h-12 bg-gray-200 rounded"></div>
+          <div class="h-12 bg-gray-200 rounded"></div>
         </div>
-        <Badge className={`${peStatus.bg} ${peStatus.color} border-0`}>
-          {peStatus.status} Valuation
-        </Badge>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      {/* Key P/E Metrics */}
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          class="text-center p-4 bg-blue-50 rounded-lg border"
-        >
-          <div class="text-2xl font-bold text-blue-600">{currentPE.toFixed(1)}x</div>
-          <div class="text-sm text-gray-600">Current P/E</div>
-          <div class="text-xs text-gray-500 mt-1">
-            {peChange >= 0 ? '+' : ''}{peChange.toFixed(1)}% vs 5Y avg
+        <div class="h-64 bg-gray-200 rounded w-full"></div>
+      </div>
+    ) : (peRatio === undefined && industryPeRatio === undefined && sectorPeRatio === undefined && !hasHistoricalData) ? (
+      <!-- No Data Fallback -->
+      <div class="text-center text-gray-500">
+        P/E ratio data not available for {stockSymbol || 'this stock'}.
+      </div>
+    ) : (
+      <!-- P/E Ratio Metrics and Chart -->
+      <div class="space-y-6">
+        <div class="grid grid-cols-3 text-center text-sm font-medium">
+          <div>
+            <p class="text-gray-600">Current P/E</p>
+            <p class="text-gray-900 font-bold">{formatPERatio(peRatio)}</p>
+          </div>
+          <div>
+            <p class="text-gray-600">Industry Avg P/E</p>
+            <p class="text-gray-900 font-bold">{formatPERatio(industryPeRatio)}</p>
+          </div>
+          <div>
+            <p class="text-gray-600">Sector Avg P/E</p>
+            <p class="text-gray-900 font-bold">{formatPERatio(sectorPeRatio)}</p>
           </div>
         </div>
 
-        <div
-          class="text-center p-4 bg-gray-50 rounded-lg border"
-        >
-          <div class="text-2xl font-bold text-gray-600">{industryAvgPE.toFixed(1)}x</div>
-          <div class="text-sm text-gray-600">Industry Average</div>
-          <div class="text-xs text-gray-500 mt-1">
-            {((currentPE - industryAvgPE) / industryAvgPE * 100).toFixed(0)}% premium
-          </div>
-        </div>
-
-        <div
-          class="text-center p-4 bg-green-50 rounded-lg border"
-        >
-          <div class="text-2xl font-bold text-green-600">{fairPE.toFixed(1)}x</div>
-          <div class="text-sm text-gray-600">Fair P/E</div>
-          <Tooltip>
-            <TooltipTrigger>
-              <div class="text-xs text-gray-500 mt-1 cursor-help">
-                Rule One Calculation <Info className="h-3 w-3 inline ml-1" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Based on growth rate and quality factors</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-
-        {analystTargetPrice && (
-          <div
-            class="text-center p-4 bg-purple-50 rounded-lg border"
-          >
-            <div class="text-2xl font-bold text-purple-600">${analystTargetPrice.toFixed(0)}</div>
-            <div class="text-sm text-gray-600">Analyst Target</div>
-            <div class="text-xs text-gray-500 mt-1">
-              {numAnalysts || 0} analysts
-            </div>
+        {hasHistoricalData && (
+          <!-- Historical P/E Ratio Chart -->
+          <div class="mt-6">
+            <h4 class="text-md font-medium text-gray-900 mb-3">Historical P/E Ratio</h4>
+            <div class="w-full h-64" id="pe-ratio-chart"></div>
           </div>
         )}
       </div>
-
-      {/* P/E Comparison Bar Chart - Recharts removed, placeholder div */}
-      <div class="h-64 mb-6 bg-gray-100 flex items-center justify-center rounded-lg">
-        <p class="text-gray-500">Chart Placeholder</p>
-      </div>
-
-      {/* P/E Analysis Summary */}
-      <div class={`p-4 rounded-lg ${peStatus.bg} border`}>
-        <h4 class={`font-semibold ${peStatus.color} mb-2`}>P/E Ratio Assessment</h4>
-        <div class="space-y-2 text-sm">
-          <p class={peStatus.color}>
-            • {symbol}'s P/E of {currentPE.toFixed(1)}x is {currentPE > industryAvgPE ? 'above' : 'below'} industry average
-          </p>
-          <p class={peStatus.color}>
-            • Trading at {((currentPE - fairPE) / fairPE * 100).toFixed(0)}% {currentPE > fairPE ? 'premium' : 'discount'} to calculated fair P/E
-          </p>
-          <p class={peStatus.color}>
-            • Historical trend: P/E has {peChange >= 0 ? 'increased' : 'decreased'} by {Math.abs(peChange).toFixed(1)}% recently
-          </p>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-
-  {/* Historical P/E Trend */}
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center space-x-2">
-        <TrendingUp className="h-5 w-5" />
-        <span>Historical P/E Ratio Trend</span>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      {/* Historical P/E Chart - Recharts removed, placeholder div */}
-      <div class="h-80 bg-gray-100 flex items-center justify-center rounded-lg">
-        <p class="text-gray-500">Chart Placeholder</p>
-      </div>
-
-      <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div class="p-3 bg-blue-50 rounded-lg">
-          <div class="text-lg font-bold text-blue-600">
-            {fiveYearHighPE.toFixed(1)}x
-          </div>
-          <div class="text-sm text-gray-600">5Y High P/E</div>
-        </div>
-        <div class="p-3 bg-green-50 rounded-lg">
-          <div class="text-lg font-bold text-green-600">
-            {fiveYearLowPE.toFixed(1)}x
-          </div>
-          <div class="text-sm text-gray-600">5Y Low P/E</div>
-        </div>
-        <div class="p-3 bg-purple-50 rounded-lg">
-          <div class="text-lg font-bold text-purple-600">
-            {fiveYearAvgPE.toFixed(1)}x
-          </div>
-          <div class="text-sm text-gray-600">5Y Average</div>
-        </div>
-        <div class="p-3 bg-gray-50 rounded-lg">
-          <div class="text-lg font-bold text-gray-600">
-            {currentPE > fiveYearAvgPE ? 'Above' : 'Below'}
-          </div>
-          <div class="text-sm text-gray-600">vs Average</div>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-
-  {/* P/E Explanation */}
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center space-x-2">
-        <Target className="h-5 w-5" />
-        <span>Understanding P/E Ratios</span>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h4 class="font-semibold text-gray-800 mb-3">What P/E Tells You</h4>
-          <div class="space-y-2 text-sm text-gray-600">
-            <p>• <strong>Higher P/E:</strong> Investors expect higher earnings growth</p>
-            <p>• <strong>Lower P/E:</strong> May indicate undervaluation or slower growth</p>
-            <p>• <strong>Industry Context:</strong> Compare within same sector for relevance</p>
-            <p>• <strong>Growth Rate:</strong> P/E should align with earnings growth rate</p>
-          </div>
-        </div>
-        <div>
-          <h4 class="font-semibold text-gray-800 mb-3">Rule One P/E Guidelines</h4>
-          <div class="space-y-2 text-sm text-gray-600">
-            <p>• <strong>Fair P/E:</strong> Typically equals earnings growth rate</p>
-            <p>• <strong>Quality Factor:</strong> Higher quality companies warrant premium</p>
-            <p>• <strong>Safety Margin:</strong> Buy below calculated fair P/E</p>
-            <p>• <strong>Historical Context:</strong> Consider company's P/E range</p>
-          </div>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
+    )}
+  </div>
 </div>
+
+{hasHistoricalData && (
+  <script define:vars={{ chartData }}>
+    import Chart from 'chart.js/auto'; // Import Chart.js
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const chartCanvas = document.getElementById('pe-ratio-chart');
+
+      if (chartCanvas && chartData && chartData.length > 0) {
+        new Chart(chartCanvas, {
+          type: 'line',
+          data: {
+            labels: chartData.map(item => item.year),
+            datasets: [
+              {
+                label: 'P/E Ratio',
+                data: chartData.map(item => item.peRatio),
+                borderColor: '#4F46E5', // Indigo
+                backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                tension: 0.1,
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'P/E Ratio'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Year'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                      label += context.parsed.y.toFixed(2);
+                    }
+                    return label;
+                  }
+                }
+              }
+            }
+          },
+        });
+      }
+    });
+  </script>
+)}
+
+<style>
+  /* Add any component-specific styles here */
+</style>

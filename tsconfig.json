@@ -7,12 +7,17 @@
     "paths": {
       "@server/*": ["./src/server/*"],
       "@shared/*": ["./src/shared/*"],
-      "@client/*": ["./src/client/src/*"],
       "@components/*": ["./src/components/*"],
       "@layouts/*": ["./src/layouts/*"],
-      "@/*": ["src/*"]
-    }
+      "@/*": ["./src/*"],
+      "react": ["./node_modules/react"],
+      "react-dom": ["./node_modules/react-dom"],
+      "@components/ui/*": ["./src/components/ui/*"]
+    },
+    "types": ["@astrojs/tailwind"],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
-  "include": [".astro/types.d.ts", "**/*", "../client/src", "./src/server", "./src/shared"],
+  "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
 }

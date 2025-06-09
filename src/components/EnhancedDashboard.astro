@@ -1,0 +1,168 @@
+---
+// Define interfaces for dashboard data structure (replace with actual types if available)
+interface PortfolioSummary {
+  totalValue?: number;
+  todayChange?: number;
+  todayChangePercent?: number;
+  overallChange?: number;
+  overallChangePercent?: number;
+}
+
+interface WatchlistItem {
+  symbol: string;
+  name?: string;
+  price?: number;
+  change?: number;
+  changePercent?: number;
+}
+
+interface WatchlistSummary {
+  items?: WatchlistItem[];
+}
+
+interface RecentActivityItem {
+  title?: string;
+  summary?: string;
+  source?: string;
+  date?: string;
+  link?: string;
+}
+
+interface RecentActivity {
+  items?: RecentActivityItem[];
+}
+
+interface DashboardData {
+  portfolioSummary?: PortfolioSummary;
+  watchlistSummary?: WatchlistSummary;
+  recentActivity?: RecentActivity;
+}
+
+// Props for the component
+interface Props {
+  stockSymbol?: string;
+  companyName?: string;
+  isLoading?: boolean;
+  dashboardData?: DashboardData;
+}
+
+const { stockSymbol, companyName, isLoading = false, dashboardData } = Astro.props;
+
+// Helper function to format currency
+const formatCurrency = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(value) : 'N/A';
+};
+
+// Helper function to format percentage
+const formatPercent = (value?: number) => {
+  return value !== undefined ? `${value.toFixed(2)}%` : 'N/A';
+};
+
+// Helper function to format numbers
+const formatNumber = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US').format(value) : 'N/A';
+};
+
+// Helper function to format market cap
+const formatMarketCap = (value?: number) => {
+  if (value === undefined) return 'N/A';
+
+  if (value >= 1e12) {
+    return `$${(value / 1e12).toFixed(2)}T`;
+  } else if (value >= 1e9) {
+    return `$${(value / 1e9).toFixed(2)}B`;
+  } else if (value >= 1e6) {
+    return `$${(value / 1e6).toFixed(2)}M`;
+  } else {
+    return `$${value.toFixed(2)}`;
+  }
+};
+---
+
+<div class="space-y-6">
+  {isLoading ? (
+    <!-- Skeleton Loader -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white shadow rounded-lg p-6 h-48"></div>
+      <div class="bg-white shadow rounded-lg p-6 h-48"></div>
+      <div class="bg-white shadow rounded-lg p-6 h-64 md:col-span-2"></div>
+    </div>
+  ) : !dashboardData ? (
+    <!-- No Data Fallback -->
+    <div class="bg-white shadow rounded-lg p-6 text-center text-gray-500">
+      No dashboard data available.
+    </div>
+  ) : (
+    <!-- Dashboard Content -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Portfolio Summary -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-semibold mb-4">Portfolio Summary</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Total Value:</span>
+            <span class="font-bold text-lg">{formatCurrency(dashboardData.portfolioSummary?.totalValue)}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Today's Gain/Loss:</span>
+            <span class={`font-bold text-lg ${dashboardData.portfolioSummary?.todayChange! >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {dashboardData.portfolioSummary?.todayChange !== undefined ? formatCurrency(dashboardData.portfolioSummary.todayChange) : 'N/A'} ({dashboardData.portfolioSummary?.todayChangePercent !== undefined ? formatPercent(dashboardData.portfolioSummary.todayChangePercent) : 'N/A'})
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Overall Gain/Loss:</span>
+            <span class={`font-bold text-lg ${dashboardData.portfolioSummary?.overallChange! >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {dashboardData.portfolioSummary?.overallChange !== undefined ? formatCurrency(dashboardData.portfolioSummary.overallChange) : 'N/A'} ({dashboardData.portfolioSummary?.overallChangePercent !== undefined ? formatPercent(dashboardData.portfolioSummary.overallChangePercent) : 'N/A'})
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watchlist Summary -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-semibold mb-4">Watchlist Summary</h3>
+        <div class="space-y-4">
+          {dashboardData.watchlistSummary?.items?.length! > 0 ? (
+            dashboardData.watchlistSummary!.items!.map(item => (
+              <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                  <p class="font-medium">{item.symbol}</p>
+                  <p class="text-sm text-gray-600">{item.name}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-medium">{formatCurrency(item.price)}</p>
+                  <p class={`text-sm ${item.change! >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {item.change !== undefined ? formatCurrency(item.change) : 'N/A'} ({item.changePercent !== undefined ? formatPercent(item.changePercent) : 'N/A'})
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div class="text-center text-gray-500">No items in watchlist.</div>
+          )}
+        </div>
+      </div>
+
+      <!-- Recent Activity/News -->
+      <div class="bg-white shadow rounded-lg p-6 md:col-span-2">
+        <h3 class="text-lg font-semibold mb-4">Recent Activity & News</h3>
+        <div class="space-y-4">
+          {dashboardData.recentActivity?.items?.length! > 0 ? (
+            dashboardData.recentActivity!.items!.map(item => (
+              <div class="border-b pb-3">
+                <p class="font-medium">{item.title}</p>
+                <p class="text-sm text-gray-600 mb-2">{item.summary}</p>
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">{item.source} • {item.date}</span>
+                  {item.link && <a href={item.link} class="text-blue-600 hover:text-blue-800">Read more</a>}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div class="text-center text-gray-500">No recent activity or news.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  )}
+</div>

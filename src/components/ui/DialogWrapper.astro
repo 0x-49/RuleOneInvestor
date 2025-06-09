@@ -1,0 +1,33 @@
+---
+/**
+ * DialogWrapper.astro
+ * 
+ * A wrapper component that ensures proper React context for Dialog/Sheet components
+ * from Radix UI when used within Astro templates.
+ */
+
+import { DialogBridge } from '@client/components/ui/ReactIslandBridge';
+import { Sheet, SheetTrigger, SheetContent } from '@client/components/ui/sheet';
+
+export interface Props {
+  triggerClass?: string;
+  contentClass?: string;
+  side?: 'top' | 'right' | 'bottom' | 'left';
+}
+
+const { triggerClass, contentClass, side = 'right' } = Astro.props;
+
+// Get the first element of the slot for the trigger and the rest for content
+const slot = await Astro.slots.render('default');
+---
+
+<DialogBridge client:only="react">
+  <Sheet>
+    <SheetTrigger class={triggerClass}>
+      <slot name="trigger" />
+    </SheetTrigger>
+    <SheetContent side={side} class={contentClass}>
+      <slot />
+    </SheetContent>
+  </Sheet>
+</DialogBridge>

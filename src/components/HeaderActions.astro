@@ -1,0 +1,77 @@
+---
+// Props for the component
+// Assuming this component might receive user authentication status or theme preference
+interface Props {
+  isAuthenticated?: boolean;
+  userName?: string;
+  currentTheme?: 'light' | 'dark';
+}
+
+const { isAuthenticated = false, userName, currentTheme = 'light' } = Astro.props;
+
+// Icons (using inline SVG for simplicity)
+const SunIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2"/>
+    <path d="M12 20v2"/>
+    <path d="m4.93 4.93 1.41 1.41"/>
+    <path d="m17.66 17.66 1.41 1.41"/>
+    <path d="M2 12h2"/>
+    <path d="M20 12h2"/>
+    <path d="m6.34 17.66-1.41 1.41"/>
+    <path d="m19.07 4.93-1.41 1.41"/>
+  </svg>
+`;
+
+const MoonIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon">
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+  </svg>
+`;
+
+const UserIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+`;
+---
+
+<div class="flex items-center space-x-4">
+  <!-- Theme Toggle Button -->
+  <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100">
+    {currentTheme === 'light' ? (
+      <Fragment set:html={MoonIcon} class="h-5 w-5 text-gray-600" />
+    ) : (
+      <Fragment set:html={SunIcon} class="h-5 w-5 text-gray-600" />
+    )}
+  </button>
+
+  {isAuthenticated ? (
+    <!-- User Profile/Logout -->
+    <div class="flex items-center space-x-2">
+      <Fragment set:html={UserIcon} class="h-5 w-5 text-gray-600" />
+      <span class="text-gray-700 text-sm font-medium">{userName || 'User'}</span>
+      <button class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
+        Logout
+      </button>
+    </div>
+  ) : (
+    <!-- Login Button -->
+    <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+      Login
+    </button>
+  )}
+</div>
+
+<script>
+  // Client-side script for theme toggle
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    // This is a placeholder. Actual theme toggling logic would go here,
+    // likely involving updating a class on the body or html element
+    // and potentially saving the preference to local storage.
+    console.log('Theme toggle clicked');
+    // Example: document.documentElement.classList.toggle('dark');
+  });
+</script>

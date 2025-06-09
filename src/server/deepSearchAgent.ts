@@ -1,4 +1,4 @@
-import { InsertFinancialMetrics } from "@shared/schema";
+import type { InsertFinancialMetrics } from "@shared/schema";
 import { geminiService } from "./geminiService";
 import { braveSearchService } from "./braveSearchService";
 

@@ -1,0 +1,130 @@
+---
+// Props for the component
+interface Props {
+  stockSymbol?: string;
+  companyName?: string;
+  financialData?: {
+    incomeStatement: any[]; // Replace 'any' with a more specific type if available
+    balanceSheet: any[]; // Replace 'any' with a more specific type if available
+    cashFlowStatement: any[]; // Replace 'any' with a more specific type if available
+  };
+}
+
+const { stockSymbol = '', companyName = '', financialData } = Astro.props;
+
+// Helper function to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+};
+
+// Helper function to format numbers
+const formatNumber = (value: number) => {
+  return new Intl.NumberFormat('en-US').format(value);
+};
+
+// Determine the years for the table headers
+const years = financialData?.incomeStatement.map(item => item.year).reverse() || [];
+---
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Financial Statements
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Key financial data for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
+  </div>
+  
+  <div class="border-t border-gray-200">
+    {financialData ? (
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Metric
+              </th>
+              {years.map(year => (
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {year}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {/* Income Statement */}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" colspan={years.length + 1}>
+                Income Statement
+              </td>
+            </tr>
+            {financialData.incomeStatement[0] && Object.keys(financialData.incomeStatement[0]).map(key => {
+              if (key === 'year') return null;
+              return (
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </td>
+                  {financialData.incomeStatement.map(item => (
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {typeof item[key] === 'number' ? formatCurrency(item[key]) : item[key]}
+                    </td>
+                  )).reverse()}
+                </tr>
+              );
+            })}
+
+            {/* Balance Sheet */}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" colspan={years.length + 1}>
+                Balance Sheet
+              </td>
+            </tr>
+             {financialData.balanceSheet[0] && Object.keys(financialData.balanceSheet[0]).map(key => {
+              if (key === 'year') return null;
+              return (
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </td>
+                  {financialData.balanceSheet.map(item => (
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {typeof item[key] === 'number' ? formatCurrency(item[key]) : item[key]}
+                    </td>
+                  )).reverse()}
+                </tr>
+              );
+            })}
+
+            {/* Cash Flow Statement */}
+             <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" colspan={years.length + 1}>
+                Cash Flow Statement
+              </td>
+            </tr>
+             {financialData.cashFlowStatement[0] && Object.keys(financialData.cashFlowStatement[0]).map(key => {
+              if (key === 'year') return null;
+              return (
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </td>
+                  {financialData.cashFlowStatement.map(item => (
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {typeof item[key] === 'number' ? formatCurrency(item[key]) : item[key]}
+                    </td>
+                  )).reverse()}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <div class="p-6 text-center text-gray-500">
+        No financial data available for {stockSymbol || 'this stock'}.
+      </div>
+    )}
+  </div>
+</div>

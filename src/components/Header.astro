@@ -1,263 +1,48 @@
 ---
-// Imports for Astro UI wrappers
-import Button from './ui/button.astro';
-import DropdownMenu from './ui/DropdownMenu.astro';
-import DropdownMenuTrigger from './ui/DropdownMenuTrigger.astro';
-import DropdownMenuContent from './ui/DropdownMenuContent.astro';
-import DropdownMenuItem from './ui/DropdownMenuItem.astro';
-import DropdownMenuSeparator from './ui/DropdownMenuSeparator.astro';
-import SheetWrapper from './ui/SheetWrapper.astro';
-
-// Imports for Lucide icons
-import {
-  TrendingUp,
-  Search,
-  Star,
-  BarChart3,
-  Calculator,
-  Menu as MenuIcon, // Renamed to avoid conflict if we name a var 'Menu'
-  User as UserIcon,
-  Settings as SettingsIcon,
-  LogOut as LogOutIcon,
-  ChevronDown,
-  Home as HomeIcon,
-  PieChart as PieChartIcon
-} from 'lucide-react';
-
-export interface UserData {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  profileImageUrl?: string;
+// Props for the component
+interface Props {
+  currentPage?: string;
 }
 
-export interface Props {
-  isAuthenticated: boolean;
-  user?: UserData;
-  // currentPage: string; // Astro.url.pathname will be used directly
-}
+const { currentPage = "dashboard" } = Astro.props;
 
-const { isAuthenticated = false, user = {} } = Astro.props as Props; // Default to not authenticated
-const currentPath = Astro.url.pathname;
-
-const navigationItems = [
-  {
-    label: "Dashboard",
-    href: "/",
-    icon: HomeIcon,
-  },
-  {
-    label: "Stock Search",
-    href: "/search",
-    icon: Search,
-  },
-  {
-    label: "Watchlist",
-    href: "/watchlist",
-    icon: Star,
-  },
-  {
-    label: "Batch Analysis",
-    href: "/batch-analysis",
-    icon: BarChart3,
-  },
-  {
-    label: "Valuation Tool",
-    href: "/valuation",
-    icon: Calculator,
-  },
-  {
-    label: "Market Overview",
-    href: "/market",
-    icon: PieChartIcon,
-  }
+// Navigation items
+const navItems = [
+  { name: "Dashboard", href: "/dashboard", id: "dashboard" },
+  { name: "Stock Analysis", href: "/stock-analysis", id: "stock-analysis" },
+  { name: "Screening", href: "/screening", id: "screening" },
+  { name: "Watchlist", href: "/watchlist", id: "watchlist" }
 ];
-
-// Client-side script for handling clicks that change window.location
-const handleLogoutClick = () => {
-  window.location.href = "/api/logout";
-};
-
-const handleSignInClick = () => {
-  window.location.href = "/api/login";
-};
-
-// Note: Mobile menu state (mobileMenuOpen) will be handled by the Sheet component's client-side logic.
 ---
 
-<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-  <div class="container mx-auto px-4">
-    <div class="flex h-16 items-center justify-between">
-      <!-- Logo and Brand -->
-      <div class="flex items-center space-x-2">
-        <a href="/" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-          <div class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
-            <TrendingUp className="h-5 w-5 text-white" client:only="react" />
-          </div>
-          <div class="hidden sm:block">
-            <h1 class="text-lg font-bold text-gray-900 dark:text-white">
-              Rule One Assistant
-            </h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 -mt-1">
-              Phil Town's Investment Method
-            </p>
-          </div>
-        </a>
-      </div>
+<header class="bg-white shadow">
+  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+      <h1 class="text-2xl font-bold text-blue-700">Rule One Investor</h1>
+    </div>
 
-      <!-- Desktop Navigation -->
-      <nav class="hidden lg:flex items-center space-x-1">
-        {navigationItems.map((item) => {
-          const isActive = item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
-          return (
-            <a href={item.href}>
-              <Button
-                variant={isActive ? "default" : "ghost"}
-                size="sm"
-                class="flex items-center space-x-2"
-              >
-                {item.icon === HomeIcon && <HomeIcon className="h-4 w-4" client:only="react" />}
-                {item.icon === Search && <Search className="h-4 w-4" client:only="react" />}
-                {item.icon === Star && <Star className="h-4 w-4" client:only="react" />}
-                {item.icon === BarChart3 && <BarChart3 className="h-4 w-4" client:only="react" />}
-                {item.icon === Calculator && <Calculator className="h-4 w-4" client:only="react" />}
-                {item.icon === PieChartIcon && <PieChartIcon className="h-4 w-4" client:only="react" />}
-                <span>{item.label}</span>
-              </Button>
+    <nav>
+      <ul class="flex space-x-6">
+        {navItems.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class={`text-gray-600 hover:text-blue-700 px-2 py-1 rounded-md ${currentPage === item.id ? 'bg-blue-50 text-blue-700 font-medium' : ''}`}
+            >
+              {item.name}
             </a>
-          );
-        })}
-      </nav>
+          </li>
+        ))}
+      </ul>
+    </nav>
 
-      <!-- Right Side - User Menu & Mobile Menu Trigger -->
-      <div class="flex items-center space-x-3">
-        <!-- Search Quick Access (Desktop) -->
-        <a href="/search" class="hidden md:inline-flex">
-          <Button variant="outline" size="sm">
-            <Search className="h-4 w-4 mr-2" client:only="react" />
-            Search Stocks
-          </Button>
-        </a>
-
-        <!-- User Menu -->
-        {isAuthenticated && user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  {user.profileImageUrl ? (
-                    <img 
-                      src={user.profileImageUrl} 
-                      alt="Profile" 
-                      class="w-8 h-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <UserIcon className="h-4 w-4 text-blue-600" client:only="react" />
-                  )}
-                </div>
-                <span class="hidden sm:block text-sm font-medium">
-                  {user.firstName || user.email?.split('@')[0] || 'User'}
-                </span>
-                <ChevronDown className="h-3 w-3" client:only="react" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-56">
-              <div class="flex items-center justify-start gap-2 p-2">
-                <div class="flex flex-col space-y-1 leading-none">
-                  <p class="font-medium text-sm">
-                    {user.firstName && user.lastName 
-                      ? `${user.firstName} ${user.lastName}`
-                      : user.firstName || 'User'}
-                  </p>
-                  <p class="w-[200px] truncate text-xs text-muted-foreground">
-                    {user.email}
-                  </p>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-              <a href="/profile">
-                <DropdownMenuItem class="cursor-pointer">
-                  <UserIcon className="mr-2 h-4 w-4" client:only="react" />
-                  Profile
-                </DropdownMenuItem>
-              </a>
-              <a href="/settings">
-                <DropdownMenuItem class="cursor-pointer">
-                  <SettingsIcon className="mr-2 h-4 w-4" client:only="react" />
-                  Settings
-                </DropdownMenuItem>
-              </a>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem class="cursor-pointer" id="logout-button">
-                <LogOutIcon className="mr-2 h-4 w-4" client:only="react" />
-                Sign Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Button id="signin-button">
-            Sign In
-          </Button>
-        )}
-
-        <!-- Mobile Menu Trigger -->
-        <div class="lg:hidden">
-          <SheetWrapper
-            trigger={
-              <Button variant="ghost" size="sm">
-                <MenuIcon className="h-5 w-5" />
-              </Button>
-            }
-            side="right"
-            className="w-80 pt-12"
-            content={
-              <nav class="flex flex-col space-y-3">
-                {navigationItems.map((item) => {
-                  const isActive = item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
-                  const iconClasses = `h-5 w-5 ${isActive ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'}`;
-                  return (
-                    <a href={item.href} class={`text-lg font-medium flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 ${isActive ? 'bg-gray-100 dark:bg-gray-800' : ''}`}>
-                      {item.icon === HomeIcon && <HomeIcon className={iconClasses} />}
-                      {item.icon === Search && <Search className={iconClasses} />}
-                      {item.icon === Star && <Star className={iconClasses} />}
-                      {item.icon === BarChart3 && <BarChart3 className={iconClasses} />}
-                      {item.icon === Calculator && <Calculator className={iconClasses} />}
-                      {item.icon === PieChartIcon && <PieChartIcon className={iconClasses} />}
-                      <span class={isActive ? 'text-blue-600' : 'text-gray-700 dark:text-gray-200'}>{item.label}</span>
-                    </a>
-                  );
-                })}
-                <hr class="my-4"/>
-                {/* Mobile Search Quick Access (if desired) */}
-                <a href="/search" class="text-lg font-medium flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <Search className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                  <span>Search Stocks</span>
-                </a>
-              </nav>
-            }
-          />
-        </div>
-      </div>
+    <!-- Placeholder for Header Actions (e.g., Login/Logout, Theme Toggle) -->
+    <div>
+      <!-- You would include your HeaderActions component or similar logic here -->
+      <!-- Example: <HeaderActions /> -->
+      <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        Login
+      </button>
     </div>
   </div>
 </header>
-
-<script define:vars={{ isAuthenticated }}>
-  const logoutButton = document.getElementById('logout-button');
-  if (logoutButton) {
-    logoutButton.addEventListener('click', () => {
-      window.location.href = "/api/logout";
-    });
-  }
-
-  // Only add sign-in listener if the user is not authenticated
-  // and the button is expected to be on the page.
-  if (!isAuthenticated) {
-    const signinButton = document.getElementById('signin-button');
-    if (signinButton) {
-      signinButton.addEventListener('click', () => {
-        window.location.href = "/api/login";
-      });
-    }
-  }
-</script>

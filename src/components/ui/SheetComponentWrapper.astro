@@ -1,0 +1,25 @@
+---
+// Import the React SheetWrapper component
+import { SheetWrapper } from '@client/components/ui/SheetWrapper';
+
+export interface Props {
+  triggerButton: any;
+  title?: string;
+  description?: string;
+  contentClass?: string;
+  side?: 'top' | 'right' | 'bottom' | 'left';
+}
+
+const { triggerButton, title, description, contentClass, side = 'right' } = Astro.props;
+---
+
+<!-- Use client:only to ensure the entire structure is hydrated as a single React tree -->
+<SheetWrapper
+  trigger={triggerButton}
+  title={title}
+  description={description}
+  side={side}
+  className={contentClass}
+  content={<slot />}
+  client:only="react"
+/>

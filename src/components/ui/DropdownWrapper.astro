@@ -1,0 +1,34 @@
+---
+/**
+ * DropdownWrapper.astro
+ * 
+ * A wrapper component that ensures proper React context for DropdownMenu components
+ * from Radix UI when used within Astro templates.
+ */
+
+import { DropdownBridge } from '@client/components/ui/ReactIslandBridge';
+import { 
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent
+} from '@client/components/ui/dropdown-menu';
+
+export interface Props {
+  triggerClass?: string;
+  contentClass?: string;
+  align?: "center" | "start" | "end";
+}
+
+const { triggerClass, contentClass, align = "end" } = Astro.props;
+---
+
+<DropdownBridge client:only="react">
+  <DropdownMenu>
+    <DropdownMenuTrigger class={triggerClass}>
+      <slot name="trigger" />
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align={align} class={contentClass}>
+      <slot />
+    </DropdownMenuContent>
+  </DropdownMenu>
+</DropdownBridge>

@@ -1,222 +1,114 @@
 ---
-import { Card, CardContent, CardHeader, CardTitle } from '../client/src/components/ui/card'; // Assuming UI components are React
-import { Badge } from '../client/src/components/ui/badge'; // Assuming UI components are React
-import { Button } from '../client/src/components/ui/button'; // Assuming UI components are React
-import { Newspaper, TrendingUp, TrendingDown, ExternalLink, Calendar, Globe } from 'lucide-react'; // Keep for now, will address later
-
-interface NewsItem {
-  title: string;
-  url: string;
-  time_published: string;
-  authors: string[];
-  summary: string;
-  source: string;
-  category_within_source: string;
-  source_domain: string;
-  topics: Array<{
-    topic: string;
-    relevance_score: string;
-  }>;
-  overall_sentiment_score: number;
-  overall_sentiment_label: string;
-  ticker_sentiment: Array<{
-    ticker: string;
-    relevance_score: string;
-    ticker_sentiment_score: string;
-    ticker_sentiment_label: string;
-  }>;
-}
-
+// Props for the component
 interface Props {
-  symbol: string;
+  stockSymbol?: string;
+  companyName?: string;
+  newsItems?: {
+    title?: string;
+    summary?: string;
+    source?: string;
+    date?: string;
+    link?: string;
+    sentiment?: 'positive' | 'neutral' | 'negative';
+  }[];
+  overallSentiment?: 'positive' | 'neutral' | 'negative';
+  isLoading?: boolean;
 }
 
-const { symbol } = Astro.props;
+const { stockSymbol, companyName, newsItems, overallSentiment, isLoading = false } = Astro.props;
 
-// Fetch news data
-const response = await fetch(`${Astro.url.origin}/api/news/${symbol}`);
-const newsData: NewsItem[] = response.ok ? await response.json() : [];
-
-const getSentimentColor = (score: number) => {
-  if (score > 0.1) return "text-green-600";
-  if (score < -0.1) return "text-red-600";
-  return "text-gray-600";
-};
-
-const getSentimentBadge = (label: string) => {
-  switch (label.toLowerCase()) {
-    case 'bullish':
+// Helper function to determine sentiment color
+const getSentimentColor = (sentiment?: string) => {
+  switch (sentiment) {
     case 'positive':
-      return "default";
-    case 'bearish':
+      return 'bg-green-100 text-green-800';
     case 'negative':
-      return "destructive";
+      return 'bg-red-100 text-red-800';
+    case 'neutral':
     default:
-      return "secondary";
+      return 'bg-gray-100 text-gray-800';
   }
 };
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-
-  if (diffInHours < 1) return "Just now";
-  if (diffInHours < 24) return `${diffInHours}h ago`;
-  if (diffInHours < 48) return "1 day ago";
-  return `${Math.floor(diffInHours / 24)} days ago`;
+// Helper function to determine overall sentiment text
+const getOverallSentimentText = (sentiment?: string) => {
+  switch (sentiment) {
+    case 'positive':
+      return 'Positive';
+    case 'negative':
+      return 'Negative';
+    case 'neutral':
+    default:
+      return 'Neutral';
+  }
 };
-
-// Calculate overall sentiment metrics
-const sentimentScores = newsData.map(item => item.overall_sentiment_score);
-const avgSentiment = sentimentScores.length > 0 ? sentimentScores.reduce((sum, score) => sum + score, 0) / sentimentScores.length : 0;
-
-const positiveNews = newsData.filter(item => item.overall_sentiment_score > 0.1).length;
-const negativeNews = newsData.filter(item => item.overall_sentiment_score < -0.1).length;
-const neutralNews = newsData.length - positiveNews - negativeNews;
 ---
 
-<div class="space-y-6">
-  {/* Sentiment Overview */}
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <Newspaper className="h-5 w-5" />
-          <span>News & Sentiment Analysis</span>
-        </div>
-        <Badge variant={avgSentiment > 0.1 ? "default" : avgSentiment < -0.1 ? "destructive" : "secondary"}>
-          {avgSentiment > 0.1 ? <TrendingUp className="h-3 w-3 mr-1" /> : avgSentiment < -0.1 ? <TrendingDown className="h-3 w-3 mr-1" /> : null}
-          Overall: {avgSentiment > 0.1 ? "Positive" : avgSentiment < -0.1 ? "Negative" : "Neutral"}
-        </Badge>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div
-          class="text-center p-4 bg-blue-50 rounded-lg"
-        >
-          <div class="text-2xl font-bold text-blue-600">{newsData.length}</div>
-          <div class="text-sm text-gray-600">Total Articles</div>
-        </div>
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      News & Sentiment
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Latest news and sentiment analysis for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
+  </div>
 
-        <div
-          class="text-center p-4 bg-green-50 rounded-lg"
-        >
-          <div class="text-2xl font-bold text-green-600">{positiveNews}</div>
-          <div class="text-sm text-gray-600">Positive</div>
-        </div>
-
-        <div
-          class="text-center p-4 bg-gray-50 rounded-lg"
-        >
-          <div class="text-2xl font-bold text-gray-600">{neutralNews}</div>
-          <div class="text-sm text-gray-600">Neutral</div>
-        </div>
-
-        <div
-          class="text-center p-4 bg-red-50 rounded-lg"
-        >
-          <div class="text-2xl font-bold text-red-600">{negativeNews}</div>
-          <div class="text-sm text-gray-600">Negative</div>
-        </div>
+  <div class="border-t border-gray-200">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="p-6 space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        <div class="h-4 bg-gray-200 rounded w-32"></div>
+        {[...Array(5)].map((_, i) => (
+          <div class="space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-full"></div>
+            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        ))}
       </div>
-
-      {/* Sentiment Summary */}
-      <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg mb-6">
-        <h4 class="font-semibold text-blue-900 mb-2">Market Sentiment Summary</h4>
-        <div class="text-sm text-blue-800">
-          <p>• Average sentiment score: <span class={`font-medium ${getSentimentColor(avgSentiment)}`}>{avgSentiment.toFixed(3)}</span></p>
-          <p>• Sentiment distribution: {((positiveNews / newsData.length) * 100).toFixed(0)}% positive, {((neutralNews / newsData.length) * 100).toFixed(0)}% neutral, {((negativeNews / newsData.length) * 100).toFixed(0)}% negative</p>
-          <p>• Recent coverage indicates {avgSentiment > 0.1 ? "optimistic" : avgSentiment < -0.1 ? "cautious" : "mixed"} market sentiment for {symbol}</p>
-        </div>
+    ) : (!newsItems?.length! && !overallSentiment) ? (
+      <!-- No Data Fallback -->
+      <div class="p-6 text-center text-gray-500">
+        No news or sentiment data available for {stockSymbol || 'this stock'}.
       </div>
-    </CardContent>
-  </Card>
+    ) : (
+      <!-- News and Sentiment Content -->
+      <div class="divide-y divide-gray-200">
+        {/* Overall Sentiment */}
+        {overallSentiment && (
+          <div class="p-4 flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700">Overall Sentiment:</span>
+            <span class={`px-3 py-1 rounded-full text-sm font-medium ${getSentimentColor(overallSentiment)}`}>
+              {getOverallSentimentText(overallSentiment)}
+            </span>
+          </div>
+        )}
 
-  {/* Recent News Articles */}
-  <Card>
-    <CardHeader>
-      <CardTitle>Recent News Articles</CardTitle>
-    </CardHeader>
-    <CardContent>
-      {newsData.length === 0 ? (
-        <div class="text-center text-slate-600 dark:text-slate-400 py-8">
-          <p>No recent news found for {symbol}</p>
-        </div>
-      ) : (
-        <div class="space-y-4">
-          {newsData.slice(0, 10).map((article) => {
-            const tickerSentiment = article.ticker_sentiment.find(ts => ts.ticker === symbol);
-
-            return (
-              <div
-                class="border rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                <div class="flex items-start justify-between mb-2">
-                  <h4 class="font-semibold text-gray-900 leading-snug pr-4">
-                    {article.title}
-                  </h4>
-                  <div class="flex items-center space-x-2 flex-shrink-0">
-                    <Badge variant={getSentimentBadge(article.overall_sentiment_label)}>
-                      {article.overall_sentiment_label}
-                    </Badge>
-                    {tickerSentiment && (
-                      <Badge variant={getSentimentBadge(tickerSentiment.ticker_sentiment_label)} className="text-xs">
-                        {symbol}: {tickerSentiment.ticker_sentiment_label}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                  <div class="flex items-center space-x-1">
-                    <Globe className="h-3 w-3" />
-                    <span>{article.source}</span>
-                  </div>
-                  <div class="flex items-center space-x-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(article.time_published)}</span>
-                  </div>
-                  {article.authors.length > 0 && (
-                    <span>by {article.authors.slice(0, 2).join(", ")}</span>
+        {/* News Items */}
+        {newsItems?.length! > 0 && (
+          <div class="p-4 space-y-4">
+            {newsItems!.map(item => (
+              <div class="border-b pb-3 last:border-b-0">
+                <div class="flex justify-between items-center mb-1">
+                  <p class="font-medium text-gray-900">{item.title}</p>
+                  {item.sentiment && (
+                    <span class={`px-2 py-0.5 rounded-full text-xs font-medium ${getSentimentColor(item.sentiment)}`}>
+                      {getOverallSentimentText(item.sentiment)}
+                    </span>
                   )}
                 </div>
-
-                <p class="text-gray-700 text-sm leading-relaxed mb-3">
-                  {article.summary}
-                </p>
-
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
-                    <span class="text-xs text-gray-500">Sentiment Score:</span>
-                    <span class={`text-xs font-medium ${getSentimentColor(article.overall_sentiment_score)}`}>
-                      {article.overall_sentiment_score.toFixed(3)}
-                    </span>
-                    {tickerSentiment && (
-                      <>
-                        <span class="text-xs text-gray-500">| {symbol}:</span>
-                        <span class={`text-xs font-medium ${getSentimentColor(parseFloat(tickerSentiment.ticker_sentiment_score))}`}>
-                          {parseFloat(tickerSentiment.ticker_sentiment_score).toFixed(3)}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(article.url, '_blank')}
-                    className="flex items-center space-x-1"
-                  >
-                    <span>Read More</span>
-                    <ExternalLink className="h-3 w-3" />
-                  </Button>
+                <p class="text-sm text-gray-600 mb-2">{item.summary}</p>
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">{item.source} • {item.date}</span>
+                  {item.link && <a href={item.link} class="text-blue-600 hover:text-blue-800">Read more</a>}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-    </CardContent>
-  </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
 </div>

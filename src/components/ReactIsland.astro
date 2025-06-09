@@ -1,0 +1,25 @@
+---
+/**
+ * ReactIsland.astro
+ * 
+ * A specialized component that creates a properly isolated React island within Astro.
+ * This component ensures that all React context providers are properly set up,
+ * preventing the common "X must be used within Y" errors that occur when 
+ * React components that rely on context are rendered independently.
+ */
+
+import { ReactIslandBridge } from '../client/src/components/ui/ReactIslandBridge';
+
+export interface Props {
+  /**
+   * Optional theme to pass to the ThemeProvider
+   */
+  defaultTheme?: string;
+}
+
+const { defaultTheme = 'light' } = Astro.props;
+---
+
+<ReactIslandBridge defaultTheme={defaultTheme} client:only="react">
+  <slot />
+</ReactIslandBridge>

@@ -1,5 +1,69 @@
 ---
-import ReactUserProfile from '../client/src/components/UserProfile'; // Assuming UserProfile is a React component
+// Props for the component
+interface Props {
+  userName?: string;
+  userEmail?: string;
+  isLoading?: boolean;
+}
+
+const { userName, userEmail, isLoading = false } = Astro.props;
+
+// Icon (using inline SVG for simplicity)
+const UserIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+`;
 ---
 
-<ReactUserProfile client:only="react" />
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      User Profile
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Your profile information.
+    </p>
+  </div>
+
+  <div class="border-t border-gray-200">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="p-6 space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-3/4"></div>
+        <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    ) : !userName && !userEmail ? (
+      <!-- No Data Fallback -->
+      <div class="p-6 text-center text-gray-500">
+        User profile data not available.
+      </div>
+    ) : (
+      <!-- User Profile Content -->
+      <dl>
+        {userName && (
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">
+              Name
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              {userName}
+            </dd>
+          </div>
+        )}
+        {userEmail && (
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">
+              Email address
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              {userEmail}
+            </dd>
+          </div>
+        )}
+        <!-- Add other profile fields as needed -->
+      </dl>
+    )}
+  </div>
+</div>

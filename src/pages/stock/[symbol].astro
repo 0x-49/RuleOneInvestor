@@ -1,10 +1,136 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import StockDetail from '../../client/src/pages/StockDetail'; // Assuming StockDetail is a React component
+import MainLayout from '../../layouts/MainLayout.astro';
+import StockSearch from '../../components/StockSearch.astro';
+import FinancialTrends from '../../components/FinancialTrends.astro';
+import FairValueGauge from '../../components/FairValueGauge.astro';
+import BigFourMetrics from '../../components/BigFourMetrics.astro';
+import DetailedFinancialTable from '../../components/DetailedFinancialTable.astro';
+import DividendAnalysis from '../../components/DividendAnalysis.astro';
+import ComparisonPanel from '../../components/ComparisonPanel.astro';
+import NewsAndSentiment from '../../components/NewsAndSentiment.astro';
+import NoDataFallback from '../../components/NoDataFallback.astro';
+import RuleOneAnalysis from '../../components/RuleOneAnalysis.astro';
+import TechnicalAnalysis from '../../components/TechnicalAnalysis.astro';
+import UserProfile from '../../components/UserProfile.astro'; // Assuming UserProfile might be used on a stock page
+import PERatioAnalysis from '../../components/PERatioAnalysis.astro'; // Import PERatioAnalysis
 
+// Get the stock symbol from the URL parameter
 const { symbol } = Astro.params;
+
+// Define page title
+const pageTitle = `${symbol} Analysis`;
+
+// Mock data for demonstration (replace with actual data fetching logic based on 'symbol')
+const isLoading = false; // Set to true when fetching data
+
+// Placeholder data structures - in a real app, you'd fetch data for the specific symbol
+const financialData = {
+  incomeStatement: [
+    { year: "2023", revenue: 383285, netIncome: 100000, eps: 6.00 },
+    { year: "2022", revenue: 394328, netIncome: 99803, eps: 5.90 },
+    // ... more years
+  ],
+  balanceSheet: [
+    { year: "2023", totalCurrentAssets: 134836, totalCurrentLiabilities: 145309, totalDebt: 104613, totalEquity: 62147 },
+    // ... more years
+  ],
+  cashFlowStatement: [
+    { year: "2023", freeCashFlow: 99584 },
+    // ... more years
+  ],
+};
+
+const peRatio = 28.5;
+const industryPeRatio = 25.0;
+const sectorPeRatio = 30.0;
+const historicalPeRatios = [
+  { year: "2019", peRatio: 18.0 },
+  // ... more years
+];
+
+const currentPrice = 150.25;
+const stickerPrice = 187.50;
+const mosPrice = 131.25;
+
+const analysisData = {
+  overallScore: 85,
+  breakdown: [
+    { category: "Moat", score: 90, summary: "Strong brand and ecosystem." },
+    // ... more breakdown items
+  ],
+};
+
+const newsItems = [
+  { title: `${symbol} News 1`, summary: `Summary for ${symbol} news 1...`, source: "Source A", date: "2024-09-10", link: "#", sentiment: "positive" as "positive" | "neutral" | "negative" },
+  // ... more news items
+];
+
+const overallSentiment = "positive";
+
+const technicalData = {
+  dailyPrices: [
+    { date: "2024-09-01", open: 145, high: 150, low: 140, close: 148, volume: 1000000 },
+    // ... more price data
+  ],
+  movingAverages: [
+    { period: 50, value: 145 },
+    { period: 200, value: 130 },
+  ],
+};
+
+// You would fetch actual data here based on the 'symbol'
+// Example: const stockData = await fetchStockData(symbol);
 ---
 
-<Layout title={`Stock Detail for ${symbol} - Rule One Investor`}>
-  <StockDetail client:only="react" />
-</Layout>
+<MainLayout title={pageTitle}>
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6">{pageTitle}</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Stock Search (Optional on this page, but included for completeness) -->
+        <StockSearch />
+
+        <!-- Financial Trends -->
+        <FinancialTrends financialData={financialData} isLoading={isLoading} />
+
+        <!-- Detailed Financial Table -->
+        <DetailedFinancialTable financialData={financialData} isLoading={isLoading} />
+
+        <!-- Technical Analysis -->
+        <TechnicalAnalysis technicalData={technicalData} isLoading={isLoading} />
+
+        <!-- News and Sentiment -->
+        <NewsAndSentiment newsItems={newsItems} overallSentiment={overallSentiment} isLoading={isLoading} />
+      </div>
+
+      <!-- Right Column (Sidebar) -->
+      <div class="space-y-6">
+        <!-- Fair Value Gauge -->
+        <FairValueGauge currentPrice={currentPrice} stickerPrice={stickerPrice} mosPrice={mosPrice} isLoading={isLoading} />
+
+        <!-- Big Four Metrics -->
+        <BigFourMetrics metrics={financialData.incomeStatement} isLoading={isLoading} /> <!-- Using incomeStatement as a placeholder -->
+
+        <!-- Dividend Analysis -->
+        <DividendAnalysis dividendData={{ annualDividends: financialData.cashFlowStatement, annualEarnings: financialData.incomeStatement, currentPrice: currentPrice }} isLoading={isLoading} /> <!-- Using cashFlowStatement and incomeStatement as placeholders -->
+
+        <!-- Rule One Analysis -->
+        <RuleOneAnalysis analysisData={analysisData} isLoading={isLoading} />
+
+        <!-- P/E Ratio Analysis -->
+        <PERatioAnalysis peRatio={peRatio} industryPeRatio={industryPeRatio} sectorPeRatio={sectorPeRatio} historicalPeRatios={historicalPeRatios} isLoading={isLoading} />
+
+        <!-- User Profile (Optional on this page) -->
+        <!-- <UserProfile userName="Test User" isLoading={isLoading} /> -->
+
+        <!-- Batch Analysis Panel (Optional on this page) -->
+        <!-- <BatchAnalysisPanel isLoading={isLoading} /> -->
+
+        <!-- Watchlist (Optional on this page) -->
+        <!-- <Watchlist isLoading={isLoading} /> -->
+      </div>
+    </div>
+  </div>
+</MainLayout>

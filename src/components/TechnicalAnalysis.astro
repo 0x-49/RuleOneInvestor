@@ -1,14 +1,204 @@
 ---
-import ReactTechnicalAnalysis from '../client/src/components/TechnicalAnalysis'; // Assuming TechnicalAnalysis is a React component
-
-interface Props {
-  symbol: string;
-  currentPrice: number;
-  priceChange: number;
-  priceChangePercent: number;
+// Define interfaces for technical data structure (replace with actual types if available)
+interface DailyPrice {
+  date: string;
+  open?: number;
+  high?: number;
+  low?: number;
+  close?: number;
+  volume?: number;
 }
 
-const { symbol, currentPrice, priceChange, priceChangePercent } = Astro.props;
+interface MovingAverage {
+  period?: number;
+  value?: number;
+}
+
+interface TechnicalData {
+  dailyPrices?: DailyPrice[];
+  movingAverages?: MovingAverage[];
+  // Add interfaces for other technical indicators if needed
+}
+
+// Props for the component
+interface Props {
+  stockSymbol?: string;
+  companyName?: string;
+  technicalData?: TechnicalData;
+  isLoading?: boolean;
+}
+
+const { stockSymbol, companyName, technicalData, isLoading = false } = Astro.props;
+
+// Helper function to format numbers
+const formatNumber = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US').format(value) : 'N/A';
+};
+
+// Helper function to format currency
+const formatCurrency = (value?: number) => {
+  return value !== undefined ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value) : 'N/A';
+};
+
+// Prepare data for a simple price chart (replace with actual chart data structure)
+const priceChartData = technicalData?.dailyPrices?.map(item => ({
+  date: item.date,
+  open: item.open,
+  high: item.high,
+  low: item.low,
+  close: item.close,
+  volume: item.volume,
+})).reverse() || [];
+
+const hasPriceData = priceChartData.length > 0;
 ---
 
-<ReactTechnicalAnalysis client:only="react" symbol={symbol} currentPrice={currentPrice} priceChange={priceChange} priceChangePercent={priceChangePercent} />
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Technical Analysis
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Key technical indicators and price trends for {companyName || 'Company'} ({stockSymbol || 'TICKER'})
+    </p>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    {isLoading ? (
+      <!-- Skeleton Loader -->
+      <div class="space-y-4">
+        <div class="h-6 bg-gray-200 rounded w-48"></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="h-12 bg-gray-200 rounded"></div>
+          <div class="h-12 bg-gray-200 rounded"></div>
+        </div>
+        <div class="h-64 bg-gray-200 rounded w-full"></div>
+      </div>
+    ) : !technicalData || !hasPriceData ? (
+      <!-- No Data Fallback -->
+      <div class="text-center text-gray-500">
+        Technical analysis data not available for {stockSymbol || 'this stock'}.
+      </div>
+    ) : (
+      <!-- Technical Analysis Content -->
+      <div class="space-y-6">
+        <!-- Key Indicators (Example: Simple Moving Averages) -->
+        {technicalData.movingAverages?.length! > 0 && (
+          <div>
+            <h4 class="text-md font-medium text-gray-900 mb-3">Moving Averages</h4>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              {technicalData.movingAverages!.map(avg => (
+                <div class="flex justify-between">
+                  <span class="text-gray-600">{avg.period}-Day SMA:</span>
+                  <span class="font-medium text-gray-900">{formatCurrency(avg.value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Price Chart -->
+        <div>
+          <h4 class="text-md font-medium text-gray-900 mb-3">Price Chart</h4>
+          <div class="w-full h-64" id="price-chart"></div>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+{hasPriceData && (
+  <script define:vars={{ priceChartData }}>
+    import Chart from 'chart.js/auto'; // Import Chart.js
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const chartCanvas = document.getElementById('price-chart');
+
+      if (chartCanvas && priceChartData && priceChartData.length > 0) {
+        new Chart(chartCanvas, {
+          type: 'line', // Or 'candlestick' if you use a different library/plugin
+          data: {
+            labels: priceChartData.map(item => item.date),
+            datasets: [
+              {
+                label: 'Closing Price',
+                data: priceChartData.map(item => item.close),
+                borderColor: '#3B82F6', // Blue
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                tension: 0.1,
+                fill: false,
+                yAxisID: 'y',
+              },
+              {
+                label: 'Volume',
+                data: priceChartData.map(item => item.volume),
+                borderColor: '#9CA3AF', // Gray
+                backgroundColor: 'rgba(156, 163, 175, 0.5)',
+                type: 'bar', // Volume as a bar chart
+                yAxisID: 'y1', // Use a secondary Y-axis for volume
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                  display: true,
+                  text: 'Price ($)'
+                },
+                beginAtZero: false, // Price doesn't necessarily start at zero
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: 'Volume'
+                },
+                beginAtZero: true,
+                grid: {
+                  drawOnChartArea: false, // Only draw grid lines for the left axis
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                      label += context.dataset.label === 'Volume' ? formatNumber(context.parsed.y) : formatCurrency(context.parsed.y);
+                    }
+                    return label;
+                  }
+                }
+              }
+            }
+          },
+        });
+      }
+    });
+  </script>
+)}
+
+<style>
+  /* Add any component-specific styles here */
+</style>

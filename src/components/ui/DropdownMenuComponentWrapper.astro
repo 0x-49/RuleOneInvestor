@@ -1,0 +1,33 @@
+---
+// Import the React DropdownMenuWrapper component
+import { DropdownMenuWrapper } from '@client/components/ui/DropdownMenuWrapper';
+import type { JSX } from 'react';
+
+export interface DropdownMenuItem {
+  label: string;
+  onClick?: () => void;
+  href?: string;
+  icon?: JSX.Element;
+  separator?: boolean;
+  isLabel?: boolean;
+  disabled?: boolean;
+}
+
+export interface Props {
+  trigger: JSX.Element;
+  items: DropdownMenuItem[];
+  align?: "center" | "start" | "end";
+  className?: string;
+}
+
+const { trigger, items, align = "end", className } = Astro.props;
+---
+
+<!-- Use client:only to ensure the entire structure is hydrated as a single React tree -->
+<DropdownMenuWrapper
+  trigger={trigger}
+  items={items}
+  align={align}
+  className={className}
+  client:only="react"
+/>

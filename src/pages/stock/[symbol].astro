@@ -20,66 +20,38 @@ const { symbol } = Astro.params as { symbol: string }; // Explicitly type symbol
 // Define page title
 const pageTitle = `${symbol} Analysis`;
 
-// Mock data for demonstration (replace with actual data fetching logic based on 'symbol')
-const isLoading = false; // Set to true when fetching data
+// Server-side data fetching for the stock symbol
+let stockData = null;
+let fetchError = null;
+try {
+  const res = await fetch(`${Astro.url.origin}/api/stocks/${symbol}`);
+  if (!res.ok) {
+    fetchError = `Error fetching data for ${symbol}: ${res.statusText}`;
+  } else {
+    stockData = await res.json();
+  }
+} catch (err) {
+  const errorObj = err as any;
+  fetchError = `Error fetching data for ${symbol}: ${errorObj?.message || errorObj}`;
+}
 
-// Placeholder data structures - in a real app, you'd fetch data for the specific symbol
-const financialData = {
-  incomeStatement: [
-    { year: "2023", revenue: 383285, netIncome: 100000, eps: 6.00 },
-    { year: "2022", revenue: 394328, netIncome: 99803, eps: 5.90 },
-    // ... more years
-  ],
-  balanceSheet: [
-    { year: "2023", totalCurrentAssets: 134836, totalCurrentLiabilities: 145309, totalDebt: 104613, totalEquity: 62147 },
-    // ... more years
-  ],
-  cashFlowStatement: [
-    { year: "2023", freeCashFlow: 99584 },
-    // ... more years
-  ],
-};
+const isLoading = !stockData && !fetchError;
 
-const peRatio = 28.5;
-const industryPeRatio = 25.0;
-const sectorPeRatio = 30.0;
-const historicalPeRatios = [
-  { year: "2019", peRatio: 18.0 },
-  // ... more years
-];
+// Destructure all required data for components
+const financialData = stockData?.financialData || {};
+const peRatio = stockData?.peRatio;
+const industryPeRatio = stockData?.industryPeRatio;
+const sectorPeRatio = stockData?.sectorPeRatio;
+const historicalPeRatios = stockData?.historicalPeRatios || [];
+const currentPrice = stockData?.currentPrice;
+const stickerPrice = stockData?.stickerPrice;
+const mosPrice = stockData?.mosPrice;
+const analysisData = stockData?.analysisData || {};
+const newsItems = stockData?.newsItems || [];
+const overallSentiment = stockData?.overallSentiment;
+const technicalData = stockData?.technicalData || {};
+const bigFourGrowth = stockData?.bigFourGrowth || {};
 
-const currentPrice = 150.25;
-const stickerPrice = 187.50;
-const mosPrice = 131.25;
-
-const analysisData = {
-  overallScore: 85,
-  breakdown: [
-    { category: "Moat", score: 90, summary: "Strong brand and ecosystem." },
-    // ... more breakdown items
-  ],
-};
-
-const newsItems = [
-  { title: `${symbol} News 1`, summary: `Summary for ${symbol} news 1...`, source: "Source A", date: "2024-09-10", link: "#", sentiment: "positive" as "positive" | "neutral" | "negative" },
-  // ... more news items
-];
-
-const overallSentiment = "positive";
-
-const technicalData = {
-  dailyPrices: [
-    { date: "2024-09-01", open: 145, high: 150, low: 140, close: 148, volume: 1000000 },
-    // ... more price data
-  ],
-  movingAverages: [
-    { period: 50, value: 145 },
-    { period: 200, value: 130 },
-  ],
-};
-
-// You would fetch actual data here based on the 'symbol'
-// Example: const stockData = await fetchStockData(symbol);
 ---
 
 <MainLayout title={pageTitle}>
@@ -95,14 +67,17 @@ const technicalData = {
         <!-- Financial Trends -->
         <FinancialTrends financialData={financialData} isLoading={isLoading} />
 
-        <!-- Detailed Financial Table -->
         <DetailedFinancialTable financialData={financialData} isLoading={isLoading} />
 
-        <!-- Technical Analysis -->
         <TechnicalAnalysis technicalData={technicalData} isLoading={isLoading} />
 
-        <!-- News and Sentiment -->
         <NewsAndSentiment newsItems={newsItems} overallSentiment={overallSentiment} isLoading={isLoading} />
+
+        {fetchError && (
+          <div class="bg-red-100 text-red-800 p-4 rounded shadow mt-4">
+            {fetchError}
+          </div>
+        )}
       </div>
 
       <!-- Right Column (Sidebar) -->
@@ -110,17 +85,12 @@ const technicalData = {
         <!-- Fair Value Gauge -->
         <FairValueGauge currentPrice={currentPrice} stickerPrice={stickerPrice} mosPrice={mosPrice} isLoading={isLoading} />
 
-        <!-- Big Four Metrics -->
-        {/* Pass stockSymbol to BigFourMetrics */}
-        <BigFourMetrics stockSymbol={symbol} />
+        <BigFourMetrics stockSymbol={symbol} metrics={bigFourGrowth} isLoading={isLoading} />
 
-        <!-- Dividend Analysis -->
-        <DividendAnalysis dividendData={{ annualDividends: financialData.cashFlowStatement, annualEarnings: financialData.incomeStatement, currentPrice: currentPrice }} isLoading={isLoading} /> {/* Using cashFlowStatement and incomeStatement as placeholders */}
+        <DividendAnalysis dividendData={financialData.dividends} isLoading={isLoading} />
 
-        <!-- Rule One Analysis -->
         <RuleOneAnalysis analysisData={analysisData} isLoading={isLoading} />
 
-        <!-- P/E Ratio Analysis -->
         <PERatioAnalysis peRatio={peRatio} industryPeRatio={industryPeRatio} sectorPeRatio={sectorPeRatio} historicalPeRatios={historicalPeRatios} isLoading={isLoading} />
 
         <!-- User Profile (Optional on this page) -->

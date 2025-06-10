@@ -1,68 +1,23 @@
 ---
 // src/components/BigFourMetrics.astro
-import type { StockWithMetrics } from '../shared/schema'; // Assuming a shared schema for data types
-import Chart from 'chart.js/auto'; // Import Chart.js for the chart
+import Chart from 'chart.js/auto';
 
 interface Props {
   stockSymbol: string;
   metrics?: any[];
+  bigFourGrowth?: any;
   isLoading?: boolean;
 }
 
-const { stockSymbol, metrics: metricsProp, isLoading: isLoadingProp } = Astro.props;
+const { stockSymbol, metrics = [], bigFourGrowth = {}, isLoading = false } = Astro.props;
 
-// Fetch stock data including metrics on the server
-let stockData: StockWithMetrics | null = null;
-let isLoading = true;
-let error: string | null = null;
-
-try {
-  const response = await fetch(`${Astro.url.origin}/api/stocks/${stockSymbol}`);
-  if (!response.ok) {
-    error = `Error fetching data for ${stockSymbol}: ${response.statusText}`;
-    console.error(error);
-  } else {
-    stockData = await response.json();
-  }
-} catch (err: any) {
-  error = `Error in fetching data for ${stockSymbol}: ${err.message}`;
-  console.error(err);
-} finally {
-  isLoading = false;
-}
-
-const metrics = stockData?.metrics || [];
-const bigFourGrowth = stockData?.bigFourGrowth;
 const dataYearsAvailable = metrics.length;
 const showDeepSearchPrompt = dataYearsAvailable > 0 && dataYearsAvailable < 7;
 
-// Helper function to calculate period averages (adapted for bigFourGrowth object)
-const getGrowthAverage = (growthData: any, key: string, years: number) => {
-  if (!growthData || !growthData[key]) return 0; // Assuming growthData[key] is the average
-
-  // If bigFourGrowth directly provides averages, use them.
-  // Otherwise, recalculate from metrics if needed (based on original logic).
-  // Assuming bigFourGrowth contains pre-calculated averages for simplicity based on the type definition.
-  // The original calculatePeriodAverages function is removed as bigFourGrowth should provide this.
-
-  // Placeholder logic if bigFourGrowth doesn't contain specific year averages:
-  // This part would need adjustment based on the actual structure of bigFourGrowth
-  // For now, we'll assume bigFourGrowth has properties like salesGrowth, epsGrowth, etc.
-  // and these represent the relevant averages (e.g., 10-year).
-  // A more robust solution would involve passing specific year averages in bigFourGrowth or recalculating.
-
-  // Since the original script used 10-year, 5-year, and 1-year averages,
-  // and the bigFourGrowth type only has single values, we'll assume bigFourGrowth
-  // represents the primary average (likely 10-year based on the screenshot context).
-  // A more complete solution would require updating the backend API or schema
-  // to provide averages for different periods if needed for the dropdown.
-
-  // For now, we'll just use the values from bigFourGrowth and the dropdown
-  // functionality will need to be revisited or removed if only one average is available.
-
-  // Let's adapt to use the bigFourGrowth object directly for display.
-  // The dropdown functionality will be simplified or removed.
-  return growthData[key] || 0;
+// Helper function to get growth average from bigFourGrowth (props)
+const getGrowthAverage = (growthData: any, key: string) => {
+  if (!growthData || !growthData[key]) return 0;
+  return growthData[key];
 };
 
 
@@ -195,7 +150,7 @@ const metricItems = bigFourGrowth ? [
       </div>
       <div class="h-64 bg-gray-200 rounded-lg"></div>
     </div>
-  ) : error || !stockData || metrics.length === 0 ? (
+  ) : (!bigFourGrowth || metrics.length === 0) ? (
     <!-- No Data Fallback -->
     <div class="bg-white shadow rounded-lg p-6 text-center">
       <div class="mb-4">
@@ -209,7 +164,6 @@ const metricItems = bigFourGrowth ? [
         <p class="text-sm">
           This commonly happens with smaller international stocks, recent IPOs, or companies from emerging markets.
         </p>
-        {error && <p class="text-red-500 text-sm mt-2">Error: {error}</p>}
       </div>
     </div>
   ) : (

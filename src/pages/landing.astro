@@ -117,16 +117,17 @@ const userEmail = "test@example.com";
         <FairValueGauge currentPrice={currentPrice} stickerPrice={stickerPrice} mosPrice={mosPrice} isLoading={isLoading} />
       </div>
       <div class="lg:col-span-2">
-        <BigFourMetrics metrics={financialData.incomeStatement} isLoading={isLoading} /> <!-- Using incomeStatement as a placeholder for metrics -->
+        {/* Pass stockSymbol to BigFourMetrics */}
+        <BigFourMetrics stockSymbol={stockSymbol} />
       </div>
       <div class="lg:col-span-3">
         <DetailedFinancialTable financialData={financialData} isLoading={isLoading} />
       </div>
       <div class="lg:col-span-1">
-        <DividendAnalysis dividendData={{ annualDividends: financialData.cashFlowStatement, annualEarnings: financialData.incomeStatement, currentPrice: currentPrice }} isLoading={isLoading} /> <!-- Using cashFlowStatement and incomeStatement as placeholders -->
+        <DividendAnalysis dividendData={{ annualDividends: financialData.cashFlowStatement, annualEarnings: financialData.incomeStatement, currentPrice: currentPrice }} isLoading={isLoading} /> {/* Using cashFlowStatement and incomeStatement as placeholders */}
       </div>
       <div class="lg:col-span-2">
-        <ComparisonPanel stockSymbol1="AAPL" stockSymbol2="MSFT" comparisonData={{ AAPL: { price: 150.25, marketCap: 2.5e12, peRatio: 28.5, revenueGrowth5Y: 12, earningsGrowth5Y: 15, equityGrowth5Y: 10, roic5Y: 25, moatScore: 4.5 }, MSFT: { price: 300.00, marketCap: 2.2e12, peRatio: 35.0, revenueGrowth5Y: 10, earningsGrowth5Y: 12, equityGrowth5Y: 8, roic5Y: 20, moatScore: 4.0 } }} isLoading={isLoading} /> <!-- Mock comparison data -->
+        <ComparisonPanel stockSymbol1="AAPL" stockSymbol2="MSFT" comparisonData={{ AAPL: { price: 150.25, marketCap: 2.5e12, peRatio: 28.5, revenueGrowth5Y: 12, earningsGrowth5Y: 15, equityGrowth5Y: 10, roic5Y: 25, moatScore: 4.5 }, MSFT: { price: 300.00, marketCap: 2.2e12, peRatio: 35.0, revenueGrowth5Y: 10, earningsGrowth5Y: 12, equityGrowth5Y: 8, roic5Y: 20, moatScore: 4.0 } }} isLoading={isLoading} /> {/* Mock comparison data */}
       </div>
       <div class="lg:col-span-3">
         <RuleOneAnalysis analysisData={analysisData} isLoading={isLoading} />
@@ -138,7 +139,7 @@ const userEmail = "test@example.com";
         <UserProfile userName={userName} userEmail={userEmail} isLoading={isLoading} />
       </div>
       <div class="lg:col-span-1">
-        <BatchAnalysisPanel isLoading={isLoading} /> <!-- Example usage, status/progress would be dynamic -->
+        <BatchAnalysisPanel isLoading={isLoading} /> {/* Example usage, status/progress would be dynamic */}
       </div>
     </div>
   </div>

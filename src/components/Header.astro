@@ -9,16 +9,19 @@ const { currentPage = "dashboard" } = Astro.props;
 // Navigation items
 const navItems = [
   { name: "Dashboard", href: "/dashboard", id: "dashboard" },
-  { name: "Stock Analysis", href: "/stock-analysis", id: "stock-analysis" },
+  // Update Stock Analysis link to point to a placeholder stock details page
+  { name: "Stock Analysis", href: "/stock/AAPL", id: "stock-analysis" }, // Note: This should be dynamic
   { name: "Screening", href: "/screening", id: "screening" },
-  { name: "Watchlist", href: "/watchlist", id: "watchlist" }
+  // Remove Watchlist link as it's on the dashboard
+  // { name: "Watchlist", href: "/watchlist", id: "watchlist" }
 ];
 ---
 
 <header class="bg-white shadow">
   <div class="container mx-auto px-4 py-4 flex justify-between items-center">
     <div class="flex items-center space-x-4">
-      <h1 class="text-2xl font-bold text-blue-700">Rule One Investor</h1>
+      {/* Link the title to the landing page */}
+      <a href="/" class="text-2xl font-bold text-blue-700 hover:text-blue-800">Rule One Investor</a>
     </div>
 
     <nav>

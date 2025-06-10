@@ -1,6 +1,6 @@
 ---
 // Import the React SheetWrapper component
-import { SheetWrapper } from '@client/components/ui/SheetWrapper';
+
 
 export interface Props {
   triggerButton: any;
@@ -14,12 +14,6 @@ const { triggerButton, title, description, contentClass, side = 'right' } = Astr
 ---
 
 <!-- Use client:only to ensure the entire structure is hydrated as a single React tree -->
-<SheetWrapper
-  trigger={triggerButton}
-  title={title}
-  description={description}
-  side={side}
-  className={contentClass}
-  content={<slot />}
-  client:only="react"
-/>
+<div class={contentClass}>
+  <slot />
+</div>

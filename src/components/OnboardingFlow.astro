@@ -1,0 +1,179 @@
+---
+// OnboardingFlow.astro - User onboarding experience with multi-step tour
+interface OnboardingStep {
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+}
+
+const steps: OnboardingStep[] = [
+  {
+    title: "Welcome to Rule One Investor",
+    description: "Your intelligent assistant for making better investment decisions using Phil Town's proven Rule One methodology.",
+    image: "/images/onboarding-welcome.jpg",
+    alt: "Rule One investing welcome"
+  },
+  {
+    title: "Discover Great Companies",
+    description: "Find wonderful businesses with strong competitive advantages, excellent management, and growth potential.",
+    image: "/images/onboarding-search.jpg",
+    alt: "Searching for great companies"
+  },
+  {
+    title: "Calculate True Value",
+    description: "Use advanced metrics to determine a business's intrinsic value and apply a margin of safety.",
+    image: "/images/onboarding-calculate.jpg",
+    alt: "Calculating business value"
+  },
+  {
+    title: "Buy With Confidence",
+    description: "Know exactly when to buy and sell based on market prices and your calculated sticker price.",
+    image: "/images/onboarding-invest.jpg",
+    alt: "Confident investing"
+  }
+];
+---
+
+<div id="onboarding-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center hidden" style="display: none;">
+  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-4xl w-full mx-4 overflow-hidden">
+    <div id="onboarding-carousel" class="flex transition-transform duration-500">
+      {steps.map((step, index) => (
+        <div class="onboarding-slide flex-shrink-0 w-full" data-step={index + 1}>
+          <div class="flex flex-col md:flex-row h-full">
+            <!-- Image section -->
+            <div class="md:w-1/2 h-52 md:h-auto relative bg-blue-100 dark:bg-blue-900 overflow-hidden">
+              <img 
+                src={step.image} 
+                alt={step.title}
+                class="w-full h-full object-cover opacity-90"
+                onerror="this.src='/images/placeholder-onboarding.jpg'; this.onerror=null;" 
+              />
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent"></div>
+            </div>
+            
+            <!-- Content section -->
+            <div class="md:w-1/2 p-6 md:p-10 flex flex-col">
+              <div class="mb-8">
+                <span class="inline-block px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 dark:text-blue-300 dark:bg-blue-900 rounded-full mb-4">
+                  Step {index + 1} of {steps.length}
+                </span>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
+              </div>
+              
+              <div class="mt-auto flex items-center justify-between">
+                <div class="flex space-x-2">
+                  {steps.map((_, i) => (
+                    <button 
+                      class={`w-2.5 h-2.5 rounded-full transition-colors ${i === index ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
+                      data-step-dot={i + 1}
+                    ></button>
+                  ))}
+                </div>
+                
+                <div class="flex space-x-3">
+                  {index > 0 && (
+                    <button 
+                      class="onboarding-prev px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  
+                  {index < steps.length - 1 ? (
+                    <button 
+                      class="onboarding-next px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                    >
+                      Continue
+                    </button>
+                  ) : (
+                    <button 
+                      id="onboarding-complete" 
+                      class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                    >
+                      Get Started
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check if user has completed onboarding
+    const onboardingCompleted = localStorage.getItem('onboarding-completed');
+    const overlay = document.getElementById('onboarding-overlay');
+    
+    if (!onboardingCompleted && overlay) {
+      // Show onboarding after a short delay
+      setTimeout(() => {
+        overlay.classList.remove('hidden');
+      }, 1500);
+      
+      // Set up carousel functionality
+      const carousel = document.getElementById('onboarding-carousel');
+      const slides = document.querySelectorAll('.onboarding-slide');
+      const nextButtons = document.querySelectorAll('.onboarding-next');
+      const prevButtons = document.querySelectorAll('.onboarding-prev');
+      const dots = document.querySelectorAll('[data-step-dot]');
+      let currentStep = 1;
+      
+      function goToSlide(step: number) {
+        if (carousel && step >= 1 && step <= slides.length) {
+          currentStep = step;
+          const offset = (step - 1) * -100;
+          carousel.style.transform = `translateX(${offset}%)`;
+          
+          // Update active dot
+          dots.forEach((dot, i) => {
+            if (i + 1 === step) {
+              dot.classList.replace('bg-gray-300', 'bg-blue-600');
+              dot.classList.replace('dark:bg-gray-700', 'bg-blue-600');
+            } else {
+              dot.classList.replace('bg-blue-600', 'bg-gray-300');
+              dot.classList.add('dark:bg-gray-700');
+            }
+          });
+        }
+      }
+      
+      // Event listeners for next/previous buttons
+      nextButtons.forEach(btn => {
+        btn.addEventListener('click', () => goToSlide(currentStep + 1));
+      });
+      
+      prevButtons.forEach(btn => {
+        btn.addEventListener('click', () => goToSlide(currentStep - 1));
+      });
+      
+      // Event listeners for indicator dots
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => goToSlide(i + 1));
+      });
+      
+      // Complete onboarding
+      const completeButton = document.getElementById('onboarding-complete');
+      if (completeButton) {
+        completeButton.addEventListener('click', () => {
+          localStorage.setItem('onboarding-completed', 'true');
+          overlay.classList.add('hidden');
+        });
+      }
+      
+      // Allow clicking outside to dismiss
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          localStorage.setItem('onboarding-dismissed', 'true');
+          overlay.classList.add('hidden');
+        }
+      });
+    }
+  });
+</script>

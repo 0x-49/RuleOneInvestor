@@ -12,9 +12,9 @@
       "@/*": ["./src/*"],
       "react": ["./node_modules/react"],
       "react-dom": ["./node_modules/react-dom"],
-      "@components/ui/*": ["./src/components/ui/*"]
+      "@components/ui/*": ["./src/components/ui/*"],
+      "@client/*": ["./src/client/src/*"]
     },
-    "types": ["@astrojs/tailwind"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
   },

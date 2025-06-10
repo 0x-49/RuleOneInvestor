@@ -1,9 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
 import node from '@astrojs/node';
 import mdx from '@astrojs/mdx';
+import tailwind from '@astrojs/tailwind';
 import remarkToc from 'remark-toc';
 import path from 'path';
 
@@ -11,11 +11,8 @@ import path from 'path';
 export default defineConfig({
   output: 'server',  // Changed to 'server' for compatibility with Node adapter
   integrations: [
-    react(), 
-    tailwind({
-      // Optimize Tailwind for production
-      applyBaseStyles: false,
-    }),
+    react(),
+    tailwind(), // Add Tailwind CSS integration
     mdx({
       // MDX options for blog content
       remarkPlugins: [remarkToc]
@@ -52,4 +49,5 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+  site: 'http://localhost:3000', // Local development URL, change to your production URL when deploying
 });

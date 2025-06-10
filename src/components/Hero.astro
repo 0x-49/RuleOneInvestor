@@ -1,0 +1,88 @@
+---
+// Hero.astro - Beautiful and professional landing section
+import Search from './Search.astro';
+---
+
+<section class="relative bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 py-12 sm:py-16 lg:py-20 overflow-hidden">
+  <!-- Background design elements -->
+  <div class="absolute inset-0 z-0 overflow-hidden">
+    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-300 opacity-20 blur-3xl"></div>
+    <div class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-indigo-300 opacity-20 blur-3xl"></div>
+    <div class="absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400 opacity-10 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 h-28 w-28 translate-x-1/4 translate-y-1/4 rounded-full bg-indigo-500 opacity-10 blur-xl"></div>
+  </div>
+
+  <!-- Content container -->
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="flex flex-col items-center text-center">
+      <!-- Logo and branding -->
+      <div class="mb-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 20h.01"></path>
+            <path d="M7 20v-4"></path>
+            <path d="M12 20v-8"></path>
+            <path d="M17 20V8"></path>
+            <path d="M22 4v16"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Main heading -->
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6">
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-700">
+          Rule One
+        </span> 
+        <span>Intelligent Investor</span>
+      </h1>
+
+      <!-- Subheading -->
+      <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mb-8">
+        Make smarter investment decisions using Phil Town's proven Rule One methodology
+      </p>
+
+      <!-- Search component -->
+      <div class="w-full max-w-2xl mb-10">
+        <Search />
+      </div>
+
+      <!-- Feature highlights -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 w-full max-w-5xl">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700">
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">Find Great Companies</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Discover undervalued businesses with strong moats and excellent management.</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700">
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8h1a4 4 0 1 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+          </div>
+          <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">Calculate True Value</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Determine a business's intrinsic value using growth rate and margin of safety analysis.</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700">
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">Buy With Confidence</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">Know exactly when to buy and sell with clear entry and exit points based on data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+---
+// RegionCard.astro - A component for displaying regional investment data
+interface Props {
+  region: string;
+  count: string;
+  growth: string;
+}
+
+const { region, count, growth } = Astro.props;
+
+// Determine if growth is positive
+const isPositive = growth && growth.includes('+');
+const growthClass = isPositive ? 'text-green-600' : 'text-red-600';
+
+// Region-specific background colors
+const bgColors = {
+  'North America': 'bg-blue-50',
+  'Europe': 'bg-green-50',
+  'Asia Pacific': 'bg-amber-50',
+  'Emerging Markets': 'bg-purple-50'
+};
+
+type RegionKey = 'North America' | 'Europe' | 'Asia Pacific' | 'Emerging Markets';
+
+const bgColor = bgColors[region as RegionKey] || 'bg-gray-50';
+---
+
+<div class={`rounded-lg p-6 shadow-sm border ${bgColor}`}>
+  <h3 class="text-base font-medium">{count}</h3>
+  <p class="text-sm text-gray-500">{region}</p>
+  <p class={`mt-2 text-sm font-medium ${growthClass}`}>{growth}</p>
+</div>

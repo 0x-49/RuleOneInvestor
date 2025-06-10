@@ -1,8 +1,57 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Landing from '../client/src/pages/Landing'; // Assuming Landing is a React component
+import MainLayout from '@layouts/MainLayout.astro';
+import MetricCard from '@components/MetricCard.astro';
+import RegionCard from '@components/RegionCard.astro';
+import WatchlistCard from '@components/WatchlistCard.astro';
+import GrowthRatesCard from '@components/GrowthRatesCard.astro';
+import DataQualityAlert from '@components/DataQualityAlert.astro';
+import Hero from '@components/Hero.astro';
+import OnboardingFlow from '@components/OnboardingFlow.astro';
+import ImageGallery from '@components/ImageGallery.astro';
+import StockSelector from '@components/StockSelector.astro';
 ---
 
-<Layout title="Rule One Investor">
-  <Landing client:only="react" />
-</Layout>
+<MainLayout title="Rule One Investor - Intelligent Investing Assistant">
+  <!-- Include onboarding flow for new users -->
+  <OnboardingFlow />
+  
+  <!-- Hero Section with search -->
+  <Hero />
+
+  <!-- Premium Dashboard Content -->
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your Investment Dashboard</h2>
+        <p class="text-gray-600 dark:text-gray-300">Monitor and analyze your investments with precision</p>
+      </div>
+      
+      <!-- Stock Selector with enhanced styling -->
+      <div class="mt-4 lg:mt-0 w-full lg:w-72">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3">
+          <label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Select a company</label>
+          <StockSelector />
+        </div>
+      </div>
+    </div>
+    
+    <!-- Featured Image Gallery -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <RegionCard region="North America" count="156" growth="+12.3%" />
+      <RegionCard region="Europe" count="89" growth="+6.7%" />
+      <RegionCard region="Asia Pacific" count="142" growth="+15.2%" />
+      <RegionCard region="Emerging Markets" count="36" growth="+6.8%" />
+    </div>
+    
+    <!-- Growth Rates and Watchlist Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+      <GrowthRatesCard />
+      <WatchlistCard />
+    </div>
+    
+    <!-- Data Quality Alerts -->
+    <div class="mb-10">
+      <DataQualityAlert />
+    </div>
+  </div>
+</MainLayout>

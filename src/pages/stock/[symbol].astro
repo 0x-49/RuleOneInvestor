@@ -15,7 +15,7 @@ import UserProfile from '../../components/UserProfile.astro'; // Assuming UserPr
 import PERatioAnalysis from '../../components/PERatioAnalysis.astro'; // Import PERatioAnalysis
 
 // Get the stock symbol from the URL parameter
-const { symbol } = Astro.params;
+const { symbol } = Astro.params as { symbol: string }; // Explicitly type symbol as string
 
 // Define page title
 const pageTitle = `${symbol} Analysis`;
@@ -111,10 +111,11 @@ const technicalData = {
         <FairValueGauge currentPrice={currentPrice} stickerPrice={stickerPrice} mosPrice={mosPrice} isLoading={isLoading} />
 
         <!-- Big Four Metrics -->
-        <BigFourMetrics metrics={financialData.incomeStatement} isLoading={isLoading} /> <!-- Using incomeStatement as a placeholder -->
+        {/* Pass stockSymbol to BigFourMetrics */}
+        <BigFourMetrics stockSymbol={symbol} />
 
         <!-- Dividend Analysis -->
-        <DividendAnalysis dividendData={{ annualDividends: financialData.cashFlowStatement, annualEarnings: financialData.incomeStatement, currentPrice: currentPrice }} isLoading={isLoading} /> <!-- Using cashFlowStatement and incomeStatement as placeholders -->
+        <DividendAnalysis dividendData={{ annualDividends: financialData.cashFlowStatement, annualEarnings: financialData.incomeStatement, currentPrice: currentPrice }} isLoading={isLoading} /> {/* Using cashFlowStatement and incomeStatement as placeholders */}
 
         <!-- Rule One Analysis -->
         <RuleOneAnalysis analysisData={analysisData} isLoading={isLoading} />

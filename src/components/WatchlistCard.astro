@@ -1,0 +1,28 @@
+---
+// WatchlistCard.astro - Component for displaying watchlist stocks
+import WatchlistTable from './WatchlistTable.astro';
+
+// Mock data for demonstration purposes - replace with actual data fetching
+const watchlistSymbols = ['AAPL', 'NVO'];
+---
+
+<div class="border rounded-lg shadow-sm bg-white">
+  <div class="flex justify-between items-center p-4 border-b">
+    <h3 class="text-lg font-semibold">Watchlist</h3>
+    <button class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      Manage
+    </button>
+  </div>
+
+  {watchlistSymbols.length === 0 ? (
+    <div class="p-8 text-center">
+      <p class="text-gray-500">No stocks in your watchlist</p>
+      <button class="mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Stocks</button>
+    </div>
+  ) : (
+    <WatchlistTable symbols={watchlistSymbols} />
+  )}
+</div>

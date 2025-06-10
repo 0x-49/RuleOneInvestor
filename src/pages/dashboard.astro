@@ -1,8 +1,46 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ReactDashboard from '../client/src/pages/Dashboard'; // Assuming Dashboard is a React component
+import MainLayout from '../layouts/MainLayout.astro';
+import BigFourMetrics from '../components/BigFourMetrics.astro';
+import WatchlistCard from '../components/WatchlistCard.astro'; // Assuming WatchlistCard is also on the dashboard
+import StockSelector from '../components/StockSelector.astro'; // Assuming a StockSelector component exists
+
+// Placeholder for the selected stock symbol - this should be managed by client-side state
+const selectedStockSymbol = 'AAPL'; // Replace with actual state management
+
+// In a real application, you would fetch the watchlist symbols here as well
+const watchlistSymbols = ['AAPL', 'NVO']; // Placeholder
+
 ---
 
-<Layout title="Dashboard - Rule One Investor">
-  <ReactDashboard client:only="react" />
-</Layout>
+<MainLayout title="Dashboard - Rule One Investor">
+  <div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+    <!-- Stock Selector - This will need client-side logic -->
+    <div class="mb-6">
+      <StockSelector /> {/* Assuming StockSelector handles state internally or via props */}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Big Four Growth Rates -->
+      <div>
+        {/*
+          We need a React component here to fetch data using the hook
+          and pass it to the BigFourMetrics Astro component.
+        */}
+        {/* For now, passing placeholder data */}
+        <BigFourMetrics
+          stockSymbol={selectedStockSymbol}
+        />
+      </div>
+
+      <!-- Watchlist Card -->
+      <div>
+        <WatchlistCard symbols={watchlistSymbols} /> {/* Pass watchlist symbols */}
+      </div>
+    </div>
+
+    {/* Add other dashboard components here */}
+
+  </div>
+</MainLayout>

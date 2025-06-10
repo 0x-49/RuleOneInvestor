@@ -1,0 +1,178 @@
+---
+import MainLayout from "@layouts/MainLayout.astro";
+import Hero from "@components/Hero.astro";
+import Search from "@components/Search.astro";
+import OnboardingFlow from "@components/OnboardingFlow.astro";
+import ImageGallery from "@components/ImageGallery.astro";
+import Card from "@components/ui/card.astro";
+import Notification from "@components/ui/Notification.astro";
+import MetricCard from "@components/MetricCard.astro";
+---
+
+<MainLayout title="Rule One Investor - UI Showcase">
+  <!-- Onboarding Flow (hidden by default, will show based on localStorage) -->
+  <OnboardingFlow />
+  
+  <!-- Hero Section -->
+  <section class="mb-16">
+    <h2 class="text-2xl font-bold text-center mb-6">Hero Section</h2>
+    <Hero />
+  </section>
+  
+  <!-- Search Component -->
+  <section class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-6">Advanced Search</h2>
+    <div class="max-w-xl mx-auto">
+      <Search />
+    </div>
+  </section>
+
+  <!-- Image Gallery -->
+  <section class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-6">Beautiful Image Gallery</h2>
+    <div class="max-w-4xl mx-auto">
+      <ImageGallery />
+    </div>
+  </section>
+  
+  <!-- Card Components -->
+  <section class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-6">Card Components</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <Card class="p-6 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-bold mb-2">Understanding Moats</h3>
+        <p class="text-gray-600 dark:text-gray-300 mb-4">Learn how to identify strong competitive advantages that protect a company's profits.</p>
+        <a href="#" class="text-blue-600 hover:underline font-medium flex items-center">
+          Learn more
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </Card>
+      
+      <Card class="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-bold mb-2">Management Analysis</h3>
+        <p class="text-gray-600 dark:text-gray-300 mb-4">How to evaluate whether company leaders are candid, capable, and focused on shareholder returns.</p>
+        <a href="#" class="text-blue-600 hover:underline font-medium flex items-center">
+          Learn more
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </Card>
+      
+      <Card class="p-6 border-blue-200 dark:border-blue-800 hover:shadow-lg transition-shadow">
+        <h3 class="text-lg font-bold mb-2">Margin of Safety</h3>
+        <p class="text-gray-600 dark:text-gray-300 mb-4">Why purchasing stocks at a discount to their intrinsic value is crucial for long-term success.</p>
+        <a href="#" class="text-blue-600 hover:underline font-medium flex items-center">
+          Learn more
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </Card>
+    </div>
+  </section>
+  
+  <!-- Metric Cards -->
+  <section class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-6">Metric Cards</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
+      <MetricCard 
+        title="ROIC" 
+        value="24.3%" 
+        trend="up"
+        changePercent="2.5%"
+        icon="trending-up"
+        tooltip="Return on Invested Capital measures how efficiently a company uses its capital to generate profits."
+      />
+      <MetricCard 
+        title="Equity Growth" 
+        value="18.7%" 
+        trend="up"
+        changePercent="1.2%"
+        icon="trending-up"
+        colorClass="bg-green-50 text-green-700"
+        tooltip="Year-over-year growth in shareholder equity."
+      />
+      <MetricCard 
+        title="EPS Growth" 
+        value="15.4%" 
+        trend="down"
+        changePercent="-0.8%"
+        icon="bar-chart-2"
+        colorClass="bg-yellow-50 text-yellow-700"
+        tooltip="Year-over-year growth in Earnings Per Share."
+      />
+      <MetricCard 
+        title="FCF Growth" 
+        value="12.1%" 
+        trend="up"
+        changePercent="0.5%"
+        icon="dollar-sign"
+        colorClass="bg-blue-50 text-blue-700"
+        tooltip="Year-over-year growth in Free Cash Flow."
+      />
+    </div>
+  </section>
+
+  <!-- Notifications -->
+  <section class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-6">Notification System</h2>
+    
+    <div class="max-w-3xl mx-auto space-y-4">
+      <Notification 
+        type="info" 
+        title="New Feature Available" 
+        message="Check out our new AI-powered stock screening tool to find undervalued opportunities."
+      />
+      
+      <Notification 
+        type="success" 
+        title="Watchlist Updated" 
+        message="AAPL has been successfully added to your watchlist."
+      />
+      
+      <Notification 
+        type="warning" 
+        title="Market Volatility Alert" 
+        message="We're seeing increased market volatility. Consider reviewing your portfolio allocation."
+      />
+      
+      <Notification 
+        type="error" 
+        title="Data Connection Issue" 
+        message="We're having trouble connecting to our data provider. Some metrics may be temporarily unavailable."
+      />
+    </div>
+  </section>
+  
+  <!-- Call to Action -->
+  <section class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl overflow-hidden">
+      <div class="px-6 py-8 md:p-10 flex flex-col md:flex-row items-center justify-between">
+        <div class="text-center md:text-left mb-6 md:mb-0">
+          <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Become a Rule One Investor</h3>
+          <p class="text-blue-100 text-sm md:text-base max-w-xl">Get access to advanced financial metrics, AI-powered stock analysis, and personalized investment recommendations.</p>
+        </div>
+        <button class="px-6 py-3 bg-white text-blue-700 font-medium rounded-xl shadow-sm hover:shadow-md transition-shadow whitespace-nowrap">
+          Start 14-Day Free Trial
+        </button>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  // Force show onboarding for showcase page
+  document.addEventListener('DOMContentLoaded', () => {
+    const onboardingOverlay = document.getElementById('onboarding-overlay');
+    if (onboardingOverlay) {
+      // Display onboarding with flex layout
+      onboardingOverlay.style.display = 'flex';
+      // Wait a bit and then advance to the second step for better showcase
+      setTimeout(() => {
+        const nextBtn = document.querySelector('[data-action="next"]');
+        if (nextBtn) {
+          (nextBtn as HTMLElement).click();
+        }
+      }, 1500);
+    }
+  });
+</script>

@@ -6,8 +6,8 @@
  * from Radix UI when used within Astro templates.
  */
 
-import { DialogBridge } from '@client/components/ui/ReactIslandBridge';
-import { Sheet, SheetTrigger, SheetContent } from '@client/components/ui/sheet';
+
+
 
 export interface Props {
   triggerClass?: string;
@@ -21,13 +21,6 @@ const { triggerClass, contentClass, side = 'right' } = Astro.props;
 const slot = await Astro.slots.render('default');
 ---
 
-<DialogBridge client:only="react">
-  <Sheet>
-    <SheetTrigger class={triggerClass}>
-      <slot name="trigger" />
-    </SheetTrigger>
-    <SheetContent side={side} class={contentClass}>
-      <slot />
-    </SheetContent>
-  </Sheet>
-</DialogBridge>
+<div class={contentClass}>
+  <slot />
+</div>

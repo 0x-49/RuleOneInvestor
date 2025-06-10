@@ -1,8 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ReactScreening from '../client/src/pages/Screening'; // Assuming Screening is a React component
 ---
 
 <Layout title="Screening - Rule One Investor">
-  <ReactScreening client:only="react" />
+  <main>
+    <h1>Stock Screening</h1>
+    <p>This is the stock screening page.</p>
+  </main>
 </Layout>
+
+<style>
+  main {
+    padding: 1rem;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+</style>

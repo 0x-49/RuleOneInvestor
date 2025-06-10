@@ -1,32 +1,47 @@
 ---
 import AppHeader from '../components/Header.astro'; // Updated import alias
 import Footer from '../components/Footer.astro';
-import type { UserData } from '../components/Header.astro'; // Import UserData type for clarity
+// import type { UserData } from '../components/Header.astro'; // No named export, so remove this line
 
-interface Props {
-	title: string;
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  // Add other fields as needed
 }
 
-const { title } = Astro.props;
+interface Props {
+  title: string;
+  article?: boolean;
+  isAuthenticated?: boolean;
+  user?: UserData;
+}
 
-let isAuthenticated: boolean = false;
-let user: UserData | undefined = undefined;
+const { title, isAuthenticated: isAuthenticatedProp, user: userProp } = Astro.props;
 
-try {
-  const response = await fetch(Astro.url.origin + '/api/auth/status');
-  if (response.ok) {
-    const authData = await response.json();
-    isAuthenticated = authData.isAuthenticated;
-    user = authData.user;
-  } else {
-    // Handle cases where the auth status endpoint fails or returns an error
-    console.error('Failed to fetch authentication status:', response.status);
-    // Defaults to not authenticated
+let isAuthenticated: boolean;
+let user: UserData | undefined;
+
+if (typeof isAuthenticatedProp === 'boolean' && userProp !== undefined) {
+  isAuthenticated = isAuthenticatedProp;
+  user = userProp;
+} else {
+  isAuthenticated = false;
+  user = undefined;
+  try {
+    const response = await fetch(Astro.url.origin + '/api/auth/status');
+    if (response.ok) {
+      const authData = await response.json();
+      isAuthenticated = authData.isAuthenticated;
+      user = authData.user;
+    } else {
+      console.error('Failed to fetch authentication status:', response.status);
+    }
+  } catch (error) {
+    console.error('Error fetching authentication status:', error);
   }
-} catch (error) {
-  console.error('Error fetching authentication status:', error);
-  // Defaults to not authenticated
-} 
+}
+
 ---
 
 <!doctype html>
@@ -42,7 +57,7 @@ try {
 	</head>
 	<body class="min-h-screen bg-background font-sans antialiased">
 		<div class="relative flex min-h-screen flex-col">
-			<AppHeader isAuthenticated={isAuthenticated} user={user} />
+			<AppHeader />
 			<main class="flex-1">
 				<slot />
 			</main>

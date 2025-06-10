@@ -6,12 +6,8 @@
  * from Radix UI when used within Astro templates.
  */
 
-import { DropdownBridge } from '@client/components/ui/ReactIslandBridge';
-import { 
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent
-} from '@client/components/ui/dropdown-menu';
+
+
 
 export interface Props {
   triggerClass?: string;
@@ -22,13 +18,6 @@ export interface Props {
 const { triggerClass, contentClass, align = "end" } = Astro.props;
 ---
 
-<DropdownBridge client:only="react">
-  <DropdownMenu>
-    <DropdownMenuTrigger class={triggerClass}>
-      <slot name="trigger" />
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align={align} class={contentClass}>
-      <slot />
-    </DropdownMenuContent>
-  </DropdownMenu>
-</DropdownBridge>
+<div class={contentClass}>
+  <slot />
+</div>

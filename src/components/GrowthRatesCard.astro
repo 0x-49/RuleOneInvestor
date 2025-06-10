@@ -1,0 +1,23 @@
+---
+// GrowthRatesCard.astro - Component for displaying the Big Four Growth Rates data visualization
+---
+
+<div class="border rounded-lg shadow-sm bg-white">
+  <div class="p-4 border-b">
+    <h3 class="text-lg font-semibold">The Big Four Growth Rates</h3>
+  </div>
+  <div class="p-6 flex flex-col items-center justify-center text-center" style="min-height: 240px;">
+    <div class="rounded-full bg-gray-100 p-6 mb-4 w-16 h-16 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+    <h4 class="text-lg font-medium">No Financial Data Available</h4>
+    <p class="mt-2 text-gray-500 max-w-md">
+      This stock isn't covered by our financial data providers.
+      <br>This commonly happens with smaller international stocks, recent IPOs, or companies from emerging markets.
+    </p>
+  </div>
+</div>

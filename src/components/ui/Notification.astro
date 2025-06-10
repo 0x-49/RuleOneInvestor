@@ -1,0 +1,108 @@
+---
+/**
+ * Notification.astro - Modern notification component with variants
+ * Usage: <Notification type="success" title="Success!" message="Your action was completed successfully" />
+ */
+
+export interface Props {
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  dismissible?: boolean;
+  className?: string;
+}
+
+const { 
+  type = 'info',
+  title, 
+  message, 
+  dismissible = true,
+  className = ''
+} = Astro.props;
+
+// Configure variant styles based on notification type
+const variantStyles = {
+  info: {
+    container: 'bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800',
+    icon: 'text-blue-500 dark:text-blue-400',
+    title: 'text-blue-900 dark:text-blue-100',
+    message: 'text-blue-700 dark:text-blue-300',
+    iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+  },
+  success: {
+    container: 'bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800',
+    icon: 'text-green-500 dark:text-green-400',
+    title: 'text-green-900 dark:text-green-100',
+    message: 'text-green-700 dark:text-green-300',
+    iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+  },
+  warning: {
+    container: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800',
+    icon: 'text-yellow-500 dark:text-yellow-400',
+    title: 'text-yellow-900 dark:text-yellow-100',
+    message: 'text-yellow-700 dark:text-yellow-300',
+    iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
+  },
+  error: {
+    container: 'bg-red-50 border-red-200 dark:bg-red-900/30 dark:border-red-800',
+    icon: 'text-red-500 dark:text-red-400',
+    title: 'text-red-900 dark:text-red-100',
+    message: 'text-red-700 dark:text-red-300',
+    iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`
+  }
+};
+
+const styles = variantStyles[type];
+---
+
+<div class={`notification-container rounded-xl border p-4 flex items-start space-x-3 shadow-sm transition-all ${styles.container} ${className}`} data-notification-type={type} data-dismissible={dismissible}>
+  <div class={`flex-shrink-0 ${styles.icon}`}>
+    <Fragment set:html={styles.iconSvg} />
+  </div>
+  
+  <div class="flex-1">
+    <h3 class={`text-sm font-medium ${styles.title}`}>{title}</h3>
+    <div class={`mt-1 text-sm ${styles.message}`}>
+      {message}
+      <slot />
+    </div>
+  </div>
+  
+  {dismissible && (
+    <button type="button" class="notification-dismiss flex-shrink-0 ml-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-1">
+      <span class="sr-only">Dismiss</span>
+      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  )}
+</div>
+
+<script>
+  // Find all dismissible notifications
+  document.addEventListener('DOMContentLoaded', () => {
+    const notifications = document.querySelectorAll('.notification-container[data-dismissible="true"]');
+    
+    notifications.forEach(notification => {
+      const dismissBtn = notification.querySelector('.notification-dismiss');
+      if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+          // Add fade-out animation
+          (notification as HTMLElement).style.opacity = '0';
+          (notification as HTMLElement).style.transform = 'translateY(-10px)';
+          
+          // Remove the element after animation completes
+          setTimeout(() => {
+            notification.remove();
+          }, 300);
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  .notification-container {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+</style>

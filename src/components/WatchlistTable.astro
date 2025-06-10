@@ -1,0 +1,66 @@
+---
+// src/components/WatchlistTable.astro
+import type { StockWithMetrics } from '../shared/schema'; // Assuming a shared schema for data types
+
+interface Props {
+  symbols: string[]; // Array of stock symbols in the watchlist
+}
+
+const { symbols } = Astro.props;
+
+// Fetch data for each symbol on the server
+const watchlistData: (StockWithMetrics | null)[] = await Promise.all(
+  symbols.map(async (symbol) => {
+    try {
+      // Replace with your actual API endpoint for fetching stock data
+      const response = await fetch(`${Astro.url.origin}/api/stocks/${symbol}`);
+      if (!response.ok) {
+        console.error(`Error fetching data for ${symbol}: ${response.statusText}`);
+        return null;
+      }
+      const data: StockWithMetrics = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error in fetching data for ${symbol}:`, error);
+      return null;
+    }
+  })
+);
+
+// Filter out any null values if data fetching failed for a symbol
+const validWatchlistData = watchlistData.filter(stock => stock !== null) as StockWithMetrics[];
+
+---
+
+<div class="overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Change</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      {validWatchlistData.map(stock => {
+        // Determine the color of the change text
+        const changeColorClass = stock.change >= 0 ? 'text-green-600' : 'text-red-600';
+
+        return (
+          <tr>
+            {/* Make the symbol a clickable link */}
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
+              <a href={`/stock/${stock.symbol}`}>
+                {stock.symbol}
+              </a>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{stock.name}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{`$${stock.price.toFixed(2)}`}</td>
+            <td class={`px-6 py-4 whitespace-nowrap text-sm text-right ${changeColorClass}`}>{`${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%`}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>

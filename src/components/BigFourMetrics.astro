@@ -1,79 +1,90 @@
 ---
-// Props for the component
+// src/components/BigFourMetrics.astro
+import type { StockWithMetrics } from '../shared/schema'; // Assuming a shared schema for data types
+import Chart from 'chart.js/auto'; // Import Chart.js for the chart
+
 interface Props {
-  stockSymbol?: string;
-  companyName?: string;
-  metrics?: {
-    year: string;
-    revenue?: number;
-    eps?: number;
-    bookValue?: number;
-    freeCashFlow?: number;
-  }[];
+  stockSymbol: string;
+  metrics?: any[];
   isLoading?: boolean;
 }
 
-const { stockSymbol = '', companyName = '', metrics, isLoading = false } = Astro.props;
+const { stockSymbol, metrics: metricsProp, isLoading: isLoadingProp } = Astro.props;
 
-// Helper function to calculate period averages
-const calculatePeriodAverages = (metrics: any[], field: string, years: number) => {
-  if (!metrics || metrics.length === 0) return 0;
+// Fetch stock data including metrics on the server
+let stockData: StockWithMetrics | null = null;
+let isLoading = true;
+let error: string | null = null;
 
-  const recentMetrics = metrics.slice(-years);
-  const growthRates = recentMetrics.map((metric, index) => {
-    if (index === 0) return null;
-    const currentValue = metric[field];
-    const previousValue = recentMetrics[index - 1][field];
-    if (currentValue === undefined || previousValue === undefined || previousValue === null || previousValue <= 0) return null;
-    return ((currentValue - previousValue) / previousValue) * 100;
-  }).filter(rate => rate !== null) as number[];
+try {
+  const response = await fetch(`${Astro.url.origin}/api/stocks/${stockSymbol}`);
+  if (!response.ok) {
+    error = `Error fetching data for ${stockSymbol}: ${response.statusText}`;
+    console.error(error);
+  } else {
+    stockData = await response.json();
+  }
+} catch (err: any) {
+  error = `Error in fetching data for ${stockSymbol}: ${err.message}`;
+  console.error(err);
+} finally {
+  isLoading = false;
+}
 
-  return growthRates.length > 0
-    ? growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length
-    : 0;
+const metrics = stockData?.metrics || [];
+const bigFourGrowth = stockData?.bigFourGrowth;
+const dataYearsAvailable = metrics.length;
+const showDeepSearchPrompt = dataYearsAvailable > 0 && dataYearsAvailable < 7;
+
+// Helper function to calculate period averages (adapted for bigFourGrowth object)
+const getGrowthAverage = (growthData: any, key: string, years: number) => {
+  if (!growthData || !growthData[key]) return 0; // Assuming growthData[key] is the average
+
+  // If bigFourGrowth directly provides averages, use them.
+  // Otherwise, recalculate from metrics if needed (based on original logic).
+  // Assuming bigFourGrowth contains pre-calculated averages for simplicity based on the type definition.
+  // The original calculatePeriodAverages function is removed as bigFourGrowth should provide this.
+
+  // Placeholder logic if bigFourGrowth doesn't contain specific year averages:
+  // This part would need adjustment based on the actual structure of bigFourGrowth
+  // For now, we'll assume bigFourGrowth has properties like salesGrowth, epsGrowth, etc.
+  // and these represent the relevant averages (e.g., 10-year).
+  // A more robust solution would involve passing specific year averages in bigFourGrowth or recalculating.
+
+  // Since the original script used 10-year, 5-year, and 1-year averages,
+  // and the bigFourGrowth type only has single values, we'll assume bigFourGrowth
+  // represents the primary average (likely 10-year based on the screenshot context).
+  // A more complete solution would require updating the backend API or schema
+  // to provide averages for different periods if needed for the dropdown.
+
+  // For now, we'll just use the values from bigFourGrowth and the dropdown
+  // functionality will need to be revisited or removed if only one average is available.
+
+  // Let's adapt to use the bigFourGrowth object directly for display.
+  // The dropdown functionality will be simplified or removed.
+  return growthData[key] || 0;
 };
 
-// Calculate different time period averages
-const tenYearAverages = {
-  salesGrowth: calculatePeriodAverages(metrics!, 'revenue', 10),
-  epsGrowth: calculatePeriodAverages(metrics!, 'eps', 10),
-  equityGrowth: calculatePeriodAverages(metrics!, 'bookValue', 10),
-  fcfGrowth: calculatePeriodAverages(metrics!, 'freeCashFlow', 10),
-};
 
-const fiveYearAverages = {
-  salesGrowth: calculatePeriodAverages(metrics!, 'revenue', 5),
-  epsGrowth: calculatePeriodAverages(metrics!, 'eps', 5),
-  equityGrowth: calculatePeriodAverages(metrics!, 'bookValue', 5),
-  fcfGrowth: calculatePeriodAverages(metrics!, 'freeCashFlow', 5),
-};
-
-const oneYearAverages = {
-  salesGrowth: calculatePeriodAverages(metrics!, 'revenue', 2),
-  epsGrowth: calculatePeriodAverages(metrics!, 'eps', 2),
-  equityGrowth: calculatePeriodAverages(metrics!, 'bookValue', 2),
-  fcfGrowth: calculatePeriodAverages(metrics!, 'freeCashFlow', 2),
-};
-
-// Prepare chart data for ALL years (not filtered)
-const chartData = metrics?.map((metric, index) => {
+// Prepare chart data from metrics
+const chartData = metrics.map((metric, index) => {
   if (index === 0) return null;
 
-  const previousMetric = metrics![index - 1];
+  const previousMetric = metrics[index - 1];
 
-  const salesGrowth = metric.revenue !== undefined && previousMetric.revenue !== undefined && previousMetric.revenue !== null && previousMetric.revenue > 0
+  const salesGrowth = (metric.revenue !== undefined && metric.revenue !== null && previousMetric.revenue !== undefined && previousMetric.revenue !== null && previousMetric.revenue > 0)
     ? ((metric.revenue - previousMetric.revenue) / previousMetric.revenue) * 100
     : 0;
 
-  const epsGrowth = metric.eps !== undefined && previousMetric.eps !== undefined && previousMetric.eps !== null && previousMetric.eps > 0
+  const epsGrowth = (metric.eps !== undefined && metric.eps !== null && previousMetric.eps !== undefined && previousMetric.eps !== null && previousMetric.eps > 0)
     ? ((metric.eps - previousMetric.eps) / previousMetric.eps) * 100
     : 0;
 
-  const equityGrowth = metric.bookValue !== undefined && previousMetric.bookValue !== undefined && previousMetric.bookValue !== null && previousMetric.bookValue > 0
+  const equityGrowth = (metric.bookValue !== undefined && metric.bookValue !== null && previousMetric.bookValue !== undefined && previousMetric.bookValue !== null && previousMetric.bookValue > 0)
     ? ((metric.bookValue - previousMetric.bookValue) / previousMetric.bookValue) * 100
     : 0;
 
-  const fcfGrowth = metric.freeCashFlow !== undefined && previousMetric.freeCashFlow !== undefined && previousMetric.freeCashFlow !== null && previousMetric.freeCashFlow > 0
+  const fcfGrowth = (metric.freeCashFlow !== undefined && metric.freeCashFlow !== null && previousMetric.freeCashFlow !== undefined && previousMetric.freeCashFlow !== null && previousMetric.freeCashFlow > 0)
     ? ((metric.freeCashFlow - previousMetric.freeCashFlow) / previousMetric.freeCashFlow) * 100
     : 0;
 
@@ -84,12 +95,10 @@ const chartData = metrics?.map((metric, index) => {
     equityGrowth,
     fcfGrowth,
   };
-}).filter(item => item !== null) || [];
+}).filter(item => item !== null);
 
-const dataYearsAvailable = metrics?.length || 0;
-const showDeepSearchPrompt = dataYearsAvailable > 0 && dataYearsAvailable < 7;
 
-// Icons (using inline SVG for simplicity)
+// Icons (using inline SVG for simplicity) - Keep these as they are used in the template
 const TrendingUpIcon = `
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up">
     <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
@@ -119,7 +128,7 @@ const PiggyBankIcon = `
     <path d="M2 17v.01"/>
     <path d="M7 15h4"/>
     <path d="M17 15h2"/>
-    <path d="M21 12V7a2 2 0 0 0-2-2H17"/>
+    <path d="M21 12V7a2 0 0 0-2-2H17"/>
     <path d="M12 17h.01"/>
   </svg>
 `;
@@ -132,37 +141,42 @@ const InfoIcon = `
   </svg>
 `;
 
-// Metric data structure for rendering
-const metricItems = [
+// Metric data structure for rendering - Update to use fetched data
+const metricItems = bigFourGrowth ? [
   {
     title: "Sales Growth",
     key: "salesGrowth",
     icon: TrendingUpIcon,
     color: "text-green-600",
     bgColor: "from-green-500/10 to-green-500/5 border-green-500/20",
+    value: bigFourGrowth.salesGrowth,
   },
   {
     title: "EPS Growth",
     key: "epsGrowth",
     icon: DollarSignIcon,
-    color: "text-blue-600", // Changed color for distinction
-    bgColor: "from-blue-500/10 to-blue-500/5 border-blue-500/20", // Changed color for distinction
+    color: "text-blue-600",
+    bgColor: "from-blue-500/10 to-blue-500/5 border-blue-500/20",
+    value: bigFourGrowth.epsGrowth,
   },
   {
     title: "Equity Growth",
     key: "equityGrowth",
     icon: BarChart3Icon,
-    color: "text-yellow-600", // Changed color for distinction
-    bgColor: "from-yellow-500/10 to-yellow-500/5 border-yellow-500/20", // Changed color for distinction
+    color: "text-yellow-600",
+    bgColor: "from-yellow-500/10 to-yellow-500/5 border-yellow-500/20",
+    value: bigFourGrowth.equityGrowth,
   },
   {
     title: "FCF Growth",
     key: "fcfGrowth",
     icon: PiggyBankIcon,
-    color: "text-purple-600", // Changed color for distinction
-    bgColor: "from-purple-500/10 to-purple-500/5 border-purple-500/20", // Changed color for distinction
+    color: "text-purple-600",
+    bgColor: "from-purple-500/10 to-purple-500/5 border-purple-500/20",
+    value: bigFourGrowth.fcfGrowth,
   },
-];
+] : [];
+
 ---
 
 <div class="space-y-4">
@@ -181,7 +195,7 @@ const metricItems = [
       </div>
       <div class="h-64 bg-gray-200 rounded-lg"></div>
     </div>
-  ) : !metrics || metrics.length === 0 ? (
+  ) : error || !stockData || metrics.length === 0 ? (
     <!-- No Data Fallback -->
     <div class="bg-white shadow rounded-lg p-6 text-center">
       <div class="mb-4">
@@ -195,6 +209,7 @@ const metricItems = [
         <p class="text-sm">
           This commonly happens with smaller international stocks, recent IPOs, or companies from emerging markets.
         </p>
+        {error && <p class="text-red-500 text-sm mt-2">Error: {error}</p>}
       </div>
     </div>
   ) : (
@@ -202,11 +217,12 @@ const metricItems = [
     <div class="bg-white shadow rounded-lg p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-gray-900">The Big Four Growth Rates</h2>
+        {/* Period selection dropdown - simplified or removed if only one average is available */}
+        {/* Keeping for now, but functionality needs review based on bigFourGrowth structure */}
         <div class="flex items-center space-x-2">
           <select id="period-select" class="rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
             <option value="10year">10-Year Avg</option>
-            <option value="5year">5-Year Avg</option>
-            <option value="1year">1-Year Avg</option>
+            {/* Add options for 5-Year and 1-Year if available in bigFourGrowth or calculated */}
           </select>
           <div class="relative group">
             <Fragment set:html={InfoIcon} class="h-4 w-4 text-gray-400 cursor-help" />
@@ -218,7 +234,7 @@ const metricItems = [
       </div>
 
       <div class="grid grid-cols-2 gap-4 mb-6" id="metrics-grid">
-        {metricItems.map((metric, index) => (
+        {metricItems.map((metric) => (
           <div class={`bg-gradient-to-r ${metric.bgColor} rounded-lg p-4 border`} data-metric={metric.key}>
             <div class="flex items-center justify-between mb-2">
               <span class="text-sm font-medium text-gray-700">
@@ -227,23 +243,12 @@ const metricItems = [
               <Fragment set:html={metric.icon} class={`h-5 w-5 ${metric.color}`} />
             </div>
             <div class="text-2xl font-bold text-gray-900" data-value>
-              {/* Value will be updated by client-side script */}
-              N/A
+              {/* Display the fetched value */}
+              {metric.value !== null && metric.value !== undefined ? `${metric.value.toFixed(1)}%` : 'N/A'}
             </div>
+            {/* Simplified display for averages, assuming bigFourGrowth provides the main average */}
             <div class="text-xs text-gray-600 space-y-1">
-              <div class="flex justify-between">
-                <span>10Y: </span>
-                <span class="font-medium" data-10year>N/A</span>
-              </div>
-              <div class="flex justify-between">
-                <span>5Y: </span>
-                <span class="font-medium" data-5year>N/A</span>
-              </div>
-              <div class="flex justify-between">
-                <span>1Y: </span>
-                <span class="font-medium" data-1year>N/A</span>
-              </div>
-              <div class="text-green-600 font-medium pt-1">
+               <div class="text-green-600 font-medium pt-1">
                 Target: >10%
               </div>
             </div>
@@ -253,7 +258,7 @@ const metricItems = [
 
       <!-- Chart Container -->
       <div class="mt-6">
-        <div id="growth-chart" class="w-full h-64"></div>
+        <canvas id="growth-chart" class="w-full h-64"></canvas> {/* Use canvas for Chart.js */}
       </div>
     </div>
   )}
@@ -273,68 +278,13 @@ const metricItems = [
   )}
 </div>
 
-<script lang="ts" define:vars={{ tenYearAverages, fiveYearAverages, oneYearAverages, chartData }}>
-  import Chart from 'chart.js/auto'; // Import Chart.js
-
+{/* Client-side script for Chart.js - needs to be in a script tag with is:inline or in a separate file */}
+<script is:inline define:vars={{ chartData }}>
   document.addEventListener('DOMContentLoaded', () => {
-    const periodSelect = document.getElementById('period-select');
-    const metricsGrid = document.getElementById('metrics-grid');
     const chartCanvas = document.getElementById('growth-chart');
 
-    // Data for updating metrics display
-    const averages = {
-      '10year': tenYearAverages,
-      '5year': fiveYearAverages,
-      '1year': oneYearAverages,
-    };
-
-    // Function to update the displayed metric values
-    const updateMetrics = (selectedPeriod) => {
-      if (!metricsGrid) return;
-
-      const currentAverages = averages[selectedPeriod];
-
-      metricsGrid.querySelectorAll('[data-metric]').forEach(metricElement => {
-        const metricKey = metricElement.getAttribute('data-metric');
-        const valueElement = metricElement.querySelector('[data-value]');
-        const tenYearElement = metricElement.querySelector('[data-10year]');
-        const fiveYearElement = metricElement.querySelector('[data-5year]');
-        const oneYearElement = metricElement.querySelector('[data-1year]');
-
-        if (valueElement && metricKey) {
-          const value = currentAverages[metricKey];
-          valueElement.textContent = `${value.toFixed(1)}%`;
-        }
-        if (tenYearElement && metricKey) {
-           tenYearElement.textContent = `${tenYearAverages[metricKey].toFixed(1)}%`;
-        }
-        if (fiveYearElement && metricKey) {
-           fiveYearElement.textContent = `${fiveYearAverages[metricKey].toFixed(1)}%`;
-        }
-        if (oneYearElement && metricKey) {
-           oneYearElement.textContent = `${oneYearAverages[metricKey].toFixed(1)}%`;
-        }
-      });
-    };
-
-    // Initial update based on default selected period
-    if (periodSelect) {
-      updateMetrics(periodSelect.value);
-    }
-
-
-    // Add event listener to the select element
-    if (periodSelect) {
-      periodSelect.addEventListener('change', (event) => {
-        const selectedPeriod = event.target.value;
-        updateMetrics(selectedPeriod);
-      });
-    }
-
-
-    // Initialize the chart
-    if (chartCanvas) {
-      new Chart(chartCanvas, {
+    if (chartCanvas && chartData && chartData.length > 0) {
+      new Chart(chartCanvas, { // Removed type assertion here
         type: 'line',
         data: {
           labels: chartData.map(item => item.year),

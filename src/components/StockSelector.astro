@@ -53,13 +53,14 @@ const popularStocks = [
 {onStockSelect && (
   <script lang="ts" define:vars={{ onStockSelect }}>
     document.addEventListener('DOMContentLoaded', () => {
-      const stockSelect = document.getElementById('stock-select') as HTMLSelectElement | null;
+      const stockSelect = document.getElementById('stock-select');
 
       if (stockSelect) {
         stockSelect.addEventListener('change', (event) => {
-          const selectedSymbol = stockSelect.value;
-          // Call the onStockSelect function passed from the parent Astro page
-          onStockSelect(selectedSymbol);
+          const target = event.target;
+          if(target instanceof HTMLSelectElement) {
+            window.location.href = `/stock/${target.value}`;
+          }
         });
       }
     });

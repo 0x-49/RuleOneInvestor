@@ -1,0 +1,44 @@
+---
+// MetricCard.astro - A component for displaying key metrics with icons
+interface Props {
+  title: string;
+  value: string;
+  icon: string;
+  color?: 'blue' | 'green' | 'purple' | 'orange';
+  trend?: string;
+  changePercent?: string;
+  colorClass?: string;
+  tooltip?: string;
+}
+
+const { title, value, icon, color = 'blue', trend, changePercent, colorClass, tooltip } = Astro.props;
+
+// Color mapping for the different card styles
+const colorClasses = {
+  blue: "bg-blue-50 border-blue-200 text-blue-600",
+  green: "bg-green-50 border-green-200 text-green-600",
+  purple: "bg-purple-50 border-purple-200 text-purple-600",
+  orange: "bg-orange-50 border-orange-200 text-orange-600"
+};
+
+// Icon mapping
+type IconKey = 'globe' | 'check-circle' | 'award' | 'trending-up';
+
+const iconMapping: Record<IconKey, string> = {
+  globe: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+  "check-circle": `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+  award: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
+  "trending-up": `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>`
+};
+---
+
+<div class={`rounded-lg border p-6 shadow-sm ${colorClasses[color]}`}>
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-medium">{title}</h3>
+    <div class="rounded-full p-1 opacity-80">
+      <!-- Render the icon based on the icon prop -->
+      <Fragment set:html={iconMapping[icon as IconKey] || ''} />
+    </div>
+  </div>
+  <p class="mt-3 text-3xl font-bold">{value}</p>
+</div>

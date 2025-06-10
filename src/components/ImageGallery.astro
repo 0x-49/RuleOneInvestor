@@ -1,0 +1,59 @@
+---
+// ImageGallery.astro - Beautiful financial imagery component
+---
+
+<div class="image-gallery overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900">
+  <div class="grid grid-cols-2 gap-2 p-2 md:grid-cols-4 md:gap-4 md:p-4">
+    <!-- Featured large image -->
+    <div class="col-span-2 row-span-2 overflow-hidden rounded-xl shadow-lg transition-transform hover:scale-[1.02]">
+      <img 
+        src="/images/stock-market-bull.jpg" 
+        alt="Bull market visualization"
+        class="h-full w-full object-cover transition-transform hover:scale-105"
+        onerror="this.src='https://images.unsplash.com/photo-1611974789855-9c2a0a7236e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'; this.onerror=null;"
+      />
+    </div>
+    
+    <!-- Small images -->
+    <div class="overflow-hidden rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+      <img 
+        src="/images/finance-chart.jpg" 
+        alt="Financial chart"
+        class="h-full w-full object-cover transition-transform hover:scale-105"
+        onerror="this.src='https://images.unsplash.com/photo-1559526324-593bc073d938?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'; this.onerror=null;"
+      />
+    </div>
+    
+    <div class="overflow-hidden rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+      <img 
+        src="/images/stock-analysis.jpg" 
+        alt="Stock analysis"
+        class="h-full w-full object-cover transition-transform hover:scale-105"
+        onerror="this.src='https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'; this.onerror=null;"
+      />
+    </div>
+    
+    <div class="overflow-hidden rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+      <img 
+        src="/images/investing-concept.jpg" 
+        alt="Investment concept"
+        class="h-full w-full object-cover transition-transform hover:scale-105"
+        onerror="this.src='https://images.unsplash.com/photo-1633158829875-e5316a358c6c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'; this.onerror=null;"
+      />
+    </div>
+    
+    <div class="overflow-hidden rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+      <img 
+        src="/images/financial-growth.jpg" 
+        alt="Financial growth"
+        class="h-full w-full object-cover transition-transform hover:scale-105"
+        onerror="this.src='https://images.unsplash.com/photo-1604594849809-dfedbc827105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'; this.onerror=null;"
+      />
+    </div>
+  </div>
+  
+  <div class="mx-4 mb-4 mt-2 text-center">
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Rule #1: Don't lose money</h3>
+    <p class="text-sm text-gray-600 dark:text-gray-300">Powered by Phil Town's investment methodology</p>
+  </div>
+</div>

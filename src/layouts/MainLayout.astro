@@ -7,16 +7,32 @@ export interface Props {
   description?: string;
   image?: string;
   type?: string;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 
 const { 
   title, 
   description = "Rule One Investor - Intelligent value investing tools and insights", 
   image = "/social-card.jpg",
-  type = "website" 
+  type = "website",
+  hideHeader = false,
+  hideFooter = false
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// Navigation items for both desktop and mobile menus
+const navigationItems = [
+  { label: "Home", href: "/", icon: "home" },
+  { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
+  { label: "Watchlist", href: "/watchlist", icon: "star" },
+  { label: "Stock Analysis", href: "/stock-analysis", icon: "chart" },
+  { label: "Screener", href: "/screener", icon: "search" },
+  { label: "Market Overview", href: "/market", icon: "pie-chart" }
+];
+
+// Determine if current path matches a navigation item
+const currentPath = Astro.url.pathname;
+const canonicalURL = new URL(currentPath, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -38,14 +54,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonicalURL}>
     <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
-    <meta property="og:image" content={new URL(image, Astro.url)}>
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content={canonicalURL}>
-    <meta property="twitter:title" content={title}>
-    <meta property="twitter:description" content={description}>
-    <meta property="twitter:image" content={new URL(image, Astro.url)}>
+  <meta property="og:image" content={new URL(image && typeof image === 'string' ? image : '/social-card.jpg', Astro.url)}>
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content={canonicalURL}>
+  <meta property="twitter:title" content={title}>
+  <meta property="twitter:description" content={description}>
+  <meta property="twitter:image" content={new URL(image && typeof image === 'string' ? image : '/social-card.jpg', Astro.url)}>
     
     <!-- Preload critical assets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,131 +72,212 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <slot name="head"/>
   </head>
   <body class="min-h-screen flex flex-col bg-background text-foreground">
-    <header class="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div class="container-outer flex h-16 items-center justify-between">
-        <div class="flex items-center gap-6">
-          <a href="/" class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 20h.01"></path>
-              <path d="M7 20v-4"></path>
-              <path d="M12 20v-8"></path>
-              <path d="M17 20V8"></path>
-              <path d="M22 4v16"></path>
-            </svg>
-            <span class="font-bold text-xl">Rule One Investor</span>
-          </a>
+    {!hideHeader && (
+      <header class="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container mx-auto px-4 flex h-16 items-center justify-between">
+          <div class="flex items-center gap-2 sm:gap-6">
+            <a href="/" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+              <div class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 20h.01"></path>
+                  <path d="M7 20v-4"></path>
+                  <path d="M12 20v-8"></path>
+                  <path d="M17 20V8"></path>
+                  <path d="M22 4v16"></path>
+                </svg>
+              </div>
+              <div class="hidden sm:block">
+                <h1 class="text-lg font-bold text-gray-900 dark:text-white">
+                  Rule One Assistant
+                </h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+                  Phil Town's Investment Method
+                </p>
+              </div>
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden lg:flex items-center space-x-1">
+              {navigationItems.map((item) => (
+                <a 
+                  href={item.href} 
+                  class={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentPath === item.href ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                >
+                  <span>{item.label}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
           
-          <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <a href="/" class="transition-colors hover:text-primary">Home</a>
-            <a href="/dashboard" class="transition-colors hover:text-primary">Dashboard</a>
-            <a href="/watchlist" class="transition-colors hover:text-primary">Watchlist</a>
-            <a href="/stock-analysis" class="transition-colors hover:text-primary">Stock Analysis</a>
-            <a href="/screener" class="transition-colors hover:text-primary">Screener</a>
-            <a href="/blog" class="transition-colors hover:text-primary">Blog</a>
-          </nav>
+          <!-- Right Side - Search & User -->
+          <div class="flex items-center space-x-3">
+            <!-- Search Quick Access (hidden on mobile) -->
+            <a href="/search" class="hidden md:flex items-center px-3 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              Search Stocks
+            </a>
+            
+            <!-- Sign In Button -->
+            <button type="button" class="hidden sm:inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700 h-9 px-4 py-2">
+              Sign In
+            </button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button type="button" class="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700" aria-label="Toggle Menu" id="menu-toggle">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
         
-        <div class="flex items-center space-x-2">
-          <button type="button" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2">
-            Sign In
-          </button>
-          
-          <button type="button" class="lg:hidden" aria-label="Toggle Menu" id="menu-toggle">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+        <!-- Mobile Menu (hidden by default) -->
+        <div class="mobile-menu hidden border-t" id="mobile-menu">
+          <div class="px-4 py-2 space-y-1">
+            {navigationItems.map((item) => (
+              <a 
+                href={item.href} 
+                class={`block px-3 py-2 rounded-md text-base font-medium ${currentPath === item.href ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+              >
+                <div class="flex items-center">
+                  <!-- Display icon based on the icon name -->
+                  {item.icon === "home" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                  )}
+                  {item.icon === "dashboard" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                  )}
+                  {item.icon === "star" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  )}
+                  {item.icon === "chart" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="20" x2="18" y2="10"></line>
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                  )}
+                  {item.icon === "search" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  )}
+                  {item.icon === "pie-chart" && (
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                      <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                    </svg>
+                  )}
+                  <span>{item.label}</span>
+                </div>
+              </a>
+            ))}
+  
+            <!-- Mobile-only Sign In button -->
+            <div class="pt-4 pb-2 border-t sm:hidden">
+              <button type="button" class="w-full flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2">
+                Sign In
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <div class="mobile-menu hidden lg:hidden border-t" id="mobile-menu">
-        <div class="container-outer py-4">
-          <nav class="flex flex-col space-y-1">
-            <a href="/" class="mobile-nav-item">Home</a>
-            <a href="/dashboard" class="mobile-nav-item">Dashboard</a>
-            <a href="/watchlist" class="mobile-nav-item">Watchlist</a>
-            <a href="/stock-analysis" class="mobile-nav-item">Stock Analysis</a>
-            <a href="/screener" class="mobile-nav-item">Screener</a>
-            <a href="/blog" class="mobile-nav-item">Blog</a>
-          </nav>
-        </div>
-      </div>
-    </header>
+      </header>
+    )}
     
     <main class="flex-grow">
-      <slot />
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <slot />
+      </div>
     </main>
     
-    <footer class="border-t bg-muted">
-      <div class="container-outer py-10 md:py-16">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-          <div>
-            <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 20h.01"></path>
-                <path d="M7 20v-4"></path>
-                <path d="M12 20v-8"></path>
-                <path d="M17 20V8"></path>
-                <path d="M22 4v16"></path>
-              </svg>
-              <span class="font-bold text-lg">Rule One Investor</span>
+    {!hideFooter && (
+      <footer class="border-t bg-gray-50 dark:bg-gray-800">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            <div>
+              <div class="flex items-center space-x-2 mb-4">
+                <div class="flex items-center justify-center w-7 h-7 bg-blue-600 rounded-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                  </svg>
+                </div>
+                <span class="font-bold text-gray-800 dark:text-white">Rule One Investor</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Intelligent tools and insights for value investors following the principles of Rule One investing.
+              </p>
             </div>
-            <p class="mt-4 text-sm text-muted-foreground">
-              Intelligent tools and insights for value investors following the principles of Rule One investing.
-            </p>
+            
+            <div>
+              <h4 class="font-semibold text-sm mb-4 text-gray-800 dark:text-white">Features</h4>
+              <ul class="space-y-2 text-sm">
+                <li><a href="/dashboard" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Dashboard</a></li>
+                <li><a href="/watchlist" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Watchlist</a></li>
+                <li><a href="/stock-analysis" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Stock Analysis</a></li>
+                <li><a href="/screener" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Screener</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-semibold text-sm mb-4 text-gray-800 dark:text-white">Resources</h4>
+              <ul class="space-y-2 text-sm">
+                <li><a href="/blog" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Blog</a></li>
+                <li><a href="/learning" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Learning Center</a></li>
+                <li><a href="/faq" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">FAQ</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-semibold text-sm mb-4 text-gray-800 dark:text-white">Stay Updated</h4>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Subscribe to our newsletter for investing insights.
+              </p>
+              <form class="relative">
+                <input 
+                  type="email" 
+                  placeholder="Email address" 
+                  class="w-full py-2 px-3 text-sm rounded-md border bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button 
+                  type="submit"
+                  class="absolute right-1 top-1 rounded-md px-3 py-1 text-xs bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
           </div>
           
-          <div>
-            <h4 class="font-semibold text-sm mb-4">Features</h4>
-            <ul class="space-y-2 text-sm">
-              <li><a href="/dashboard" class="text-muted-foreground hover:text-foreground">Dashboard</a></li>
-              <li><a href="/watchlist" class="text-muted-foreground hover:text-foreground">Watchlist</a></li>
-              <li><a href="/stock-analysis" class="text-muted-foreground hover:text-foreground">Stock Analysis</a></li>
-              <li><a href="/screener" class="text-muted-foreground hover:text-foreground">Screener</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 class="font-semibold text-sm mb-4">Resources</h4>
-            <ul class="space-y-2 text-sm">
-              <li><a href="/blog" class="text-muted-foreground hover:text-foreground">Blog</a></li>
-              <li><a href="/learning" class="text-muted-foreground hover:text-foreground">Learning Center</a></li>
-              <li><a href="/faq" class="text-muted-foreground hover:text-foreground">FAQ</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 class="font-semibold text-sm mb-4">Stay Updated</h4>
-            <p class="text-sm text-muted-foreground mb-4">
-              Subscribe to our newsletter for investing insights.
-            </p>
-            <form class="relative">
-              <input 
-                type="email" 
-                placeholder="Email address" 
-                class="w-full py-2 px-3 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button 
-                type="submit"
-                class="absolute right-1 top-1 rounded-md px-3 py-1 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                Subscribe
-              </button>
-            </form>
+          <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+            <div class="flex space-x-6 mb-4 md:mb-0">
+              <a href="/privacy-policy" class="hover:text-blue-600 dark:hover:text-blue-400">Privacy Policy</a>
+              <a href="/terms-of-service" class="hover:text-blue-600 dark:hover:text-blue-400">Terms of Service</a>
+              <a href="/contact" class="hover:text-blue-600 dark:hover:text-blue-400">Contact</a>
+            </div>
+            
+            <p>&copy; {new Date().getFullYear()} Rule One Investor. All rights reserved.</p>
           </div>
         </div>
-        
-        <div class="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <div class="flex space-x-6 mb-4 md:mb-0">
-            <a href="/privacy-policy" class="hover:text-foreground">Privacy Policy</a>
-            <a href="/terms-of-service" class="hover:text-foreground">Terms of Service</a>
-            <a href="/contact" class="hover:text-foreground">Contact</a>
-          </div>
-          
-          <p>&copy; {new Date().getFullYear()} Rule One Investor. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    )}
     
     <script>
       // Mobile menu toggle functionality
